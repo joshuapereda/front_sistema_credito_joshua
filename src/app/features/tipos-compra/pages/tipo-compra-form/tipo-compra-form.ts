@@ -1,11 +1,12 @@
 import { Component, computed, inject, input } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { PageHeader } from '@/app/shared/components/page-header/page-header';
+import { EmptyState } from '@/app/shared/components/empty-state/empty-state';
 import { TipoCompraService } from '../../services/tipo-compra.service';
 
 @Component({
   selector: 'app-tipo-compra-form',
-  imports: [RouterLink, PageHeader],
+  imports: [RouterLink, PageHeader, EmptyState],
   templateUrl: './tipo-compra-form.html',
 })
 export class TipoCompraForm {

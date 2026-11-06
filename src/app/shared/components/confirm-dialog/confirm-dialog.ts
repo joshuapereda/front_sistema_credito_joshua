@@ -16,8 +16,8 @@ import { Component, input, output } from '@angular/core';
 })
 export class ConfirmDialog {
   readonly abierto = input(false);
-  readonly titulo = input('Confirmar');
-  readonly mensaje = input('¿Estás seguro?');
+  readonly titulo = input('¿Eliminar este registro?');
+  readonly mensaje = input('Esta acción no se puede deshacer.');
   readonly textoConfirmar = input('Eliminar');
 
   readonly confirmar = output<void>();

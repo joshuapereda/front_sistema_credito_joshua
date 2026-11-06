@@ -1,11 +1,12 @@
 import { Component, inject, input } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { PageHeader } from '@/app/shared/components/page-header/page-header';
+import { EmptyState } from '@/app/shared/components/empty-state/empty-state';
 import { CompraService } from '../../services/compra.service';
 
 @Component({
   selector: 'app-compra-detalle',
-  imports: [RouterLink, PageHeader],
+  imports: [RouterLink, PageHeader, EmptyState],
   templateUrl: './compra-detalle.html',
 })
 export class CompraDetalle {

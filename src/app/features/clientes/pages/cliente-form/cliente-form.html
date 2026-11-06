@@ -1,6 +1,9 @@
-<app-page-header [titulo]="esEdicion() ? 'Editar cliente' : 'Nuevo cliente'">
+<app-page-header antetitulo="Clientes" [titulo]="esEdicion() ? 'Editar cliente' : 'Nuevo cliente'">
   <a class="btn btn-secondary" routerLink="/clientes">Volver</a>
 </app-page-header>
 
-<!-- TODO: formulario (.card, .label, .input, .btn) -->
-<div class="card text-sm text-gray-500">Formulario pendiente de implementar</div>
+<!-- TODO: formulario dentro de <div class="card"> usando .label, .input, .error-text y .btn -->
+<app-empty-state
+  titulo="Formulario pendiente"
+  mensaje="Aquí van los campos de cliente y los botones Guardar y Cancelar."
+/>

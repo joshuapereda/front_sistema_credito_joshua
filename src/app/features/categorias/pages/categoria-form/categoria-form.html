@@ -1,6 +1,12 @@
-<app-page-header [titulo]="esEdicion() ? 'Editar categoría' : 'Nueva categoría'">
+<app-page-header
+  antetitulo="Categorías"
+  [titulo]="esEdicion() ? 'Editar categoría' : 'Nueva categoría'"
+>
   <a class="btn btn-secondary" routerLink="/categorias">Volver</a>
 </app-page-header>
 
-<!-- TODO: formulario (.card, .label, .input, .btn) -->
-<div class="card text-sm text-gray-500">Formulario pendiente de implementar</div>
+<!-- TODO: formulario dentro de <div class="card"> usando .label, .input, .error-text y .btn -->
+<app-empty-state
+  titulo="Formulario pendiente"
+  mensaje="Aquí van los campos de categoría y los botones Guardar y Cancelar."
+/>

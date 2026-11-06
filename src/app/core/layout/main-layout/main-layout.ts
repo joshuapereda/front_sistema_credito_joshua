@@ -1,5 +1,10 @@
-import { Component } from '@angular/core';
-import { RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
+import { Component, computed, inject, signal } from '@angular/core';
+import { DatePipe } from '@angular/common';
+import { NavigationEnd, Router, RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
+import { toSignal } from '@angular/core/rxjs-interop';
+import { filter, map } from 'rxjs';
+import { AuthService } from '@/app/core/services/auth.service';
+import { BrandMark } from '@/app/shared/components/brand-mark/brand-mark';
 
 interface MenuItem {
   label: string;
@@ -13,10 +18,35 @@ interface MenuGrupo {
 
 @Component({
   selector: 'app-main-layout',
-  imports: [RouterOutlet, RouterLink, RouterLinkActive],
+  imports: [RouterOutlet, RouterLink, RouterLinkActive, DatePipe, BrandMark],
   templateUrl: './main-layout.html',
 })
 export class MainLayout {
+  private readonly authService = inject(AuthService);
+  private readonly router = inject(Router);
+
+  protected readonly hoy = new Date();
+  protected readonly usuario = this.authService.usuario;
+  protected readonly inicial = computed(() => (this.usuario() ?? '?').charAt(0).toUpperCase());
+
+  /** Menú lateral abierto en pantallas chicas */
+  protected readonly menuAbierto = signal(false);
+
+  /** Grupo del menú al que pertenece la ruta actual (se muestra en la barra superior) */
+  private readonly urlActual = toSignal(
+    this.router.events.pipe(
+      filter((e) => e instanceof NavigationEnd),
+      map((e) => e.urlAfterRedirects),
+    ),
+    { initialValue: this.router.url },
+  );
+  protected readonly seccionActual = computed(() => {
+    const url = this.urlActual();
+    const grupo = this.menu.find((g) => g.items.some((i) => url.startsWith(i.ruta)));
+    const item = grupo?.items.find((i) => url.startsWith(i.ruta));
+    return { grupo: grupo?.titulo ?? '', item: item?.label ?? '' };
+  });
+
   // Al crear una feature nueva: agregar su ruta en app.routes.ts y su item aquí
   protected readonly menu: MenuGrupo[] = [
     {
@@ -48,4 +78,8 @@ export class MainLayout {
       ],
     },
   ];
+
+  cerrarSesion(): void {
+    this.authService.logout();
+  }
 }

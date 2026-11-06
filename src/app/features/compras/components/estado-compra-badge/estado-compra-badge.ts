@@ -1,18 +1,25 @@
 import { Component, computed, input } from '@angular/core';
 import { EstadoCompra } from '../../models/compra.model';
 
-/** Etiqueta de color para el estado de una compra: <app-estado-compra-badge [estado]="compra.estado" /> */
+/** Estado de una compra: <app-estado-compra-badge [estado]="compra.estado" /> */
 @Component({
   selector: 'app-estado-compra-badge',
-  template: `<span class="rounded-full px-2.5 py-0.5 text-xs font-semibold" [class]="clases()">{{
-    texto()
-  }}</span>`,
+  template: `
+    <span
+      class="inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 font-mono text-[10.5px] font-medium tracking-[0.1em] uppercase"
+      [class]="estilo().fondo"
+    >
+      <span class="size-1.5 rounded-full" [class]="estilo().punto"></span>
+      {{ estilo().texto }}
+    </span>
+  `,
 })
 export class EstadoCompraBadge {
   readonly estado = input.required<EstadoCompra>();
 
-  protected readonly texto = computed(() => (this.estado() === 'PAGADO' ? 'Pagado' : 'Pendiente'));
-  protected readonly clases = computed(() =>
-    this.estado() === 'PAGADO' ? 'bg-emerald-100 text-emerald-700' : 'bg-amber-100 text-amber-700',
+  protected readonly estilo = computed(() =>
+    this.estado() === 'PAGADO'
+      ? { texto: 'Pagado', fondo: 'bg-ok-soft text-ok', punto: 'bg-ok' }
+      : { texto: 'Pendiente', fondo: 'bg-warn-soft text-warn', punto: 'bg-warn' },
   );
 }

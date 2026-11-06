@@ -1,10 +1,21 @@
 @if (abierto()) {
-  <div class="fixed inset-0 z-40 flex items-center justify-center bg-black/40 p-4">
-    <div role="dialog" aria-modal="true" class="card w-full max-w-sm">
-      <h2 class="text-lg font-semibold text-gray-900">{{ titulo() }}</h2>
-      <p class="mt-2 text-sm text-gray-600">{{ mensaje() }}</p>
-      <div class="mt-6 flex justify-end gap-2">
-        <button type="button" class="btn btn-secondary" (click)="cancelar.emit()">Cancelar</button>
+  <div
+    class="fixed inset-0 z-50 flex items-end justify-center bg-ink/45 p-4 backdrop-blur-[2px] sm:items-center"
+    (click)="cancelar.emit()"
+  >
+    <div
+      role="alertdialog"
+      aria-modal="true"
+      class="rise w-full max-w-[400px] rounded-[10px] border border-line bg-surface p-6 shadow-[0_24px_60px_-12px_rgb(27_26_22/0.35)]"
+      (click)="$event.stopPropagation()"
+    >
+      <p class="eyebrow text-danger!">Confirmar acción</p>
+      <h2 class="mt-2 font-display text-[24px] leading-tight font-[420] tracking-[-0.02em]">
+        {{ titulo() }}
+      </h2>
+      <p class="mt-2 text-[14.5px] leading-relaxed text-muted">{{ mensaje() }}</p>
+      <div class="mt-7 flex justify-end gap-2">
+        <button type="button" class="btn btn-ghost" (click)="cancelar.emit()">Cancelar</button>
         <button type="button" class="btn btn-danger" (click)="confirmar.emit()">
           {{ textoConfirmar() }}
         </button>

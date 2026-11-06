@@ -24,7 +24,8 @@ npm run build      # build de producción en dist/
 ```
 src/app/
 ├── core/                         Lo que existe UNA sola vez en toda la app
-│   ├── guards/                   auth.guard.ts: protege las rutas internas
+│   ├── guards/                   authGuard (rutas internas) e invitadoGuard (login)
+│   ├── http/                     http-context.ts: sinToastDeError() para peticiones concretas
 │   ├── interceptors/             error.interceptor.ts: muestra los errores HTTP como toast
 │   ├── layout/
 │   │   ├── main-layout/          encabezado + menú lateral + <router-outlet>
@@ -33,7 +34,7 @@ src/app/
 │   └── services/                 auth, notificaciones, título de la pestaña
 │
 ├── shared/                       Piezas reutilizables por VARIAS features
-│   ├── components/               page-header, empty-state, confirm-dialog
+│   ├── components/               brand-mark, page-header, empty-state, confirm-dialog
 │   ├── directives/               (vacía por ahora)
 │   ├── pipes/                    (vacía por ahora)
 │   └── validators/               celular-peru.validator.ts
@@ -91,9 +92,8 @@ No se duplica.
   Respetar los nombres del backend aunque tengan errores (por ejemplo `passwprd` en usuarios).
 - **Parámetros de ruta**: llegan como `input()` del componente (`readonly id = input<string>()`),
   gracias a `withComponentInputBinding()`.
-- **Estilos**: Tailwind en el HTML y las clases base de `src/styles.css`:
-  `btn btn-primary | btn-secondary | btn-danger`, `label`, `input`, `error-text`, `card`, `table`.
-  Los componentes no llevan archivo `.css`.
+- **Estilos**: Tailwind en el HTML y las clases base de `src/styles.css`. Los componentes no llevan archivo `.css`.
+  Ver la sección **Sistema visual**.
 - **Errores HTTP**: los muestra automáticamente `errorInterceptor`. No hace falta `alert()` ni repetir el mensaje,
   pero todo `subscribe` debe tener su `error: () => ...` (aunque sea para quitar un "cargando"); si no,
   Angular lo reporta como error no manejado en la consola.
@@ -108,7 +108,36 @@ No se duplica.
 Los services usan `environment.apiUrl` (`/api`). En desarrollo, `proxy.conf.json` redirige `/api` a
 `http://localhost:9600`, así que no hace falta configurar CORS en el backend.
 
+## Sistema visual
+
+Papel cálido, tinta y un solo acento bermellón. La idea es que se sienta como el mostrador de una tienda
+(tickets, libro de cuentas), no como una plantilla de admin genérica. **No usar colores sueltos de Tailwind**
+(`gray-500`, `blue-600`...): solo estos tokens, definidos en `@theme` de `src/styles.css`.
+
+| Token                                 | Uso                                          |
+| ------------------------------------- | -------------------------------------------- |
+| `paper`, `paper-2`, `surface`         | fondo general, menú lateral, tarjetas/inputs |
+| `ink`, `ink-2`, `muted`               | texto principal, secundario, apagado         |
+| `line`, `line-strong`                 | bordes                                       |
+| `accent`, `accent-ink`, `accent-soft` | acción principal, foco, marcas               |
+| `ok` / `warn` / `danger` (+ `-soft`)  | estados: pagado, pendiente, error            |
+
+Ejemplos: `bg-surface`, `text-muted`, `border-line`, `text-accent`, `bg-ok-soft text-ok`.
+
+**Tipografías** (se sirven desde `node_modules`, no dependen de internet):
+
+- `font-display` (Fraunces): títulos de página y números grandes de impacto. Para resaltar una palabra:
+  `<em class="text-accent italic wonk">`.
+- `font-sans` (Hanken Grotesk): todo el texto de la interfaz (es la de por defecto).
+- `font-mono` (IBM Plex Mono): montos, fechas, códigos, etiquetas pequeñas.
+
+**Clases base**: `btn` + `btn-primary | btn-accent | btn-secondary | btn-ghost | btn-danger`, `label`, `input`,
+`error-text`, `card`, `table`, `num` (montos con cifras alineadas) y `eyebrow` (etiqueta pequeña en mayúsculas).
+Animación de entrada opcional: `class="rise" style="--d: 120ms"`.
+
 ## Pendientes conocidos
 
-- **Login (HU-08)**: el backend aún no tiene `/api/auth/login`; `AuthService.estaAutenticado()` siempre devuelve `true`.
+- **Login (HU-08)**: el backend aún no tiene `/api/auth/login`. En desarrollo `environment.authSimulado = true`
+  y el login acepta cualquier usuario y contraseña; la sesión se guarda en `sessionStorage`. Cuando exista el
+  endpoint, poner `authSimulado: false` y ajustar `LoginRequest`/`Sesion` en `core/models/auth.model.ts`.
 - **Pantallas**: listas, formularios y dashboard están creados con su ruta, pero el contenido está marcado con `TODO`.

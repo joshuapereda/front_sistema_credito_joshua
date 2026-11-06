@@ -1,11 +1,12 @@
 import { Component, computed, inject, input } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { PageHeader } from '@/app/shared/components/page-header/page-header';
+import { EmptyState } from '@/app/shared/components/empty-state/empty-state';
 import { RolService } from '../../services/rol.service';
 
 @Component({
   selector: 'app-rol-form',
-  imports: [RouterLink, PageHeader],
+  imports: [RouterLink, PageHeader, EmptyState],
   templateUrl: './rol-form.html',
 })
 export class RolForm {

@@ -1,11 +1,20 @@
-<div class="mb-6 flex flex-wrap items-center justify-between gap-4">
-  <div>
-    <h1 class="text-2xl font-semibold text-gray-900">{{ titulo() }}</h1>
+<header
+  class="mb-8 flex flex-wrap items-end justify-between gap-x-6 gap-y-4 border-b border-line pb-6 lg:mb-10"
+>
+  <div class="min-w-0">
+    @if (antetitulo()) {
+      <p class="eyebrow mb-2">{{ antetitulo() }}</p>
+    }
+    <h1
+      class="font-display text-[34px] leading-[1.05] font-[420] tracking-[-0.03em] text-ink sm:text-[40px]"
+    >
+      {{ titulo() }}
+    </h1>
     @if (subtitulo()) {
-      <p class="mt-1 text-sm text-gray-500">{{ subtitulo() }}</p>
+      <p class="mt-2 max-w-[60ch] text-[15px] text-muted">{{ subtitulo() }}</p>
     }
   </div>
   <div class="flex items-center gap-2">
     <ng-content />
   </div>
-</div>
+</header>

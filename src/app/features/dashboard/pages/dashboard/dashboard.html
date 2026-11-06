@@ -1,4 +1,54 @@
-<app-page-header titulo="Dashboard" subtitulo="Resumen del sistema de crédito" />
+<section class="mb-10 flex flex-wrap items-end justify-between gap-6 border-b border-line pb-8">
+  <div>
+    <p class="eyebrow rise">Resumen del día</p>
+    <h1
+      class="rise mt-3 font-display text-[40px] leading-[1.02] font-[380] tracking-[-0.035em] sm:text-[52px]"
+      style="--d: 60ms"
+    >
+      {{ saludo }}, <em class="text-accent italic wonk">{{ usuario() }}</em
+      >.
+    </h1>
+    <p class="rise mt-3 max-w-[52ch] text-[15px] text-muted" style="--d: 120ms">
+      Así van las ventas y cobranzas de hoy.
+    </p>
+  </div>
+  <div class="rise flex gap-2" style="--d: 160ms">
+    <a class="btn btn-secondary" routerLink="/pagos/nuevo">Registrar pago</a>
+    <a class="btn btn-primary" routerLink="/compras/nuevo">Nueva venta</a>
+  </div>
+</section>
 
-<!-- TODO: tarjetas de indicadores y gráficos -->
-<div class="card text-sm text-gray-500">Dashboard pendiente de implementar</div>
+<!-- Indicadores -->
+<section
+  class="grid overflow-hidden rounded-[10px] border border-line bg-line sm:grid-cols-2 xl:grid-cols-4 gap-px"
+>
+  @for (k of indicadores; track k.etiqueta; let i = $index) {
+    <a
+      [routerLink]="k.ruta"
+      class="rise group flex flex-col bg-surface p-6 transition-colors hover:bg-paper"
+      [style.--d]="200 + i * 50 + 'ms'"
+    >
+      <div class="flex items-center justify-between">
+        <p class="eyebrow">{{ k.etiqueta }}</p>
+        <span class="font-mono text-[10px] text-line-strong">0{{ i + 1 }}</span>
+      </div>
+      <p class="num mt-5 text-[34px] leading-none font-medium tracking-[-0.03em]">
+        {{ k.valor ?? '—' }}
+      </p>
+      <p class="mt-3 text-[13px] text-muted">{{ k.nota }}</p>
+    </a>
+  }
+</section>
+
+<!-- Próximos cobros -->
+<section class="mt-12">
+  <div class="mb-4 flex items-baseline justify-between">
+    <h2 class="font-display text-[24px] font-[420] tracking-[-0.02em]">Cobranzas pendientes</h2>
+    <a routerLink="/compras" class="eyebrow hover:text-ink">Ver compras →</a>
+  </div>
+  <!-- TODO: tabla con las compras a crédito con saldo, ordenadas por antigüedad -->
+  <app-empty-state
+    titulo="Sin datos todavía"
+    mensaje="Aquí se listarán las compras a crédito con saldo pendiente, de la más antigua a la más reciente."
+  />
+</section>
