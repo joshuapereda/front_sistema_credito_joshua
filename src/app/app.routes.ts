@@ -1,5 +1,5 @@
 import { Routes } from '@angular/router';
-import { AppLayout } from './layout/component/app.layout';
+import { Layout } from './layout/layout';
 
 export const routes: Routes = [
   {
@@ -8,7 +8,7 @@ export const routes: Routes = [
   },
   {
     path: '',
-    component: AppLayout,
+    component: Layout,
     children: [
       { path: '', redirectTo: 'dashboard', pathMatch: 'full' },
       {
@@ -16,7 +16,7 @@ export const routes: Routes = [
 
       },
       {
-         path: 'clientes',loadComponent: () => import('./features/categoria/categoria').then(m => m.Categoria),
+         path: 'categorias',loadComponent: () => import('./features/categoria/categoria').then(m => m.Categoria),
       },
     ],
   },
