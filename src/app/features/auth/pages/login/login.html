@@ -1,37 +1,33 @@
-<div class="min-h-screen flex items-center justify-center p-4">
+<div class="flex min-h-screen items-center justify-center p-4">
   <form
     [formGroup]="loginForm"
     (ngSubmit)="funIngresar()"
-    class="w-full max-w-sm bg-white rounded-lg shadow p-6 flex flex-col gap-4"
+    class="card flex w-full max-w-sm flex-col gap-4"
   >
-    <h1 class="text-xl font-semibold text-center">Sistema de Crédito</h1>
+    <h1 class="text-center text-xl font-semibold">Sistema de Crédito</h1>
 
-    <label class="flex flex-col gap-1">
-      <span class="text-sm font-medium">Usuario</span>
+    <div>
+      <label class="label" for="username">Usuario</label>
       <input
+        id="username"
+        class="input"
         type="text"
         formControlName="username"
         autocomplete="username"
-        class="border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-emerald-500"
       />
-    </label>
+    </div>
 
-    <label class="flex flex-col gap-1">
-      <span class="text-sm font-medium">Contraseña</span>
+    <div>
+      <label class="label" for="password">Contraseña</label>
       <input
+        id="password"
+        class="input"
         type="password"
         formControlName="password"
         autocomplete="current-password"
-        class="border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-emerald-500"
       />
-    </label>
+    </div>
 
-    <button
-      type="submit"
-      [disabled]="loginForm.invalid"
-      class="bg-emerald-600 text-white rounded-md py-2 font-medium hover:bg-emerald-700 disabled:opacity-50"
-    >
-      Ingresar
-    </button>
+    <button type="submit" class="btn btn-primary" [disabled]="loginForm.invalid">Ingresar</button>
   </form>
 </div>

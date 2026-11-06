@@ -6,16 +6,46 @@ interface MenuItem {
   ruta: string;
 }
 
+interface MenuGrupo {
+  titulo: string;
+  items: MenuItem[];
+}
+
 @Component({
   selector: 'app-main-layout',
   imports: [RouterOutlet, RouterLink, RouterLinkActive],
   templateUrl: './main-layout.html',
 })
 export class MainLayout {
-  // Cada feature nueva se agrega aquí y en app.routes.ts
-  protected readonly menu: MenuItem[] = [
-    { label: 'Dashboard', ruta: '/dashboard' },
-    { label: 'Categorías', ruta: '/categorias' },
-    { label: 'Productos', ruta: '/productos' },
+  // Al crear una feature nueva: agregar su ruta en app.routes.ts y su item aquí
+  protected readonly menu: MenuGrupo[] = [
+    {
+      titulo: 'General',
+      items: [{ label: 'Dashboard', ruta: '/dashboard' }],
+    },
+    {
+      titulo: 'Ventas',
+      items: [
+        { label: 'Compras', ruta: '/compras' },
+        { label: 'Pagos', ruta: '/pagos' },
+        { label: 'Clientes', ruta: '/clientes' },
+      ],
+    },
+    {
+      titulo: 'Catálogo',
+      items: [
+        { label: 'Productos', ruta: '/productos' },
+        { label: 'Categorías', ruta: '/categorias' },
+        { label: 'Tipos de compra', ruta: '/tipos-compra' },
+      ],
+    },
+    {
+      titulo: 'Seguridad',
+      items: [
+        { label: 'Usuarios', ruta: '/usuarios' },
+        { label: 'Roles', ruta: '/roles' },
+        { label: 'Permisos', ruta: '/permisos' },
+      ],
+    },
   ];
 }

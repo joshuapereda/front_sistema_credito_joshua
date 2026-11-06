@@ -21,7 +21,8 @@ export class Login {
   funIngresar(): void {
     this.authService.funcLogin(this.loginForm.getRawValue()).subscribe({
       next: () => this.router.navigate(['/dashboard']),
-      error: (error) => alert('Error al iniciar sesión: ' + error.error?.message),
+      // El mensaje de error ya lo muestra el errorInterceptor; aquí solo se limpia el estado
+      error: () => {},
     });
   }
 }

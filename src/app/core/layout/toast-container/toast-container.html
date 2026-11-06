@@ -1,0 +1,19 @@
+<div class="fixed top-4 right-4 z-50 flex flex-col gap-2 w-80" aria-live="polite">
+  @for (n of notificacionService.notificaciones(); track n.id) {
+    <div
+      role="status"
+      class="flex items-start gap-3 rounded-md px-4 py-3 text-sm text-white shadow-lg"
+      [ngClass]="estilos[n.tipo]"
+    >
+      <span class="flex-1">{{ n.mensaje }}</span>
+      <button
+        type="button"
+        class="opacity-80 hover:opacity-100"
+        aria-label="Cerrar"
+        (click)="notificacionService.cerrar(n.id)"
+      >
+        ✕
+      </button>
+    </div>
+  }
+</div>

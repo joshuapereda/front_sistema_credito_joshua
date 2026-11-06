@@ -1,0 +1,14 @@
+@if (abierto()) {
+  <div class="fixed inset-0 z-40 flex items-center justify-center bg-black/40 p-4">
+    <div role="dialog" aria-modal="true" class="card w-full max-w-sm">
+      <h2 class="text-lg font-semibold text-gray-900">{{ titulo() }}</h2>
+      <p class="mt-2 text-sm text-gray-600">{{ mensaje() }}</p>
+      <div class="mt-6 flex justify-end gap-2">
+        <button type="button" class="btn btn-secondary" (click)="cancelar.emit()">Cancelar</button>
+        <button type="button" class="btn btn-danger" (click)="confirmar.emit()">
+          {{ textoConfirmar() }}
+        </button>
+      </div>
+    </div>
+  </div>
+}
