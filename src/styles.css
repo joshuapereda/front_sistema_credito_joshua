@@ -1,13 +1,8 @@
-/* Estilos globales: Tailwind + integración con PrimeNG + iconos */
+/* Estilos globales: solo Tailwind */
 @import 'tailwindcss';
-@plugin 'tailwindcss-primeui';
-@import 'primeicons/primeicons.css';
-
-@custom-variant dark (&:where(.app-dark, .app-dark *));
 
 body {
   margin: 0;
   font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
-  background: var(--p-surface-50);
-  color: var(--p-text-color);
+  @apply bg-gray-50 text-gray-800;
 }

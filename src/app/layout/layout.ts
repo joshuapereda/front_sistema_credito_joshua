@@ -3,7 +3,6 @@ import { RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
 
 interface ItemMenu {
   label: string;
-  icon: string;
   ruta: string;
 }
 
@@ -15,7 +14,7 @@ interface ItemMenu {
 export class Layout {
   // agregar aquí cada módulo nuevo (clientes, productos, compras, pagos...)
   menu: ItemMenu[] = [
-    { label: 'Dashboard', icon: 'pi pi-home', ruta: '/dashboard' },
-    { label: 'Categorías', icon: 'pi pi-tags', ruta: '/categorias' },
+    { label: 'Dashboard', ruta: '/dashboard' },
+    { label: 'Categorías', ruta: '/categorias' },
   ];
 }
