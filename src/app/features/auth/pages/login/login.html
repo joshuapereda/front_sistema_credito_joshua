@@ -48,18 +48,19 @@
             <span>{{ mensaje }}</span>
           </div>
         }
-
-        <form [formGroup]="loginForm" (ngSubmit)="ingresar()" class="mt-8 space-y-5" novalidate>
+        <!--Asociar fron control-->
+        <form [formGroup]="loginForm"class="mt-8 space-y-5" novalidate>
           <div>
+            <!--formControlName=username -->
             <label class="label" for="username">Usuario</label>
             <input
-              id="username"
-              class="input"
-              type="text"
-              formControlName="username"
-              autocomplete="username"
-              spellcheck="false"
-            />
+            id="username"
+            class="input"
+            type="text"
+            formControlName="username"
+            autocomplete="username"
+            spellcheck="false"/>
+
             @if (loginForm.controls.username.touched && loginForm.controls.username.invalid) {
               <p class="error-text">Ingresa tu usuario.</p>
             }
@@ -89,15 +90,9 @@
             }
           </div>
 
-          <button
-            type="submit"
-            class="btn btn-primary mt-2 h-12 w-full text-[15px]"
-            [disabled]="cargando()"
-          >
+          <button (click)="funIngresar()" type="submit"class="btn btn-primary mt-2 h-12 w-full text-[15px]"[disabled]="cargando()">
             @if (cargando()) {
-              <span
-                class="size-4 animate-spin rounded-full border-2 border-paper/30 border-t-paper"
-              ></span>
+              <span class="size-4 animate-spin rounded-full border-2 border-paper/30 border-t-paper"></span>
               Ingresando…
             } @else {
               Ingresar

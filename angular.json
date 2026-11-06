@@ -2,7 +2,7 @@
   "$schema": "./node_modules/@angular/cli/lib/config/schema.json",
   "version": 1,
   "cli": {
-    "packageManager": "npm",
+        "packageManager": "npm",
     "analytics": false
   },
   "newProjectRoot": "projects",
@@ -30,11 +30,6 @@
               }
             ],
             "styles": [
-              "node_modules/@fontsource-variable/fraunces/full.css",
-              "node_modules/@fontsource-variable/fraunces/full-italic.css",
-              "node_modules/@fontsource-variable/hanken-grotesk/index.css",
-              "node_modules/@fontsource/ibm-plex-mono/400.css",
-              "node_modules/@fontsource/ibm-plex-mono/500.css",
               "src/styles.css"
             ]
           },
