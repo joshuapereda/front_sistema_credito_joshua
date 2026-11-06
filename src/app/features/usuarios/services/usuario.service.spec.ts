@@ -1,0 +1,33 @@
+import { TestBed } from '@angular/core/testing';
+import { provideHttpClient } from '@angular/common/http';
+import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
+import { UsuarioService } from './usuario.service';
+
+describe('UsuarioService', () => {
+  let service: UsuarioService;
+  let http: HttpTestingController;
+
+  beforeEach(() => {
+    TestBed.configureTestingModule({
+      providers: [provideHttpClient(), provideHttpClientTesting()],
+    });
+    service = TestBed.inject(UsuarioService);
+    http = TestBed.inject(HttpTestingController);
+  });
+
+  afterEach(() => http.verify());
+
+  it('listar hace GET a /api/usuarios', () => {
+    service.listar().subscribe();
+    const req = http.expectOne('/api/usuarios');
+    expect(req.request.method).toBe('GET');
+    req.flush([]);
+  });
+
+  it('eliminar hace DELETE a /api/usuarios/:id', () => {
+    service.eliminar(1).subscribe();
+    const req = http.expectOne('/api/usuarios/1');
+    expect(req.request.method).toBe('DELETE');
+    req.flush(null);
+  });
+});

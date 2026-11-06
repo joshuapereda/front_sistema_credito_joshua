@@ -1,0 +1,117 @@
+<div class="login-fondo flex min-h-dvh flex-col">
+  <!-- Fondo: franja superior oscura con la marca de agua "S/" (soles) -->
+  <div class="login-franja" aria-hidden="true">
+    <span
+      class="marca-agua absolute right-6 bottom-0 font-display leading-none font-[300] tracking-[-0.04em] text-paper/[0.06] select-none sm:right-10"
+      >S/</span
+    >
+  </div>
+
+  <header class="flex items-center justify-between px-6 py-5 sm:px-10">
+    <app-brand-mark tono="claro" />
+    <span class="eyebrow hidden text-paper/50! sm:inline">{{
+      hoy | date: "EEEE d 'de' MMMM"
+    }}</span>
+  </header>
+
+  <main class="flex flex-1 items-center justify-center px-4 py-10">
+    <div class="rise w-full max-w-[420px]">
+      <div
+        class="rounded-[14px] border border-line bg-surface px-7 py-9 shadow-[0_1px_2px_rgb(27_26_22/0.04),0_24px_48px_-24px_rgb(27_26_22/0.18)] sm:px-10 sm:py-11"
+      >
+        <h1 class="font-display text-[34px] leading-[1.1] font-[440] tracking-[-0.025em]">
+          Iniciar sesión
+        </h1>
+        <p class="mt-2 text-[15px] text-muted">Ingresa con tu usuario y contraseña.</p>
+
+        @if (error(); as mensaje) {
+          <div
+            role="alert"
+            class="mt-6 flex gap-3 rounded-(--radius-ui) border border-danger/20 bg-danger-soft px-4 py-3 text-[14px] text-danger"
+          >
+            <svg
+              width="16"
+              height="16"
+              viewBox="0 0 16 16"
+              fill="none"
+              class="mt-0.5 shrink-0"
+              aria-hidden="true"
+            >
+              <circle cx="8" cy="8" r="6.5" stroke="currentColor" stroke-width="1.4" />
+              <path
+                d="M8 4.8v3.6M8 10.9v.3"
+                stroke="currentColor"
+                stroke-width="1.6"
+                stroke-linecap="round"
+              />
+            </svg>
+            <span>{{ mensaje }}</span>
+          </div>
+        }
+        <!--Asociar fron control-->
+        <form [formGroup]="loginForm"class="mt-8 space-y-5" novalidate>
+          <div>
+            <!--formControlName=username -->
+            <label class="label" for="username">Usuario</label>
+            <input
+            id="username"
+            class="input"
+            type="text"
+            formControlName="username"
+            autocomplete="username"
+            spellcheck="false"/>
+
+            @if (loginForm.controls.username.touched && loginForm.controls.username.invalid) {
+              <p class="error-text">Ingresa tu usuario.</p>
+            }
+          </div>
+
+          <div>
+            <label class="label" for="password">Contraseña</label>
+            <div class="relative">
+              <input
+                id="password"
+                class="input pr-20"
+                [type]="mostrarPassword() ? 'text' : 'password'"
+                formControlName="password"
+                autocomplete="current-password"
+              />
+              <button
+                type="button"
+                class="absolute inset-y-1 right-1 rounded-[4px] px-3 text-[13px] font-medium text-muted hover:bg-paper hover:text-ink"
+                (click)="mostrarPassword.set(!mostrarPassword())"
+                [attr.aria-pressed]="mostrarPassword()"
+              >
+                {{ mostrarPassword() ? 'Ocultar' : 'Mostrar' }}
+              </button>
+            </div>
+            @if (loginForm.controls.password.touched && loginForm.controls.password.invalid) {
+              <p class="error-text">Ingresa tu contraseña.</p>
+            }
+          </div>
+
+          <button (click)="funIngresar()" type="submit"class="btn btn-primary mt-2 h-12 w-full text-[15px]"[disabled]="cargando()">
+            @if (cargando()) {
+              <span class="size-4 animate-spin rounded-full border-2 border-paper/30 border-t-paper"></span>
+              Ingresando…
+            } @else {
+              Ingresar
+            }
+          </button>
+        </form>
+      </div>
+
+      @if (authSimulado) {
+        <p class="mt-5 text-center text-[13px] text-muted">
+          <span class="font-medium text-accent">Modo desarrollo:</span> el acceso está simulado
+          hasta que el backend tenga login. Cualquier usuario y contraseña sirven.
+        </p>
+      }
+    </div>
+  </main>
+
+  <footer class="flex items-center justify-between px-6 py-5 text-[13px] text-muted sm:px-10">
+    <span>© {{ hoy | date: 'y' }} Sistema de Crédito</span>
+    <span class="num">v0.1</span>
+  </footer>
+</div>

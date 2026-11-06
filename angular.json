@@ -2,13 +2,18 @@
   "$schema": "./node_modules/@angular/cli/lib/config/schema.json",
   "version": 1,
   "cli": {
-    "packageManager": "npm"
+        "packageManager": "npm",
+    "analytics": false
   },
   "newProjectRoot": "projects",
   "projects": {
     "controlClientes": {
       "projectType": "application",
-      "schematics": {},
+      "schematics": {
+        "@schematics/angular:component": {
+          "style": "none"
+        }
+      },
       "root": "",
       "sourceRoot": "src",
       "prefix": "app",
@@ -25,10 +30,8 @@
               }
             ],
             "styles": [
-                  "src/assets/styles.scss",
-                  "src/assets/tailwind.css"
-            ],
-            "scripts": []
+              "src/styles.css"
+            ]
           },
           "configurations": {
             "production": {
@@ -62,6 +65,9 @@
         },
         "serve": {
           "builder": "@angular/build:dev-server",
+          "options": {
+            "proxyConfig": "proxy.conf.json"
+          },
           "configurations": {
             "production": {
               "buildTarget": "controlClientes:build:production"
@@ -73,24 +79,9 @@
           "defaultConfiguration": "development"
         },
         "test": {
-          "builder": "@angular-devkit/build-angular:karma",
-          "options": {
-                  "tsConfig": "tsconfig.spec.json",
-                  "inlineStyleLanguage": "scss",
-                  "assets": [
-                        "src/favicon.ico",
-                        "src/assets"
-                  ],
-                  "styles": [
-                       "src/assets/styles.scss"
-                  ],
-                  "scripts": []
-                    }
-                }
-            }
+          "builder": "@angular/build:unit-test"
         }
-    },
-    "cli": {
-        "analytics": false
+      }
     }
+  }
 }

@@ -1,3 +1,204 @@
-/* You can add global styles to this file, and also import other style files */
-
+@import '@fontsource-variable/fraunces/full.css';
+@import '@fontsource-variable/fraunces/full-italic.css';
+@import '@fontsource-variable/hanken-grotesk/index.css';
+@import '@fontsource/ibm-plex-mono/400.css';
+@import '@fontsource/ibm-plex-mono/500.css';
 @import 'tailwindcss';
+
+/*
+ * Sistema visual
+ * ---------------------------------------------------------------
+ * Papel cálido + tinta + un solo acento bermellón. Tipografía:
+ *   font-display  Fraunces       títulos (serif con carácter)
+ *   font-sans     Hanken Grotesk interfaz
+ *   font-mono     IBM Plex Mono  montos, fechas, códigos (cifras tabulares)
+ * Usar SIEMPRE estos tokens (bg-paper, text-ink, border-line, text-accent...),
+ * no colores sueltos de Tailwind (gray-500, emerald-600...).
+ */
+@theme {
+  --font-display: 'Fraunces Variable', Georgia, serif;
+  --font-sans: 'Hanken Grotesk Variable', system-ui, sans-serif;
+  --font-mono: 'IBM Plex Mono', ui-monospace, monospace;
+
+  --color-paper: #f6f3ec; /* fondo general */
+  --color-paper-2: #efeae0; /* barra lateral, zonas hundidas */
+  --color-surface: #fffdf8; /* tarjetas, inputs */
+  --color-ink: #1b1a16; /* texto principal y botones */
+  --color-ink-2: #3a3832;
+  --color-muted: #75705f; /* texto secundario */
+  --color-line: #e0d9ca; /* bordes */
+  --color-line-strong: #c9c0ad;
+
+  --color-accent: #d9472b; /* bermellón: acción, foco, marcas */
+  --color-accent-ink: #b33a21;
+  --color-accent-soft: #f8e3dc;
+
+  --color-ok: #3c7a4f;
+  --color-ok-soft: #e1eddf;
+  --color-warn: #a86a12;
+  --color-warn-soft: #f6e8cc;
+  --color-danger: #b4321f;
+  --color-danger-soft: #f6dcd6;
+
+  --radius-ui: 6px;
+}
+
+@layer base {
+  html {
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+  }
+  body {
+    @apply bg-paper font-sans text-[15px] text-ink;
+    font-feature-settings: 'ss01', 'cv11';
+  }
+  /* Fraunces ajusta solo su tamaño óptico; SOFT redondea un poco los remates */
+  .font-display {
+    font-optical-sizing: auto;
+    font-variation-settings: 'SOFT' 40;
+  }
+  /* Itálica de acento (palabras resaltadas en títulos): <em class="text-accent italic wonk"> */
+  .wonk {
+    font-variation-settings:
+      'SOFT' 100,
+      'WONK' 1;
+  }
+  ::selection {
+    @apply bg-accent text-surface;
+  }
+  :focus-visible {
+    outline: 2px solid var(--color-accent);
+    outline-offset: 2px;
+  }
+}
+
+/*
+ * Clases base. Usarlas en lugar de repetir utilidades:
+ *   <button class="btn btn-primary">  <label class="label">  <input class="input">
+ *   <div class="card">  <table class="table">  <span class="num">S/ 120.00</span>
+ */
+@layer components {
+  .btn {
+    @apply inline-flex h-10 items-center justify-center gap-2 rounded-(--radius-ui) px-4 text-sm font-semibold
+      tracking-[-0.005em] transition-[background-color,color,border-color,transform] duration-150
+      active:translate-y-px disabled:pointer-events-none disabled:opacity-45;
+  }
+  .btn-primary {
+    @apply bg-ink text-paper hover:bg-ink-2;
+  }
+  .btn-accent {
+    @apply bg-accent text-surface hover:bg-accent-ink;
+  }
+  .btn-secondary {
+    @apply border border-line-strong bg-surface text-ink hover:border-ink;
+  }
+  .btn-ghost {
+    @apply text-muted hover:bg-ink/5 hover:text-ink;
+  }
+  .btn-danger {
+    @apply bg-danger text-surface hover:bg-danger/90;
+  }
+
+  .label {
+    @apply mb-1.5 block font-mono text-[11px] font-medium tracking-[0.08em] text-muted uppercase;
+  }
+  .input {
+    @apply block h-11 w-full rounded-(--radius-ui) border border-line-strong bg-surface px-3.5 text-[15px] text-ink
+      transition-[border-color,box-shadow] duration-150 placeholder:text-muted/60
+      hover:border-ink/40 focus:border-ink focus:shadow-[0_0_0_3px_var(--color-accent-soft)] focus:outline-none;
+  }
+  .input.ng-invalid.ng-touched {
+    @apply border-danger focus:shadow-[0_0_0_3px_var(--color-danger-soft)];
+  }
+  .error-text {
+    @apply mt-1.5 text-[13px] text-danger;
+  }
+
+  .card {
+    @apply rounded-[10px] border border-line bg-surface p-6;
+  }
+
+  .table {
+    @apply w-full border-collapse text-left text-sm;
+  }
+  .table th {
+    @apply border-b border-line-strong px-4 pb-3 font-mono text-[11px] font-medium tracking-[0.08em]
+      text-muted uppercase;
+  }
+  .table td {
+    @apply border-b border-line px-4 py-3.5;
+  }
+  .table tbody tr {
+    @apply transition-colors hover:bg-paper;
+  }
+
+  /* Montos y cifras: alineados y con ancho fijo */
+  .num {
+    @apply font-mono tabular-nums tracking-tight;
+  }
+  .eyebrow {
+    @apply font-mono text-[11px] font-medium tracking-[0.12em] text-muted uppercase;
+  }
+}
+
+/* ───────── Piezas gráficas (login y layout) ───────── */
+
+/* Ítem activo del menú lateral */
+.nav-activo {
+  @apply bg-surface font-semibold text-ink shadow-[0_1px_0_var(--color-line),0_0_0_1px_var(--color-line)];
+}
+.nav-activo .nav-marca {
+  opacity: 1;
+}
+
+/* Login: franja superior color tinta con renglones suaves; abajo, papel */
+.login-fondo {
+  position: relative;
+  isolation: isolate;
+  background: var(--color-paper);
+}
+.login-franja {
+  position: absolute;
+  inset: 0 0 auto 0;
+  height: 48%;
+  z-index: -1;
+  overflow: hidden;
+  background-color: var(--color-ink);
+  background-image: repeating-linear-gradient(
+    to bottom,
+    transparent 0 31px,
+    color-mix(in oklab, var(--color-paper) 5%, transparent) 31px 32px
+  );
+}
+/* Marca de agua S/: alto proporcional a la franja y apoyada sobre la línea de acento */
+.marca-agua {
+  font-size: min(32vh, 34vw);
+  /* Fraunces: la línea base queda a 0.137em del fondo de la caja (line-height 1); así la S se apoya en la línea de acento */
+  translate: 0 0.137em;
+}
+/* Línea de acento en el borde inferior de la franja */
+.login-franja::after {
+  content: '';
+  position: absolute;
+  inset: auto 0 0 0;
+  height: 2px;
+  background: var(--color-accent);
+}
+
+/* Entradas escalonadas: class="rise" style="--d: 120ms" */
+@keyframes rise {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+}
+.rise {
+  animation: rise 0.6s cubic-bezier(0.2, 0.7, 0.2, 1) both;
+  animation-delay: var(--d, 0ms);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .rise {
+    animation: none;
+  }
+}

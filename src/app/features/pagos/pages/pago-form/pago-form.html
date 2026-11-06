@@ -1,0 +1,9 @@
+<app-page-header antetitulo="Pagos" [titulo]="esEdicion() ? 'Editar pago' : 'Nuevo pago'">
+  <a class="btn btn-secondary" routerLink="/pagos">Volver</a>
+</app-page-header>
+
+<!-- TODO: formulario dentro de <div class="card"> usando .label, .input, .error-text y .btn -->
+<app-empty-state
+  titulo="Formulario pendiente"
+  mensaje="Aquí van los campos de pago y los botones Guardar y Cancelar."
+/>
