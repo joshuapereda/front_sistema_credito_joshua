@@ -1,59 +1,59 @@
-# ControlClientes
+# Sistema de Crédito — Frontend
 
-This project was generated using [Angular CLI](https://github.com/angular/angular-cli) version 22.0.4.
+Frontend en Angular 22 + Tailwind CSS 4 para el backend `back_sistema_credito_joshua` (Spring Boot, puerto 9600).
 
-## Development server
+## Requisitos
 
-To start a local development server, run:
+- Node.js 22.22+ o 24.15+ (Angular 22 no funciona con Node 20)
+- Backend corriendo en `http://localhost:9600`
 
-```bash
-ng serve
-```
-
-Once the server is running, open your browser and navigate to `http://localhost:4200/`. The application will automatically reload whenever you modify any of the source files.
-
-## Code scaffolding
-
-Angular CLI includes powerful code scaffolding tools. To generate a new component, run:
+## Comandos
 
 ```bash
-ng generate component component-name
+npm install
+npm start          # ng serve en http://localhost:4200
+npm test           # tests unitarios con vitest
+npm run build      # build de producción en dist/
 ```
 
-For a complete list of available schematics (such as `components`, `directives`, or `pipes`), run:
+## Estructura
 
-```bash
-ng generate --help
+```
+src/
+├── app/
+│   ├── core/                     # Lo que existe una sola vez en toda la app
+│   │   ├── layout/main-layout/   # Encabezado + menú lateral + <router-outlet>
+│   │   └── services/             # Servicios globales (auth, etc.)
+│   ├── features/                 # Un módulo funcional por carpeta
+│   │   ├── auth/
+│   │   │   ├── auth.routes.ts
+│   │   │   └── pages/login/
+│   │   ├── dashboard/
+│   │   ├── categorias/
+│   │   │   ├── categorias.routes.ts
+│   │   │   └── pages/categoria-list/
+│   │   └── productos/
+│   ├── app.config.ts             # Providers globales (router, HttpClient)
+│   ├── app.routes.ts             # Rutas raíz: cada feature se carga lazy
+│   └── app.ts                    # Componente raíz
+├── environments/                 # apiUrl por entorno
+└── styles.css                    # Estilos globales (Tailwind)
 ```
 
-## Building
+## Convenciones
 
-To build the project run:
+- **Todo standalone**, sin `NgModule`.
+- **Una carpeta por feature** dentro de `features/`, con su propio `xxx.routes.ts`. Dentro de cada feature:
+  - `pages/` componentes que son una pantalla (tienen ruta).
+  - `components/` piezas reutilizables solo dentro de esa feature.
+  - `services/` llamadas HTTP de la feature (`categoria.service.ts`).
+  - `models/` interfaces que reflejan los DTOs del backend (`categoria.model.ts`).
+- Si algo se reutiliza en varias features, va a `shared/` (crear la carpeta cuando haga falta).
+- Para agregar un módulo nuevo: crear `features/<nombre>/`, su `<nombre>.routes.ts`, registrarlo en `app.routes.ts` y agregarlo al `menu` de `main-layout.ts`.
+- Estilos con clases de Tailwind en el HTML; los componentes no llevan archivo `.css` (`ng generate` ya está configurado así).
+- Inyección con `inject()`, no por constructor.
+- Archivos con nombre en kebab-case sin sufijo: `categoria-list.ts`, clase `CategoriaList`.
 
-```bash
-ng build
-```
+## API y proxy
 
-This will compile your project and store the build artifacts in the `dist/` directory. By default, the production build optimizes your application for performance and speed.
-
-## Running unit tests
-
-To execute unit tests with the [Vitest](https://vitest.dev/) test runner, use the following command:
-
-```bash
-ng test
-```
-
-## Running end-to-end tests
-
-For end-to-end (e2e) testing, run:
-
-```bash
-ng e2e
-```
-
-Angular CLI does not come with an end-to-end testing framework by default. You can choose one that suits your needs.
-
-## Additional Resources
-
-For more information on using the Angular CLI, including detailed command references, visit the [Angular CLI Overview and Command Reference](https://angular.dev/tools/cli) page.
+Los servicios usan `environment.apiUrl` (`/api`). En desarrollo, `proxy.conf.json` redirige `/api` a `http://localhost:9600`, así que no hace falta configurar CORS en el backend.

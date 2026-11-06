@@ -1,4 +1,5 @@
 export const environment = {
-  //conectar al backend
-  apiUrl: 'http://localhost:9600',
+  production: false,
+  // En desarrollo, proxy.conf.json redirige /api a http://localhost:9600 (evita CORS)
+  apiUrl: '/api',
 };

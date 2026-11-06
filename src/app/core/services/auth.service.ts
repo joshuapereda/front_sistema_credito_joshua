@@ -1,18 +1,14 @@
-import { inject, Service } from '@angular/core';
-import { environment } from '../../../environments/environment.development';
 import { HttpClient } from '@angular/common/http';
+import { inject, Service } from '@angular/core';
+import { environment } from '@/environments/environment';
 
+// Pendiente HU-08: el backend todavía no expone /api/auth/login
 @Service()
 export class AuthService {
-  urlBase= environment.apiUrl
+  private readonly http = inject(HttpClient);
+  private readonly urlBase = `${environment.apiUrl}/auth`;
 
-  //encargado de enviar peticiones al backend para autenticar a los usuarios
-  http=inject(HttpClient)
-
-  //funciones
-  funcLogin(credentials: any){
-    return this.http.post(`${this.urlBase}/api/auth/login`, credentials);
+  funcLogin(credentials: { username: string; password: string }) {
+    return this.http.post(`${this.urlBase}/login`, credentials);
   }
-  funLogout(){}
-  funPerfil(){}
 }

@@ -1,0 +1,37 @@
+<div class="min-h-screen flex items-center justify-center p-4">
+  <form
+    [formGroup]="loginForm"
+    (ngSubmit)="funIngresar()"
+    class="w-full max-w-sm bg-white rounded-lg shadow p-6 flex flex-col gap-4"
+  >
+    <h1 class="text-xl font-semibold text-center">Sistema de Crédito</h1>
+
+    <label class="flex flex-col gap-1">
+      <span class="text-sm font-medium">Usuario</span>
+      <input
+        type="text"
+        formControlName="username"
+        autocomplete="username"
+        class="border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-emerald-500"
+      />
+    </label>
+
+    <label class="flex flex-col gap-1">
+      <span class="text-sm font-medium">Contraseña</span>
+      <input
+        type="password"
+        formControlName="password"
+        autocomplete="current-password"
+        class="border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-emerald-500"
+      />
+    </label>
+
+    <button
+      type="submit"
+      [disabled]="loginForm.invalid"
+      class="bg-emerald-600 text-white rounded-md py-2 font-medium hover:bg-emerald-700 disabled:opacity-50"
+    >
+      Ingresar
+    </button>
+  </form>
+</div>

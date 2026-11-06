@@ -1,22 +1,30 @@
 import { Routes } from '@angular/router';
-import { Layout } from './layout/layout';
+import { MainLayout } from './core/layout/main-layout/main-layout';
 
 export const routes: Routes = [
   {
     path: 'auth',
-    loadChildren: () => import('./auth/auth-module').then(m => m.AuthModule),
+    loadChildren: () => import('./features/auth/auth.routes').then((m) => m.AUTH_ROUTES),
   },
   {
     path: '',
-    component: Layout,
+    component: MainLayout,
     children: [
       { path: '', redirectTo: 'dashboard', pathMatch: 'full' },
       {
-        path: 'dashboard',loadComponent: () => import('./dashboard/dashboard').then(m => m.Dashboard),
-
+        path: 'dashboard',
+        loadChildren: () =>
+          import('./features/dashboard/dashboard.routes').then((m) => m.DASHBOARD_ROUTES),
       },
       {
-         path: 'categorias',loadComponent: () => import('./features/categoria/categoria').then(m => m.Categoria),
+        path: 'categorias',
+        loadChildren: () =>
+          import('./features/categorias/categorias.routes').then((m) => m.CATEGORIAS_ROUTES),
+      },
+      {
+        path: 'productos',
+        loadChildren: () =>
+          import('./features/productos/productos.routes').then((m) => m.PRODUCTOS_ROUTES),
       },
     ],
   },
