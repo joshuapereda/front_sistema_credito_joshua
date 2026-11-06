@@ -1,7 +1,17 @@
 <div class="login-fondo flex min-h-dvh flex-col">
+  <!-- Fondo: franja superior oscura con la marca de agua "S/" (soles) -->
+  <div class="login-franja" aria-hidden="true">
+    <span
+      class="absolute -right-[4vw] -bottom-[11vw] font-display text-[34vw] leading-none font-[300] tracking-[-0.06em] text-paper/[0.045] select-none"
+      >S/</span
+    >
+  </div>
+
   <header class="flex items-center justify-between px-6 py-5 sm:px-10">
-    <app-brand-mark />
-    <span class="eyebrow hidden sm:inline">{{ hoy | date: "EEEE d 'de' MMMM" }}</span>
+    <app-brand-mark tono="claro" />
+    <span class="eyebrow hidden text-paper/50! sm:inline">{{
+      hoy | date: "EEEE d 'de' MMMM"
+    }}</span>
   </header>
 
   <main class="flex flex-1 items-center justify-center px-4 py-10">

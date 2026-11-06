@@ -146,27 +146,32 @@
   opacity: 1;
 }
 
-/* Login: fondo de papel con renglones suaves en los bordes que se desvanecen hacia el centro */
+/* Login: franja superior color tinta con renglones suaves; abajo, papel */
 .login-fondo {
-  background-color: var(--color-paper);
+  position: relative;
+  isolation: isolate;
+  background: var(--color-paper);
+}
+.login-franja {
+  position: absolute;
+  inset: 0 0 auto 0;
+  height: 48%;
+  z-index: -1;
+  overflow: hidden;
+  background-color: var(--color-ink);
   background-image: repeating-linear-gradient(
     to bottom,
     transparent 0 31px,
-    color-mix(in oklab, var(--color-line) 55%, transparent) 31px 32px
+    color-mix(in oklab, var(--color-paper) 5%, transparent) 31px 32px
   );
-  background-attachment: fixed;
 }
-.login-fondo::before {
+/* Línea de acento en el borde inferior de la franja */
+.login-franja::after {
   content: '';
-  position: fixed;
-  inset: 0;
-  z-index: 0;
-  pointer-events: none;
-  background: radial-gradient(ellipse 55% 60% at 50% 50%, var(--color-paper) 35%, transparent 100%);
-}
-.login-fondo > * {
-  position: relative;
-  z-index: 1;
+  position: absolute;
+  inset: auto 0 0 0;
+  height: 2px;
+  background: var(--color-accent);
 }
 
 /* Entradas escalonadas: class="rise" style="--d: 120ms" */
