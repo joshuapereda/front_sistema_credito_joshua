@@ -165,6 +165,12 @@
     color-mix(in oklab, var(--color-paper) 5%, transparent) 31px 32px
   );
 }
+/* Marca de agua S/: alto proporcional a la franja y apoyada sobre la línea de acento */
+.marca-agua {
+  font-size: min(32vh, 34vw);
+  /* Fraunces: la línea base queda a 0.137em del fondo de la caja (line-height 1); así la S se apoya en la línea de acento */
+  translate: 0 0.137em;
+}
 /* Línea de acento en el borde inferior de la franja */
 .login-franja::after {
   content: '';
