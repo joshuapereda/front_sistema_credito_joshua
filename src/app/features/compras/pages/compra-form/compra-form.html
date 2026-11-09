@@ -1,0 +1,9 @@
+<app-page-header antetitulo="Compras" [titulo]="esEdicion() ? 'Editar compra' : 'Nueva compra'">
+  <a class="btn btn-secondary" routerLink="/compras">Volver</a>
+</app-page-header>
+
+<!-- TODO: formulario dentro de <div class="card"> usando .label, .input, .error-text y .btn -->
+<app-empty-state
+  titulo="Formulario pendiente"
+  mensaje="Aquí van los campos de compra y los botones Guardar y Cancelar."
+/>

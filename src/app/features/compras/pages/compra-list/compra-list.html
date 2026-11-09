@@ -1,0 +1,221 @@
+<app-page-header titulo="Compras" subtitulo="Ventas registradas, con su total, saldo y estado.">
+  <a class="btn btn-primary" routerLink="nuevo">Nueva compra</a>
+</app-page-header>
+
+@if (compras().length === 0) {
+  <app-empty-state
+    titulo="Aún no hay compras"
+    mensaje="Registra la primera compra para verla aquí."
+  />
+} @else {
+  <div class="overflow-hidden rounded-xl border border-gray-200 bg-white shadow-sm">
+    <div class="overflow-x-auto">
+      <table class="min-w-full divide-y divide-gray-200 text-sm">
+        <thead class="bg-gray-50">
+          <tr>
+            <th class="px-6 py-3 text-left text-xs font-semibold uppercase tracking-wider text-gray-500">N°</th>
+            <th class="px-6 py-3 text-left text-xs font-semibold uppercase tracking-wider text-gray-500">Fecha</th>
+            <th class="px-6 py-3 text-left text-xs font-semibold uppercase tracking-wider text-gray-500">Cliente</th>
+            <th class="px-6 py-3 text-left text-xs font-semibold uppercase tracking-wider text-gray-500">Tipo</th>
+            <th class="px-6 py-3 text-center text-xs font-semibold uppercase tracking-wider text-gray-500">Productos</th>
+            <th class="px-6 py-3 text-right text-xs font-semibold uppercase tracking-wider text-gray-500">Total</th>
+            <th class="px-6 py-3 text-right text-xs font-semibold uppercase tracking-wider text-gray-500">Saldo</th>
+            <th class="px-6 py-3 text-left text-xs font-semibold uppercase tracking-wider text-gray-500">Estado</th>
+            <th class="px-6 py-3 text-right text-xs font-semibold uppercase tracking-wider text-gray-500">Acciones</th>
+          </tr>
+        </thead>
+
+        <tbody class="divide-y divide-gray-100">
+          @for (com of compras(); track com.id) {
+            <tr class="transition-colors hover:bg-gray-50">
+              <td class="px-6 py-4 font-mono text-xs text-gray-500">#{{ com.id }}</td>
+
+              <td class="whitespace-nowrap px-6 py-4">
+                <div class="text-gray-900">{{ com.fechaHora | date: 'dd/MM/yyyy' }}</div>
+                <div class="text-xs text-gray-500">{{ com.fechaHora | date: 'HH:mm' }}</div>
+              </td>
+
+              <td class="px-6 py-4">
+                <div class="flex items-center gap-3">
+                  <div class="flex h-9 w-9 items-center justify-center rounded-full bg-indigo-100 text-sm font-semibold text-indigo-700">
+                    {{ com.cliente.charAt(0).toUpperCase() }}
+                  </div>
+                  <span class="font-medium text-gray-900">{{ com.cliente }}</span>
+                </div>
+              </td>
+
+              <td class="px-6 py-4">
+                @if (com.tipoCompra === 'Credito') {
+                  <span class="inline-flex items-center rounded-full bg-violet-50 px-2.5 py-1 text-xs font-medium text-violet-700 ring-1 ring-inset ring-violet-200">Crédito</span>
+                } @else {
+                  <span class="inline-flex items-center rounded-full bg-sky-50 px-2.5 py-1 text-xs font-medium text-sky-700 ring-1 ring-inset ring-sky-200">{{ com.tipoCompra }}</span>
+                }
+              </td>
+
+              <td class="px-6 py-4 text-center">
+                <span class="inline-flex h-6 min-w-6 items-center justify-center rounded-md bg-gray-100 px-2 text-xs font-semibold text-gray-700">
+                  {{ com.detalles.length }}
+                </span>
+              </td>
+
+              <td class="whitespace-nowrap px-6 py-4 text-right font-semibold text-gray-900">
+                {{ com.total | currency: 'PEN' : 'S/ ' }}
+              </td>
+
+              <td class="whitespace-nowrap px-6 py-4 text-right font-medium"
+                  [class.text-red-600]="com.saldo > 0"
+                  [class.text-emerald-600]="com.saldo === 0">
+                {{ com.saldo | currency: 'PEN' : 'S/ ' }}
+              </td>
+
+              <td class="px-6 py-4">
+                @switch (com.estado) {
+                  @case ('PAGADO') {
+                    <span class="inline-flex items-center gap-1.5 rounded-full bg-emerald-50 px-2.5 py-1 text-xs font-medium text-emerald-700 ring-1 ring-inset ring-emerald-200">
+                      <span class="h-1.5 w-1.5 rounded-full bg-emerald-500"></span>
+                      Pagado
+                    </span>
+                  }
+                  @case ('PENDIENTE') {
+                    <span class="inline-flex items-center gap-1.5 rounded-full bg-amber-50 px-2.5 py-1 text-xs font-medium text-amber-700 ring-1 ring-inset ring-amber-200">
+                      <span class="h-1.5 w-1.5 rounded-full bg-amber-500"></span>
+                      Pendiente
+                    </span>
+                  }
+                  @default {
+                    <span class="inline-flex items-center rounded-full bg-gray-100 px-2.5 py-1 text-xs font-medium text-gray-700">
+                      {{ com.estado }}
+                    </span>
+                  }
+                }
+              </td>
+
+              <td class="px-6 py-4">
+                <div class="flex items-center justify-end">
+                  <button
+                    type="button"
+                    (click)="abrir(com)"
+                    title="Ver detalle"
+                    class="inline-flex items-center gap-1.5 rounded-lg border border-gray-200 bg-white px-3 py-1.5 text-xs font-medium text-gray-700 shadow-sm transition-colors hover:border-indigo-300 hover:bg-indigo-50 hover:text-indigo-700"
+                  >
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                      <path stroke-linecap="round" stroke-linejoin="round" d="M2.036 12.322a1.012 1.012 0 010-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178z" />
+                      <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                    </svg>
+                    Ver detalle
+                  </button>
+                </div>
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  </div>
+}
+
+<!-- Modal de detalle -->
+@if (compraSeleccionada(); as c) {
+  <div
+    class="fixed inset-0 z-50 flex items-center justify-center bg-gray-900/50 p-4 backdrop-blur-sm"
+    (click)="cerrar()"
+    role="dialog"
+    aria-modal="true"
+    aria-label="Detalle de la compra"
+  >
+    <div
+      class="flex max-h-[90vh] w-full max-w-2xl flex-col overflow-hidden rounded-2xl bg-white shadow-xl"
+      (click)="$event.stopPropagation()"
+    >
+      <!-- Cabecera -->
+      <div class="flex items-start justify-between border-b border-gray-200 px-6 py-4">
+        <div>
+          <h2 class="text-lg font-bold text-gray-900">Compra #{{ c.id }}</h2>
+          <p class="mt-0.5 text-sm text-gray-500">{{ c.fechaHora | date: 'dd/MM/yyyy HH:mm' }}</p>
+        </div>
+        <div class="flex items-center gap-3">
+          @if (c.estado === 'PAGADO') {
+            <span class="inline-flex items-center gap-1.5 rounded-full bg-emerald-50 px-2.5 py-1 text-xs font-medium text-emerald-700 ring-1 ring-inset ring-emerald-200">
+              <span class="h-1.5 w-1.5 rounded-full bg-emerald-500"></span> Pagado
+            </span>
+          } @else {
+            <span class="inline-flex items-center gap-1.5 rounded-full bg-amber-50 px-2.5 py-1 text-xs font-medium text-amber-700 ring-1 ring-inset ring-amber-200">
+              <span class="h-1.5 w-1.5 rounded-full bg-amber-500"></span> Pendiente
+            </span>
+          }
+          <button
+            type="button"
+            (click)="cerrar()"
+            aria-label="Cerrar"
+            class="inline-flex h-8 w-8 items-center justify-center rounded-lg text-gray-400 transition-colors hover:bg-gray-100 hover:text-gray-600"
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+            </svg>
+          </button>
+        </div>
+      </div>
+
+      <!-- Cuerpo -->
+      <div class="overflow-y-auto px-6 py-4">
+        <div class="mb-4 grid grid-cols-3 gap-4 text-sm">
+          <div>
+            <p class="text-xs font-semibold uppercase tracking-wider text-gray-500">Cliente</p>
+            <p class="mt-1 font-medium text-gray-900">{{ c.cliente }}</p>
+          </div>
+          <div>
+            <p class="text-xs font-semibold uppercase tracking-wider text-gray-500">Vendedor</p>
+            <p class="mt-1 font-medium text-gray-900">{{ c.usuario }}</p>
+          </div>
+          <div>
+            <p class="text-xs font-semibold uppercase tracking-wider text-gray-500">Tipo</p>
+            <p class="mt-1 font-medium text-gray-900">{{ c.tipoCompra === 'Credito' ? 'Crédito' : c.tipoCompra }}</p>
+          </div>
+        </div>
+
+        <div class="overflow-hidden rounded-lg border border-gray-200">
+          <table class="min-w-full divide-y divide-gray-200 text-sm">
+            <thead class="bg-gray-50">
+              <tr>
+                <th class="px-4 py-2 text-left text-xs font-semibold uppercase tracking-wider text-gray-500">Producto</th>
+                <th class="px-4 py-2 text-center text-xs font-semibold uppercase tracking-wider text-gray-500">Cant.</th>
+                <th class="px-4 py-2 text-right text-xs font-semibold uppercase tracking-wider text-gray-500">P. unit.</th>
+                <th class="px-4 py-2 text-right text-xs font-semibold uppercase tracking-wider text-gray-500">Subtotal</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-gray-100">
+              @for (d of c.detalles; track d.productoId) {
+                <tr>
+                  <td class="px-4 py-2.5 font-medium text-gray-900">{{ d.nombreProducto }}</td>
+                  <td class="px-4 py-2.5 text-center text-gray-700">{{ d.cantidad }}</td>
+                  <td class="whitespace-nowrap px-4 py-2.5 text-right text-gray-600">{{ d.precioUnitario | currency: 'PEN' : 'S/ ' }}</td>
+                  <td class="whitespace-nowrap px-4 py-2.5 text-right font-semibold text-gray-900">{{ d.subtotal | currency: 'PEN' : 'S/ ' }}</td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Pie con resumen -->
+      <div class="border-t border-gray-200 bg-gray-50 px-6 py-4">
+        <dl class="ml-auto w-full max-w-xs space-y-1.5 text-sm">
+          <div class="flex justify-between">
+            <dt class="text-gray-600">Total</dt>
+            <dd class="font-semibold text-gray-900">{{ c.total | currency: 'PEN' : 'S/ ' }}</dd>
+          </div>
+          <div class="flex justify-between">
+            <dt class="text-gray-600">Pagado</dt>
+            <dd class="font-medium text-emerald-600">{{ c.total - c.saldo | currency: 'PEN' : 'S/ ' }}</dd>
+          </div>
+          <div class="flex justify-between border-t border-gray-200 pt-1.5">
+            <dt class="font-semibold text-gray-900">Saldo</dt>
+            <dd class="font-bold" [class.text-red-600]="c.saldo > 0" [class.text-emerald-600]="c.saldo === 0">
+              {{ c.saldo | currency: 'PEN' : 'S/ ' }}
+            </dd>
+          </div>
+        </dl>
+      </div>
+    </div>
+  </div>
+}

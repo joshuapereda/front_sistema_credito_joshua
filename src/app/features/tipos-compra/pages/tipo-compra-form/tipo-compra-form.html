@@ -1,0 +1,12 @@
+<app-page-header
+  antetitulo="Tipos de compra"
+  [titulo]="esEdicion() ? 'Editar tipo de compra' : 'Nuevo tipo de compra'"
+>
+  <a class="btn btn-secondary" routerLink="/tipos-compra">Volver</a>
+</app-page-header>
+
+<!-- TODO: formulario dentro de <div class="card"> usando .label, .input, .error-text y .btn -->
+<app-empty-state
+  titulo="Formulario pendiente"
+  mensaje="Aquí van los campos de tipo de compra y los botones Guardar y Cancelar."
+/>
