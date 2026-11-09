@@ -1,31 +1,19 @@
 import { HttpClient } from '@angular/common/http';
 import { inject, Service } from '@angular/core';
-import { Observable } from 'rxjs';
 import { environment } from '@/environments/environment';
-import { Cliente, ClienteRequest } from '../models/cliente.model';
 
 @Service()
 export class ClienteService {
-  private readonly http = inject(HttpClient);
-  private readonly url = `${environment.apiUrl}/clientes`;
+  // URL base
+  urlBase = environment.apiUrl;
+  // Inyectamos HttpClient
+  http = inject(HttpClient);
 
-  listar(): Observable<Cliente[]> {
-    return this.http.get<Cliente[]>(this.url);
+  //-----------------------------------//
+  //           CRUD PERSONA            //
+  //-----------------------------------//
+  funListarPersona() {
+    return this.http.get<any[]>(`${this.urlBase}/api/clientes`);
   }
 
-  obtener(id: number): Observable<Cliente> {
-    return this.http.get<Cliente>(`${this.url}/${id}`);
-  }
-
-  crear(body: ClienteRequest): Observable<Cliente> {
-    return this.http.post<Cliente>(this.url, body);
-  }
-
-  actualizar(id: number, body: ClienteRequest): Observable<Cliente> {
-    return this.http.put<Cliente>(`${this.url}/${id}`, body);
-  }
-
-  eliminar(id: number): Observable<void> {
-    return this.http.delete<void>(`${this.url}/${id}`);
-  }
 }

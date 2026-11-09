@@ -1,4 +1,4 @@
-import { Component, inject } from '@angular/core';
+import { Component, inject, OnInit, signal } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { PageHeader } from '@/app/shared/components/page-header/page-header';
 import { EmptyState } from '@/app/shared/components/empty-state/empty-state';
@@ -9,8 +9,21 @@ import { ClienteService } from '../../services/cliente.service';
   imports: [RouterLink, PageHeader, EmptyState],
   templateUrl: './cliente-list.html',
 })
-export class ClienteList {
+export class ClienteList implements OnInit {
+  ngOnInit(): void {
+   this.funObtenerPersona();
+  }
+  private readonly personas=signal<any>([]);
   private readonly clienteService = inject(ClienteService);
 
-  // TODO: cargar la lista con this.clienteService.listar() y mostrarla en una tabla (.table)
+  funObtenerPersona(){
+    this.clienteService.funListarPersona().subscribe({
+      next:(res:any)=>{
+        this.personas.set(res);
+      },
+      error:(error)=>{
+        console.log(error);
+      }
+    })
+  }
 }

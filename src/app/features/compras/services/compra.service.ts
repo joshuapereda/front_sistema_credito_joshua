@@ -6,26 +6,14 @@ import { Compra, CompraRequest } from '../models/compra.model';
 
 @Service()
 export class CompraService {
-  private readonly http = inject(HttpClient);
-  private readonly url = `${environment.apiUrl}/compra`;
-
-  listar(): Observable<Compra[]> {
-    return this.http.get<Compra[]>(this.url);
-  }
-
-  obtener(id: number): Observable<Compra> {
-    return this.http.get<Compra>(`${this.url}/${id}`);
-  }
-
-  crear(body: CompraRequest): Observable<Compra> {
-    return this.http.post<Compra>(this.url, body);
-  }
-
-  actualizar(id: number, body: CompraRequest): Observable<Compra> {
-    return this.http.put<Compra>(`${this.url}/${id}`, body);
-  }
-
-  eliminar(id: number): Observable<void> {
-    return this.http.delete<void>(`${this.url}/${id}`);
+  // URL base
+  urlBase = environment.apiUrl;
+  // Inyectamos HttpClient
+  http = inject(HttpClient);
+  //-----------------------------------//
+  //            CRUD COMPRA            //
+  //-----------------------------------//
+  funListarCompra() {
+    return this.http.get<any[]>(`${this.urlBase}/api/compra`);
   }
 }

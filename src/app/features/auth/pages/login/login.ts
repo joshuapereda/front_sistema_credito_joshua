@@ -15,6 +15,7 @@ export class Login {
    //inyectar por costructor
   constructor(private authService: AuthService){}
   protected readonly hoy = new Date();
+  mayusActiva = signal(false);
   protected readonly authSimulado = environment.authSimulado;
   protected readonly cargando = signal(false);
   protected readonly error = signal<string | null>(null);

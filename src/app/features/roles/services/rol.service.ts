@@ -6,26 +6,14 @@ import { Rol, RolRequest } from '../models/rol.model';
 
 @Service()
 export class RolService {
-  private readonly http = inject(HttpClient);
-  private readonly url = `${environment.apiUrl}/roles`;
-
-  listar(): Observable<Rol[]> {
-    return this.http.get<Rol[]>(this.url);
-  }
-
-  obtener(id: number): Observable<Rol> {
-    return this.http.get<Rol>(`${this.url}/${id}`);
-  }
-
-  crear(body: RolRequest): Observable<Rol> {
-    return this.http.post<Rol>(this.url, body);
-  }
-
-  actualizar(id: number, body: RolRequest): Observable<Rol> {
-    return this.http.put<Rol>(`${this.url}/${id}`, body);
-  }
-
-  eliminar(id: number): Observable<void> {
-    return this.http.delete<void>(`${this.url}/${id}`);
+ // URL base
+  urlBase = environment.apiUrl;
+  // Inyectamos HttpClient
+  http = inject(HttpClient);
+  //-----------------------------------//
+  //            CRUD ROL              //
+  //-----------------------------------//
+  funListarRoles() {
+    return this.http.get<any[]>(`${this.urlBase}/api/roles`);
   }
 }

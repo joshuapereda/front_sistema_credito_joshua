@@ -6,26 +6,15 @@ import { Permiso, PermisoRequest } from '../models/permiso.model';
 
 @Service()
 export class PermisoService {
-  private readonly http = inject(HttpClient);
-  private readonly url = `${environment.apiUrl}/permisos`;
+  // URL base
+  urlBase = environment.apiUrl;
+  // Inyectamos HttpClient
+  http = inject(HttpClient);
 
-  listar(): Observable<Permiso[]> {
-    return this.http.get<Permiso[]>(this.url);
-  }
-
-  obtener(id: number): Observable<Permiso> {
-    return this.http.get<Permiso>(`${this.url}/${id}`);
-  }
-
-  crear(body: PermisoRequest): Observable<Permiso> {
-    return this.http.post<Permiso>(this.url, body);
-  }
-
-  actualizar(id: number, body: PermisoRequest): Observable<Permiso> {
-    return this.http.put<Permiso>(`${this.url}/${id}`, body);
-  }
-
-  eliminar(id: number): Observable<void> {
-    return this.http.delete<void>(`${this.url}/${id}`);
+  //-----------------------------------//
+  //          CRUD PERMISO             //
+  //-----------------------------------//
+  funListarPermiso() {
+    return this.http.get<any[]>(`${this.urlBase}/api/permisos`);
   }
 }

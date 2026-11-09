@@ -1,31 +1,34 @@
+
 import { HttpClient } from '@angular/common/http';
-import { inject, Service } from '@angular/core';
-import { Observable } from 'rxjs';
+import { inject, Injectable } from '@angular/core';
 import { environment } from '@/environments/environment';
-import { Usuario, UsuarioRequest } from '../models/usuario.model';
 
-@Service()
+@Injectable({
+  providedIn: 'root'
+})
 export class UsuarioService {
-  private readonly http = inject(HttpClient);
-  private readonly url = `${environment.apiUrl}/usuarios`;
 
-  listar(): Observable<Usuario[]> {
-    return this.http.get<Usuario[]>(this.url);
+  // URL base
+  urlBase = environment.apiUrl;
+  // Inyectamos HttpClient
+  http = inject(HttpClient);
+
+  //-----------------------------------//
+  //          CRUD USUARIO             //
+  //-----------------------------------//
+  funListar() {
+    return this.http.get(`${this.urlBase}/api/usuarios`);
   }
-
-  obtener(id: number): Observable<Usuario> {
-    return this.http.get<Usuario>(`${this.url}/${id}`);
+  funGuarda(datos: any) {
+    return this.http.post(`${this.urlBase}/api/usuarios`, datos);
   }
-
-  crear(body: UsuarioRequest): Observable<Usuario> {
-    return this.http.post<Usuario>(this.url, body);
+  funMostrar(id: number) {
+    return this.http.get(`${this.urlBase}/api/usuarios/${id}`);
   }
-
-  actualizar(id: number, body: UsuarioRequest): Observable<Usuario> {
-    return this.http.put<Usuario>(`${this.url}/${id}`, body);
+  funEditar(id: number, datos: any) {
+    return this.http.patch(`${this.urlBase}/api/usuarios/${id}`, datos);
   }
-
-  eliminar(id: number): Observable<void> {
-    return this.http.delete<void>(`${this.url}/${id}`);
+  funEliminar(id: number) {
+    return this.http.delete(`${this.urlBase}/api/usuarios/${id}`);
   }
 }

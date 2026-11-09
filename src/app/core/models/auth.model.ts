@@ -1,4 +1,3 @@
-// Pendiente HU-08: ajustar cuando el backend defina el contrato de /api/auth/login
 export interface LoginRequest {
   username: string;
   password: string;
@@ -6,5 +5,8 @@ export interface LoginRequest {
 
 export interface Sesion {
   username: string;
-  token?: string;
+  accesToken: string;
+  refreshToken: string;
+  identifier?: number;
+  expiration?: number;
 }

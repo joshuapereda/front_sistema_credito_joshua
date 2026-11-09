@@ -6,26 +6,14 @@ import { Pago, PagoRequest } from '../models/pago.model';
 
 @Service()
 export class PagoService {
-  private readonly http = inject(HttpClient);
-  private readonly url = `${environment.apiUrl}/pago`;
-
-  listar(): Observable<Pago[]> {
-    return this.http.get<Pago[]>(this.url);
-  }
-
-  obtener(id: number): Observable<Pago> {
-    return this.http.get<Pago>(`${this.url}/${id}`);
-  }
-
-  crear(body: PagoRequest): Observable<Pago> {
-    return this.http.post<Pago>(this.url, body);
-  }
-
-  actualizar(id: number, body: PagoRequest): Observable<Pago> {
-    return this.http.put<Pago>(`${this.url}/${id}`, body);
-  }
-
-  eliminar(id: number): Observable<void> {
-    return this.http.delete<void>(`${this.url}/${id}`);
+  // URL base
+  urlBase = environment.apiUrl;
+  // Inyectamos HttpClient
+  http = inject(HttpClient);
+   //-----------------------------------//
+  //             CRUD PAGO             //
+  //-----------------------------------//
+  funListarPago() {
+    return this.http.get<any[]>(`${this.urlBase}/api/pago`);
   }
 }

@@ -16,6 +16,7 @@ import {
 import { routes } from './app.routes';
 import { errorInterceptor } from './core/interceptors/error.interceptor';
 import { AppTitleStrategy } from './core/services/app-title.strategy';
+import { authInterceptor } from './core/interceptors/interceptor';
 
 // Fechas, números y moneda en formato peruano: {{ total | currency }} -> S/ 1,250.00
 registerLocaleData(localeEsPe);
@@ -30,7 +31,12 @@ export const appConfig: ApplicationConfig = {
       withInMemoryScrolling({ scrollPositionRestoration: 'enabled' }),
     ),
     { provide: TitleStrategy, useClass: AppTitleStrategy },
-    provideHttpClient(withInterceptors([errorInterceptor])),
+    provideHttpClient(
+      withInterceptors([
+        authInterceptor,
+        errorInterceptor
+      ])
+    ),
     { provide: LOCALE_ID, useValue: 'es-PE' },
     { provide: DEFAULT_CURRENCY_CODE, useValue: 'PEN' },
   ],
