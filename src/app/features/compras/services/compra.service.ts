@@ -6,14 +6,26 @@ import { Compra, CompraRequest } from '../models/compra.model';
 
 @Service()
 export class CompraService {
-  // URL base
+
   urlBase = environment.apiUrl;
-  // Inyectamos HttpClient
   http = inject(HttpClient);
-  //-----------------------------------//
-  //            CRUD COMPRA            //
-  //-----------------------------------//
+  //---------------- FUNCIONES ----------------//
   funListarCompra() {
     return this.http.get<any[]>(`${this.urlBase}/api/compra`);
+  }
+  funListarCliente() {
+    return this.http.get<any[]>(`${this.urlBase}/api/clientes`);
+  }
+  funListarUsuario() {
+    return this.http.get<any[]>(`${this.urlBase}/api/usuarios`);
+  }
+  funListarTipoCompra() {
+    return this.http.get<any[]>(`${this.urlBase}/api/tipoCompras`);
+  }
+  funListarProducto() {
+    return this.http.get<any[]>(`${this.urlBase}/api/productos`);
+  }
+  funGuarda(datos: any) {
+    return this.http.post(`${this.urlBase}/api/compra`, datos);
   }
 }
