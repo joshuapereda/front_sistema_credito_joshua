@@ -8,16 +8,18 @@ import { environment } from '@/environments/environment';
 })
 export class UsuarioService {
 
-  // URL base
   urlBase = environment.apiUrl;
-  // Inyectamos HttpClient
   http = inject(HttpClient);
 
-  //-----------------------------------//
-  //          CRUD USUARIO             //
-  //-----------------------------------//
-  funListar() {
+  //---------------- FUNCIONES ----------------//
+  funListarUsuario() {
     return this.http.get(`${this.urlBase}/api/usuarios`);
+  }
+  funListarPersona() {
+    return this.http.get(`${this.urlBase}/api/clientes`);
+  }
+  funListarRoles() {
+    return this.http.get(`${this.urlBase}/api/roles`);
   }
   funGuarda(datos: any) {
     return this.http.post(`${this.urlBase}/api/usuarios`, datos);
