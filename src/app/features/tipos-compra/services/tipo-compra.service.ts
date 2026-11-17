@@ -14,4 +14,10 @@ export class TipoCompraService {
   funGuarda(datos: any) {
     return this.http.post(`${this.urlBase}/api/tipoCompras`, datos);
   }
+  funEditar(id: number, datos: any) {
+    return this.http.put(`${this.urlBase}/api/tipoCompras/${id}`, datos);
+  }
+  funEliminar(id: number) {
+    return this.http.delete(`${this.urlBase}/api/tipoCompras/${id}`);
+  }
 }

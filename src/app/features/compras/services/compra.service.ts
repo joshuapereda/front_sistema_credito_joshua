@@ -22,10 +22,22 @@ export class CompraService {
   funListarTipoCompra() {
     return this.http.get<any[]>(`${this.urlBase}/api/tipoCompras`);
   }
+  funListarCategoria() {
+    return this.http.get<any[]>(`${this.urlBase}/api/categorias`);
+  }
   funListarProducto() {
     return this.http.get<any[]>(`${this.urlBase}/api/productos`);
   }
   funGuarda(datos: any) {
     return this.http.post(`${this.urlBase}/api/compra`, datos);
+  }
+  funGuardaProducto(datos: any) {
+    return this.http.post(`${this.urlBase}/api/productos`, datos);
+  }
+  funGuardaCliente(datos: any) {
+    return this.http.post(`${this.urlBase}/api/clientes`, datos);
+  }
+  funEditar(id: number, datos: any) {
+    return this.http.put(`${this.urlBase}/api/compra/${id}`, datos);
   }
 }

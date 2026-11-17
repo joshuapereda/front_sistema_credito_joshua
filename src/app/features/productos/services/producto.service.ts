@@ -17,4 +17,10 @@ export class ProductoService {
   funGuarda(datos: any) {
     return this.http.post(`${this.urlBase}/api/productos`, datos);
   }
+  funEditar(id: number, datos: any) {
+    return this.http.put(`${this.urlBase}/api/productos/${id}`, datos);
+  }
+  funEliminar(id: number) {
+    return this.http.delete(`${this.urlBase}/api/productos/${id}`);
+  }
 }

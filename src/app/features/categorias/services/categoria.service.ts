@@ -15,6 +15,12 @@ export class CategoriaService {
   funGuarda(datos: any) {
     return this.http.post(`${this.urlBase}/api/categorias`, datos);
   }
+  funEditar(id: number, datos: any) {
+    return this.http.put(`${this.urlBase}/api/categorias/${id}`, datos);
+  }
+  funEliminar(id: number) {
+    return this.http.delete(`${this.urlBase}/api/categorias/${id}`);
+  }
 
 
 }

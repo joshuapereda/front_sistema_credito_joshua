@@ -28,7 +28,7 @@ export class UsuarioService {
     return this.http.get(`${this.urlBase}/api/usuarios/${id}`);
   }
   funEditar(id: number, datos: any) {
-    return this.http.patch(`${this.urlBase}/api/usuarios/${id}`, datos);
+    return this.http.put(`${this.urlBase}/api/usuarios/${id}`, datos);
   }
   funEliminar(id: number) {
     return this.http.delete(`${this.urlBase}/api/usuarios/${id}`);

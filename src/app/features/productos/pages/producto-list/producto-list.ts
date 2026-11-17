@@ -19,6 +19,12 @@ export class ProductoList implements OnInit {
   protected readonly categorias = signal<any>([]);
   protected readonly productoService = inject(ProductoService);
   protected readonly crearProducto = signal(false);
+  //si edito o no
+  protected readonly user_id = signal<any>(-1);
+  //para eliminar
+  protected readonly mensajeError = signal<string | null>(null);
+  protected readonly mensajeExito = signal<string | null>(null);
+  protected readonly productoAEliminar = signal<any>(null);
 
   //------------- LISTADO CATEGORIA ---------------//
   funObtenerCategoria() {
@@ -58,11 +64,34 @@ export class ProductoList implements OnInit {
     precioVenta: new FormControl('', { nonNullable: true, validators: [Validators.required] }),
     precioCompra: new FormControl('', { nonNullable: true, validators: [Validators.required] }),
     categoriaId: new FormControl('', { nonNullable: true, validators: [Validators.required] }),
-    foto: new FormControl<File | null>(null, Validators.required),
+    foto: new FormControl<File | null>(null),
   });
-  //------------- GUARDAR PERSONA ---------------//
+  //------------- GUARDAR ---------------//
   funGuardarProducto() {
-    if (this.productoForm.invalid) {
+    //validar si esta editando o creando
+    if (this.user_id() !== -1) {
+      //EDITAR
+      if (this.productoForm.invalid) {
+        this.productoForm.markAllAsTouched();
+        return;
+      }
+      const { nombre, precioVenta,precioCompra,categoriaId, foto } = this.productoForm.getRawValue();
+      const formData = new FormData();
+      formData.append('nombre', nombre);
+      formData.append('precioVenta', precioVenta);
+      formData.append('precioCompra', precioCompra);
+      formData.append('categoriaId', categoriaId);
+      if (foto) formData.append('foto', foto); //solo si eligió una nueva
+
+      this.productoService.funEditar(this.user_id(), formData).subscribe({
+        next: () => {
+          this.funObtenerProducto();
+          this.cerrarModal();
+        },
+        error: (err) => console.error('Error al editar la categoría', err),
+      });
+    }else{
+      if (this.productoForm.invalid) {
       this.productoForm.markAllAsTouched();
       return;
     }
@@ -83,6 +112,7 @@ export class ProductoList implements OnInit {
       },
       error: (error) => console.log(error),
     });
+    }
   }
   //Subir foto
   onFotoSeleccionada(event: Event) {
@@ -93,7 +123,52 @@ export class ProductoList implements OnInit {
     this.productoForm.controls.foto.markAsTouched();
 
   }
-  //------------- GUARDAR PERSONA ---------------//
+  //------------- EDITAR CATEGORIA ---------------//
+  funEditarProducto(p: any) {
+    this.user_id.set(p.id);
+    this.productoForm.patchValue({
+      nombre: p.nombre,
+      precioVenta: p.precioVenta,
+      precioCompra: p.precioCompra,
+      categoriaId: p.categoriaId,
+      foto: null,
+    });
+  }
+  //------------- ELIMINAR CATEGORIA ---------------//
+  //abre el modal de confirmación (el botón de la papelera ya lo llama)
+  funEliminarProducto(pro: any) {
+    this.productoAEliminar.set(pro);
+  }
+
+  cancelarEliminar() {
+    this.productoAEliminar.set(null);
+  }
+
+  confirmarEliminar() {
+    const cat = this.productoAEliminar();
+    if (!cat) return;
+
+    this.productoService.funEliminar(cat.id).subscribe({
+      next: () => {
+        this.productoAEliminar.set(null);
+        this.funObtenerProducto();
+        this.mensajeExito.set(`El producto "${cat.nombre}" se eliminó exitosamente.`);
+      },
+      error: (err) => {
+        this.productoAEliminar.set(null);
+        this.mensajeError.set(err.error?.message ?? 'No se pudo eliminar el producto');
+      },
+    });
+  }
+
+  cerrarExito() {
+    this.mensajeExito.set(null);
+  }
+
+  cerrarAviso() {
+    this.mensajeError.set(null);
+  }
+  //------------- MODALS ---------------//
   abrir(compra: any) {
     this.crearProducto.set(compra);
   }
