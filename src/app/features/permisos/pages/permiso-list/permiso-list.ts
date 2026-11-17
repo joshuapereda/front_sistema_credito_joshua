@@ -17,13 +17,19 @@ export class PermisoList implements OnInit {
   protected readonly permisos = signal<any[]>([]);
   private readonly permisoService = inject(PermisoService);
   protected readonly crearPermiso = signal(false);
+  //si edito o no - obtener id (-1 = creando)
+  protected readonly user_id = signal<number>(-1);
+  //para eliminar
+  protected readonly mensajeError = signal<string | null>(null);
+  protected readonly mensajeExito = signal<string | null>(null);
+  protected readonly permisoAEliminar = signal<any>(null);
 
   //------------- LISTADO PERMISO ---------------//
   funObtenerPermiso() {
     this.permisoService.funListarPermiso().subscribe({
-      next: (res: any) => {
+      next: (permi: any) => {
         //guardar en permisos
-        this.permisos.set(res);
+        this.permisos.set(permi);
       },
 
       error: (error) => {
@@ -40,6 +46,24 @@ export class PermisoList implements OnInit {
   });
   //------------- GUARDAR PERMISO --------------//
   funGuardarPermiso() {
+    //validar si esta editando o creando
+    if (this.user_id() !== -1) {
+      //EDITAR
+      if (this.permisoForm.invalid) {
+        this.permisoForm.markAllAsTouched();
+        return;
+      }
+      const { nombre, recurso ,accion} = this.permisoForm.getRawValue();
+      const permiso = { nombre, recurso,accion };
+
+      this.permisoService.funEditar(this.user_id(), permiso).subscribe({
+        next: () => {
+          this.funObtenerPermiso();
+          this.cerrarModal();
+        },
+        error: (err) => console.error('Error al editar los permisos', err),
+      });
+    } else {
     //validar si el formualrio esta vacio
     if (this.permisoForm.invalid) {
       this.permisoForm.markAllAsTouched();
@@ -53,6 +77,43 @@ export class PermisoList implements OnInit {
       },
       error: (error) => { console.log(error) }
     });
+  }}
+  //------------- EDITAR CATEGORIA ---------------//
+  funEditarPermiso(cat: any) {
+    //almacenar el id al dar click
+    this.user_id.set(cat.id)
+    //precargar los datos ya registrado
+    this.permisoForm.patchValue({
+      nombre: cat.nombre,
+      recurso: cat.recurso,
+      accion: cat.accion,
+    });
+  }
+   //------------- ELIMINAR CATEGORIA ---------------//
+  //abre el modal de confirmación (el botón de la papelera ya lo llama)
+  funEliminarCategoria(permi: any) {
+    this.permisoAEliminar.set(permi);
+  }
+
+  cancelarEliminar() {
+    this.permisoAEliminar.set(null);
+  }
+
+  confirmarEliminar() {
+    const cat = this.permisoAEliminar();
+    if (!cat) return;
+
+    this.permisoService.funEliminar(cat.id).subscribe({
+      next: () => {
+        this.permisoAEliminar.set(null);
+        this.funObtenerPermiso();
+        this.mensajeExito.set(`EL permiso "${cat.nombre}" se eliminó exitosamente.`);
+      },
+      error: (err) => {
+        this.permisoAEliminar.set(null);
+        this.mensajeError.set(err.error?.message ?? 'No se pudo eliminar el permiso');
+      },
+    });
   }
   //---------------- MODALES ----------------//
   abrir(compra: any) {
@@ -65,5 +126,12 @@ export class PermisoList implements OnInit {
   @HostListener('document:keydown.escape')
   onEscape() {
     if (this.crearPermiso()) this.cerrarModal();
+  }
+  cerrarExito() {
+    this.mensajeExito.set(null);
+  }
+
+  cerrarAviso() {
+    this.mensajeError.set(null);
   }
 }

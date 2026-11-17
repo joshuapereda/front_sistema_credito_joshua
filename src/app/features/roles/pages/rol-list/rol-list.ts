@@ -22,6 +22,12 @@ export class RolList implements OnInit {
   // Orden de las columnas
   private readonly ordenAcciones = ['LISTAR', 'CREAR', 'ACTUALIZAR', 'ELIMINAR'];
   protected readonly busquedaPermiso = signal('');
+  //si edito o no - obtener id
+  protected readonly user_id = signal<any>(-1);
+  //para eliminar
+  protected readonly mensajeError = signal<string | null>(null);
+  protected readonly mensajeExito = signal<string | null>(null);
+  protected readonly rolaAEliminar = signal<any>(null);
 
   //------------- LISTADO PERMISO ---------------//
   funObtenerPermiso() {
@@ -66,25 +72,55 @@ export class RolList implements OnInit {
   });
   //------------- GUARDAR ROL ---------------//
   funGuardarRol() {
-    if (this.rolForm.invalid) {
-      this.rolForm.markAllAsTouched();
-      return;
+    //validar si esta editando o creando
+    if (this.user_id() !== -1) {
+      //EDITAR
+      if (this.rolForm.invalid) {
+        this.rolForm.markAllAsTouched();
+        return;
+      }
+      const { nombre, descripcion,permisosId } = this.rolForm.getRawValue();
+      const rol = { nombre, descripcion ,permisosId};
+
+      this.rolService.funEditar(this.user_id(), rol).subscribe({
+        next: () => {
+          this.funObtenerRol();
+          this.cerrarModal();
+        },
+        error: (err) => console.error('Error al editar el rol', err),
+      });
+    } else {
+      if (this.rolForm.invalid) {
+        this.rolForm.markAllAsTouched();
+        return;
+      }
+
+      const { nombre, descripcion, permisosId } = this.rolForm.getRawValue();
+
+      const usuario = {
+        nombre,
+        descripcion,
+        permisosId,
+      };
+
+      this.rolService.funGuarda(usuario).subscribe({
+        next: () => {
+          this.cerrarModal();
+          this.funObtenerRol();
+        },
+        error: (error) => console.log(error),
+      });
     }
-
-    const { nombre, descripcion, permisosId } = this.rolForm.getRawValue();
-
-    const usuario = {
-      nombre,
-      descripcion,
-      permisosId,
-    };
-
-    this.rolService.funGuarda(usuario).subscribe({
-      next: () => {
-        this.cerrarModal();
-        this.funObtenerRol();
-      },
-      error: (error) => console.log(error),
+  }
+  //------------- EDITAR CATEGORIA ---------------//
+  funEditarRol(rol: any) {
+    //almacenar el id al dar click
+    this.user_id.set(rol.id)
+    //precargar los datos ya registrado
+    this.rolForm.patchValue({
+      nombre: rol.nombre,
+      descripcion: rol.descripcion,
+      permisosId: rol.permisosId,
     });
   }
   //------------- MODAL ---------------//
@@ -179,5 +215,38 @@ export class RolList implements OnInit {
   todosVisiblesMarcados(): boolean {
     const visibles = this.modulos().flatMap(m => m.ids);
     return visibles.length > 0 && visibles.every(id => this.permisoMarcado(id));
+  }
+  //------------- ELIMINAR CATEGORIA ---------------//
+  //abre el modal de confirmación (el botón de la papelera ya lo llama)
+  funEliminarRol(rol: any) {
+    this.rolaAEliminar.set(rol);
+  }
+
+  cancelarEliminar() {
+    this.rolaAEliminar.set(null);
+  }
+
+  confirmarEliminar() {
+    const cat = this.rolaAEliminar();
+    if (!cat) return;
+
+    this.rolService.funEliminar(cat.id).subscribe({
+      next: () => {
+        this.rolaAEliminar.set(null);
+        this.funObtenerRol();
+        this.mensajeExito.set(`El rol "${cat.nombre}" se eliminó exitosamente.`);
+      },
+      error: (err) => {
+        this.rolaAEliminar.set(null);
+        this.mensajeError.set(err.error?.message ?? 'No se pudo eliminar el rol');
+      },
+    });
+  }
+  cerrarExito() {
+    this.mensajeExito.set(null);
+  }
+
+  cerrarAviso() {
+    this.mensajeError.set(null);
   }
 }

@@ -1,6 +1,25 @@
+<head>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+</head>
 <app-page-header titulo="Compras" subtitulo="Ventas registradas, con su total, saldo y estado.">
-  <a class="btn colorBoton" (click)="abrirVenta(true)"> <samp>+</samp> Nueva compra</a>
+  <div class="acciones">
+    <a class="btn-accion btn-producto" (click)="abrirProducto(true)">
+      <i class="bi bi-box-seam"></i>
+      <span>Nuevo producto</span>
+    </a>
+
+    <a class="btn-accion btn-cliente" (click)="abrirCliente(true)">
+      <i class="bi bi-person-plus"></i>
+      <span>Nuevo cliente</span>
+    </a>
+
+    <a class="btn-accion btn-compra" (click)="abrirVenta(true)">
+      <i class="bi bi-cart-plus"></i>
+      <span>Nueva compra</span>
+    </a>
+  </div>
 </app-page-header>
+
 
 @if (compras().length === 0) {
 <app-empty-state titulo="Aún no hay compras" mensaje="Registra la primera compra para verla aquí." />
@@ -10,27 +29,28 @@
     <table class="min-w-full divide-y divide-gray-200 text-sm">
       <thead class="bg-gray-50">
         <tr>
-          <th class="px-6 py-3 text-left text-xs font-semibold uppercase tracking-wider text-gray-500">N°</th>
-          <th class="px-6 py-3 text-left text-xs font-semibold uppercase tracking-wider text-gray-500">Fecha</th>
-          <th class="px-6 py-3 text-left text-xs font-semibold uppercase tracking-wider text-gray-500">Cliente</th>
-          <th class="px-6 py-3 text-left text-xs font-semibold uppercase tracking-wider text-gray-500">Tipo</th>
-          <th class="px-6 py-3 text-center text-xs font-semibold uppercase tracking-wider text-gray-500">Productos</th>
-          <th class="px-6 py-3 text-right text-xs font-semibold uppercase tracking-wider text-gray-500">Total</th>
-          <th class="px-6 py-3 text-right text-xs font-semibold uppercase tracking-wider text-gray-500">Saldo</th>
+          <th class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-gray-500">N°</th>
+          <th class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-gray-500">Fecha</th>
+          <th class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-gray-500">Cliente</th>
+          <th class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-gray-500">Tipo</th>
+          <th class="px-4 py-3 text-center text-xs font-semibold uppercase tracking-wider text-gray-500">Productos</th>
+          <th class="px-8 py-3 text-right text-xs font-semibold uppercase tracking-wider text-gray-500">Total</th>
+          <th class="px-10 py-3 text-right text-xs font-semibold uppercase tracking-wider text-gray-500">Saldo</th>
           <th class="px-6 py-3 text-left text-xs font-semibold uppercase tracking-wider text-gray-500">Estado</th>
-          <th class="px-6 py-3 text-right text-xs font-semibold uppercase tracking-wider text-gray-500">Acciones</th>
+          <th class="px-10 py-3 text-left text-xs font-semibold uppercase tracking-wider text-gray-500">Detalle</th>
+          <th class="px-4 py-3 text-right text-xs font-semibold uppercase tracking-wider text-gray-500">Acciones</th>
         </tr>
       </thead>
 
       <tbody class="divide-y divide-gray-100">
         @for (com of compras(); track com.id) {
         <tr class="transition-colors hover:bg-gray-50">
-          <td class="px-6 py-4 font-mono text-xs text-gray-500">#{{ com.id }}</td>
+          <td class="px-2 py-4 font-mono text-xs text-gray-500">#{{ com.id }}</td>
           <td class="whitespace-nowrap px-6 py-4">
             <p class="font-medium text-gray-900">{{ com.fechaHora | date: 'dd/MM/yyyy' }}</p>
             <p class="text-xs text-gray-500">{{ com.fechaHora | date: 'hh:mm a' }}</p>
           </td>
-          <td class="px-6 py-4">
+          <td class="px-4 py-4">
             <div class="flex items-center gap-3">
               <div
                 class="flex h-9 w-9 items-center justify-center rounded-full bg-indigo-100 text-sm font-semibold text-indigo-700">
@@ -40,7 +60,7 @@
             </div>
           </td>
 
-          <td class="px-6 py-4">
+          <td class="px-3 py-4">
             @if (com.tipoCompra === 'Credito') {
             <span
               class="inline-flex items-center rounded-full bg-violet-50 px-2.5 py-1 text-xs font-medium text-violet-700 ring-1 ring-inset ring-violet-200">Crédito</span>
@@ -103,6 +123,20 @@
                   <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
                 </svg>
                 Ver detalle
+              </button>
+            </div>
+          </td>
+          <td class="px-9 py-4">
+            <div
+              class="flex items-center justify-end gap-1 opacity-60 transition-opacity group-hover:opacity-100 focus-within:opacity-100">
+              <!-- el (click) va en el button, y solo llama a funEditarCompra -->
+              <button type="button" class="icon-btn" title="Editar compra" aria-label="Editar compra"
+                (click)="abrirVenta(true);funEditarCompra(com)">
+                <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75"
+                  aria-hidden="true">
+                  <path stroke-linecap="round" stroke-linejoin="round"
+                    d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931z" />
+                </svg>
               </button>
             </div>
           </td>
@@ -323,7 +357,216 @@
   </div>
 </div>
 }
+@if (crearCliente(); as c) {
+<div class="modal-overlay" (click)="cerrarModalCliente()">
+  <div class="modal" role="dialog" aria-modal="true" aria-labelledby="modal-titulo" (click)="$event.stopPropagation()">
+    <div class="modal-header">
+      <div class="modal-icon" aria-hidden="true">🏷️</div>
+      <div class="modal-heading">
+        <h2 id="modal-titulo">Nuevo Cliente</h2>
+        <p>Define el Cliente</p>
+      </div>
+      <button class="modal-close" type="button" aria-label="Cerrar" (click)="cerrarModalCliente()">
+        ✕
+      </button>
+    </div>
+    <form [formGroup]="clienteForm" (ngSubmit)="funGuardarCliente()">
+      <div class="modal-body">
+        <div class="field-row">
+          <div class="field">
+            <label class="field-label" for="nombre">Nombre</label>
+            <input class="field-input" id="nombre" type="text" placeholder="Ej: Nombre del producto"
+              formControlName="nombre" autofocus />
+            @if (clienteForm.controls.nombre.touched && clienteForm.controls.nombre.invalid) {
+            <p class="field-error">El nombre es obligatorio.</p>
+            }
+            @if (errorServidor().length) {
+            <div class="server-error" role="alert">
+              @for (m of errorServidor(); track m) {
+              <p>{{ m }}</p>
+              }
+            </div>
+            }
+          </div>
+
+          <div class="field">
+            <label class="field-label" for="gmail">Gmail</label>
+            <input class="field-input" id="gmail" type="text" placeholder="Ej: admin@gmail.com" formControlName="gmail"
+              autofocus />
+          </div>
+        </div>
+
+        <div class="field-row">
+          <div class="field">
+            <label class="field-label" for="telefono">N° Telefono</label>
+            <input class="field-input" id="telefono" type="text" placeholder="Ej: 9XX-XXX-XXX"
+              formControlName="telefono" autofocus />
+            @if (clienteForm.controls.telefono.touched && clienteForm.controls.telefono.invalid) {
+            <p class="field-error">El N° Telefono es obligatorio.</p>
+            }
+          </div>
+
+          <div class="field">
+            <label class="field-label" for="direccion">Direccion</label>
+            <input class="field-input" id="direccion" type="text" placeholder="Ej: AV.XXX-XXX"
+              formControlName="direccion" autofocus />
+            @if (clienteForm.controls.direccion.touched && clienteForm.controls.direccion.invalid) {
+            <p class="field-error">La Direccion es obligatorio.</p>
+            }
+          </div>
+        </div>
+        <div class="field-row">
+          <div class="field">
+            <label class="field-label" for="docIdentidad">D° Identidad</label>
+            <input class="field-input" id="docIdentidad" type="text" placeholder="Ej: 7XXXXXXX"
+              formControlName="docIdentidad" autofocus />
+            @if (clienteForm.controls.docIdentidad.touched && clienteForm.controls.docIdentidad.invalid) {
+            <p class="field-error">El D° Identidad es obligatorio.</p>
+            }
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="mbtn mbtn-ghost" type="button" (click)="cerrarModalCliente()">Cancelar</button>
+        <button class="mbtn colorBoton" type="submit">Guardar</button>
+      </div>
+    </form>
+  </div>
+</div>
+}
+@if (crearProducto(); as c) {
+<div class="modal-overlay" (click)="cerrarModalProducto()">
+  <div class="modal" role="dialog" aria-modal="true" aria-labelledby="modal-titulo" (click)="$event.stopPropagation()">
+    <div class="modal-header">
+      <div class="modal-icon" aria-hidden="true">🏷️</div>
+      <div class="modal-heading">
+        <h2 id="modal-titulo">Nuevo Producto</h2>
+        <p>Define el Producto</p>
+      </div>
+      <button class="modal-close" type="button" aria-label="Cerrar" (click)="cerrarModalProducto()">
+        ✕
+      </button>
+    </div>
+
+    <form [formGroup]="productoForm" (ngSubmit)="funGuardarProducto()">
+      <div class="modal-body">
+        <div class="field-row">
+          <div class="field">
+            <label class="field-label" for="nombre">Nombre</label>
+            <input class="field-input" id="nombre" type="text" placeholder="Ej: Nombre del producto"
+              formControlName="nombre" autofocus />
+            @if (productoForm.controls.nombre.touched && productoForm.controls.nombre.invalid) {
+            <p class="field-error">El nombre es obligatorio.</p>
+            }
+          </div>
+          <div class="field">
+            <label class="field-label" for="categoriaId">Categoria</label>
+            <select class="field-input" id="categoriaId" formControlName="categoriaId">
+              <option [ngValue]="null" disabled>Selecciona una producto</option>
+              @for (cat of categorias(); track cat.id) {
+              <option [ngValue]="cat.id">{{ cat.nombre }}</option>
+              }
+            </select>
+            @if (productoForm.controls.categoriaId.touched && productoForm.controls.categoriaId.invalid) {
+            <p class="field-error">El producto es obligatoria.</p>
+            }
+          </div>
+        </div>
+
+        <div class="field-row">
+          <div class="field">
+            <label class="field-label" for="precioVenta">Precio de venta</label>
+            <input class="field-input" id="precioVenta" type="number" min="0" step="0.01" placeholder="Ej: S/200.00"
+              formControlName="precioVenta" />
+            @if (productoForm.controls.precioVenta.touched && productoForm.controls.precioVenta.invalid) {
+            <p class="field-error">El precio de venta es obligatorio.</p>
+            }
+          </div>
+
+          <div class="field">
+            <label class="field-label" for="precioCompra">Precio de compra</label>
+            <input class="field-input" id="precioCompra" type="number" min="0" step="0.01" placeholder="Ej: S/50.00"
+              formControlName="precioCompra" />
+            @if (productoForm.controls.precioCompra.touched && productoForm.controls.precioCompra.invalid) {
+            <p class="field-error">El precio de compra es obligatorio.</p>
+            }
+          </div>
+        </div>
+        <div class="field">
+          <label class="field-label" for="foto">Foto</label>
+          <input class="field-input" id="foto" type="file" accept="image/*" (change)="onFotoSeleccionada($event)" />
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="mbtn mbtn-ghost" type="button" (click)="cerrarModalProducto()">Cancelar</button>
+        <button class="mbtn colorBoton" type="submit">Guardar</button>
+      </div>
+    </form>
+  </div>
+</div>
+}
 <style>
+  /*  ======BOTONES========  */
+  .acciones {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    align-items: center;
+  }
+
+  .btn-accion {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 18px;
+    border-radius: 10px;
+    font-size: 14px;
+    font-weight: 600;
+    color: #fff;
+    cursor: pointer;
+    user-select: none;
+    text-decoration: none;
+    border: 1px solid transparent;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+    transition: transform 0.15s ease, box-shadow 0.15s ease, filter 0.15s ease;
+  }
+
+  .btn-accion i {
+    font-size: 18px;
+    line-height: 1;
+  }
+
+  .btn-accion:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 14px rgba(0, 0, 0, 0.22);
+    filter: brightness(1.08);
+    color: #fff;
+  }
+
+  .btn-accion:active {
+    transform: translateY(0);
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+  }
+
+  .btn-producto {
+    background: linear-gradient(135deg, #0ea5a4, #0d9488);
+  }
+
+  .btn-cliente {
+    background: linear-gradient(135deg, #f59e0b, #d97706);
+  }
+
+  .btn-compra {
+    background: linear-gradient(135deg, #6366f1, #4f46e5);
+  }
+
+  @media (max-width: 576px) {
+    .btn-accion {
+      flex: 1 1 100%;
+      justify-content: center;
+    }
+  }
+
   /* ===== MODAL BASE ===== */
   .modal-overlay {
     position: fixed;

@@ -4,7 +4,7 @@ import { environment } from '@/environments/environment';
 
 @Service()
 export class ClienteService {
-  
+
   urlBase = environment.apiUrl;
   http = inject(HttpClient);
 
@@ -14,6 +14,12 @@ export class ClienteService {
   }
   funGuarda(datos: any) {
     return this.http.post(`${this.urlBase}/api/clientes`, datos);
+  }
+  funEditar(id: number, datos: any) {
+    return this.http.put(`${this.urlBase}/api/clientes/${id}`, datos);
+  }
+  funEliminar(id: number) {
+    return this.http.delete(`${this.urlBase}/api/clientes/${id}`);
   }
 
 }

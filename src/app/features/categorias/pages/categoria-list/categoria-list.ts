@@ -20,6 +20,12 @@ export class CategoriaList implements OnInit {
   protected readonly categoriaService = inject(CategoriaService);
   //abrir modal con el nombre de
   protected readonly crearCategoria = signal(false);
+  //si edito o no - obtener id
+  protected readonly user_id = signal<any>(-1);
+  //para eliminar
+  protected readonly mensajeError = signal<string | null>(null);
+  protected readonly mensajeExito = signal<string | null>(null);
+  protected readonly categoriaAEliminar = signal<any>(null);
 
   //------------- LISTADO CATEGORIA ---------------//
   funObtenerCategoria() {
@@ -37,28 +43,50 @@ export class CategoriaList implements OnInit {
   protected readonly categoriaForm = new FormGroup({
     nombre: new FormControl('', { nonNullable: true, validators: [Validators.required] }),
     descripcion: new FormControl('', { nonNullable: true, validators: [Validators.required] }),
-    foto: new FormControl<File | null>(null, Validators.required),
+    foto: new FormControl<File | null>(null),
   });
   //------------- GUARDAR CATEGORIA ---------------//
   funGuardarCategoria() {
-    if (this.categoriaForm.invalid) {
-      this.categoriaForm.markAllAsTouched();
-      return;
-    }
-    const { nombre, descripcion, foto } = this.categoriaForm.getRawValue();
-    //Form Data para las fotos
-    const formData = new FormData();
-    formData.append('nombre', nombre ?? '');
-    formData.append('descripcion', descripcion ?? '');
-    if (foto) formData.append('foto', foto);
+    //validar si esta editando o creando
+    if (this.user_id() !== -1) {
+      //EDITAR
+      if (this.categoriaForm.invalid) {
+        this.categoriaForm.markAllAsTouched();
+        return;
+      }
+      const { nombre, descripcion, foto } = this.categoriaForm.getRawValue();
+      const formData = new FormData();
+      formData.append('nombre', nombre);
+      formData.append('descripcion', descripcion);
+      if (foto) formData.append('foto', foto); //solo si eligió una nueva
 
-    this.categoriaService.funGuarda(formData).subscribe({
-      next: () => {
-        this.funObtenerCategoria();
-        this.cerrarModal();
-      },
-      error: (err) => console.error('Error al guardar la categoría', err),
-    });
+      this.categoriaService.funEditar(this.user_id(), formData).subscribe({
+        next: () => {
+          this.funObtenerCategoria();
+          this.cerrarModal();
+        },
+        error: (err) => console.error('Error al editar la categoría', err),
+      });
+    } else {
+      //CREAR
+      if (this.categoriaForm.invalid) {
+        this.categoriaForm.markAllAsTouched();
+        return;
+      }
+      const { nombre, descripcion, foto } = this.categoriaForm.getRawValue();
+      const formData = new FormData();
+      formData.append('nombre', nombre ?? '');
+      formData.append('descripcion', descripcion ?? '');
+      if (foto) formData.append('foto', foto);
+
+      this.categoriaService.funGuarda(formData).subscribe({
+        next: () => {
+          this.funObtenerCategoria();
+          this.cerrarModal();
+        },
+        error: (err) => console.error('Error al guardar la categoría', err),
+      });
+    }
   }
   //Para almacenar una foto
   onFotoSeleccionada(event: Event) {
@@ -68,8 +96,44 @@ export class CategoriaList implements OnInit {
     this.categoriaForm.controls.foto.markAsTouched();
 
   }
-  //------------- MODAL ---------------//
+  //------------- EDITAR ---------------//
+  funEditarCategoria(cat: any) {
+    //almacenar el id al dar click
+    this.user_id.set(cat.id)
+    //precargar los datos ya registrado
+    this.categoriaForm.patchValue({
+      nombre: cat.nombre,
+      descripcion: cat.descripcion,
+      foto: null,
+    });
+  }
+  //------------- ELIMINAR CATEGORIA ---------------//
+  //abre el modal de confirmación (el botón de la papelera ya lo llama)
+  funEliminarCategoria(cat: any) {
+    this.categoriaAEliminar.set(cat);
+  }
 
+  cancelarEliminar() {
+    this.categoriaAEliminar.set(null);
+  }
+
+  confirmarEliminar() {
+    const cat = this.categoriaAEliminar();
+    if (!cat) return;
+
+    this.categoriaService.funEliminar(cat.id).subscribe({
+      next: () => {
+        this.categoriaAEliminar.set(null);
+        this.funObtenerCategoria();
+        this.mensajeExito.set(`La categoría "${cat.nombre}" se eliminó exitosamente.`);
+      },
+      error: (err) => {
+        this.categoriaAEliminar.set(null);
+        this.mensajeError.set(err.error?.message ?? 'No se pudo eliminar la categoría');
+      },
+    });
+  }
+  //------------- MODAL ---------------//
   abrir(compra: any) {
     this.crearCategoria.set(compra);
   }
@@ -82,6 +146,14 @@ export class CategoriaList implements OnInit {
   @HostListener('document:keydown.escape')
   onEscape() {
     if (this.crearCategoria()) this.cerrarModal();
+  }
+  //------------------------------------//
+   cerrarExito() {
+    this.mensajeExito.set(null);
+  }
+
+  cerrarAviso() {
+    this.mensajeError.set(null);
   }
 
 }

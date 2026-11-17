@@ -15,4 +15,10 @@ export class PermisoService {
   funGuarda(datos: any) {
     return this.http.post(`${this.urlBase}/api/permisos`, datos);
   }
+  funEditar(id: number, datos: any) {
+    return this.http.put(`${this.urlBase}/api/permisos/${id}`, datos);
+  }
+  funEliminar(id: number) {
+    return this.http.delete(`${this.urlBase}/api/permisos/${id}`);
+  }
 }

@@ -20,6 +20,12 @@ export class UsuarioList implements OnInit {
   protected readonly roles = signal<any>([]);
   protected readonly usuarioService = inject(UsuarioService);
   protected readonly crearUsuario = signal(false);
+  //si edito o no - obtener id (-1 = creando)
+  protected readonly user_id = signal<number>(-1);
+  //para eliminar
+  protected readonly mensajeError = signal<string | null>(null);
+  protected readonly mensajeExito = signal<string | null>(null);
+  protected readonly usuarioAEliminar = signal<any>(null);
 
   //------------- LISTADO PERSONA ---------------//
   funObtenerPersona() {
@@ -96,26 +102,81 @@ export class UsuarioList implements OnInit {
   }
   //------------- GUARDAR PERSONA ---------------//
   funGuardarUsuario() {
-    if (this.usuarioForm.invalid) {
-      this.usuarioForm.markAllAsTouched();
-      return;
+    //validar si esta editando o creando
+    if (this.user_id() !== -1) {
+      //EDITAR
+      if (this.usuarioForm.invalid) {
+        this.usuarioForm.markAllAsTouched();
+        return;
+      }
+      const { username, passwprd, personaId, rolesId } = this.usuarioForm.getRawValue();
+      const usuario = { username, passwprd, personaId, rolesId };
+
+      this.usuarioService.funEditar(this.user_id(), usuario).subscribe({
+        next: () => {
+          this.funObtenerUsuarios();
+          this.cerrarModal();
+        },
+        error: (err) => console.error('Error al editar el usuario', err),
+      });
+    } else {
+      //CREAR
+      if (this.usuarioForm.invalid) {
+        this.usuarioForm.markAllAsTouched();
+        return;
+      }
+      const { username, passwprd, personaId, rolesId } = this.usuarioForm.getRawValue();
+      const usuario = { username, passwprd, personaId, rolesId };
+
+      this.usuarioService.funGuarda(usuario).subscribe({
+        next: () => {
+          this.funObtenerUsuarios();
+          this.cerrarModal();
+        },
+        error: (err) => console.error('Error al guardar el usuario', err),
+      });
     }
+  }
+  //------------- EDITAR ---------------//
+  funEditarUsuario(user: any) {
+    //almacenar el id al dar click
+    this.user_id.set(user.id)
+    //precargar los datos ya registrado
+    this.usuarioForm.patchValue({
+      username: user.username,
+      personaId: user.personaId,
+      rolesId: user.rolesId,
+      passwprd: '',
+    });
+    //al editar, la contraseña es opcional (vacío = mantener la anterior)
+    const pass = this.usuarioForm.controls.passwprd;
+    pass.clearValidators();
+    pass.updateValueAndValidity();
+  }
+  //------------- ELIMINAR CATEGORIA ---------------//
+  //abre el modal de confirmación (el botón de la papelera ya lo llama)
+  funEliminarUsuario(user: any) {
+    this.usuarioAEliminar.set(user);
+  }
 
-    const { username, passwprd, personaId, rolesId } = this.usuarioForm.getRawValue();
+  cancelarEliminar() {
+    this.usuarioAEliminar.set(null);
+  }
 
-    const usuario = {
-      username,
-      passwprd,
-      personaId,
-      rolesId,
-    };
+  confirmarEliminar() {
+    const cat = this.usuarioAEliminar();
+    if (!cat) return;
 
-    this.usuarioService.funGuarda(usuario).subscribe({
+    this.usuarioService.funEliminar(cat.id).subscribe({
       next: () => {
-        this.cerrarModal();
+        this.usuarioAEliminar.set(null);
         this.funObtenerUsuarios();
+        this.mensajeExito.set(`El usuario "${cat.username}" se eliminó exitosamente.`);
       },
-      error: (error) => console.log(error),
+      error: (err) => {
+        this.usuarioAEliminar.set(null);
+        this.mensajeError.set(err.error?.message ?? 'No se pudo eliminar el usuario');
+      },
     });
   }
   //------------- MODAL ---------------//
@@ -124,10 +185,24 @@ export class UsuarioList implements OnInit {
   }
   cerrarModal() {
     this.crearUsuario.set(false);
+    //volver a modo "crear"
+    this.user_id.set(-1);
+    //restaurar la contraseña como obligatoria para el próximo "Nuevo usuario"
+    const pass = this.usuarioForm.controls.passwprd;
+    pass.setValidators([Validators.required]);
     this.usuarioForm.reset({ username: '', passwprd: '', personaId: null, rolesId: [] });
+    pass.updateValueAndValidity();
   }
   @HostListener('document:keydown.escape')
   onEscape() {
     if (this.crearUsuario()) this.cerrarModal();
   }
+  cerrarExito() {
+    this.mensajeExito.set(null);
+  }
+
+  cerrarAviso() {
+    this.mensajeError.set(null);
+  }
+
 }
