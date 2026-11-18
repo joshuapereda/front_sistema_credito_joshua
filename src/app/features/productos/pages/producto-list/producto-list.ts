@@ -1,13 +1,15 @@
-import { Component, computed, HostListener, inject, OnInit, signal } from '@angular/core';
+import { Component, computed, HostListener, inject, OnInit, signal, ViewEncapsulation } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { PageHeader } from '@/app/shared/components/page-header/page-header';
 import { EmptyState } from '@/app/shared/components/empty-state/empty-state';
 import { ProductoService } from '../../services/producto.service';
 import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
+import { ConfirmDialog } from '@/app/shared/components/confirm-dialog/confirm-dialog';
+import { AvisoDialog } from '@/app/shared/components/aviso-dialog/aviso-dialog';
 
 @Component({
   selector: 'app-producto-list',
-  imports: [RouterLink, PageHeader, EmptyState, ReactiveFormsModule],
+  imports: [RouterLink, PageHeader, EmptyState, ReactiveFormsModule,ConfirmDialog,AvisoDialog],
   templateUrl: './producto-list.html',
 })
 export class ProductoList implements OnInit {

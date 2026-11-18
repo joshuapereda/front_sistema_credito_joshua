@@ -111,62 +111,16 @@
   </div>
 </div>
 }
-@if (mensajeError(); as msg) {
-<div class="modal-overlay" (click)="cerrarAviso()">
-  <div class="modal" role="alertdialog" aria-modal="true" (click)="$event.stopPropagation()">
-    <div class="modal-header">
-      <div class="modal-icon" aria-hidden="true">⚠️</div>
-      <div class="modal-heading">
-        <h2>No se pudo eliminar</h2>
-      </div>
-      <button class="modal-close" type="button" aria-label="Cerrar" (click)="cerrarAviso()">✕</button>
-    </div>
-    <div class="modal-body">
-      <p>{{ msg }}</p>
-    </div>
-    <div class="modal-footer">
-      <button class="mbtn colorBoton" type="button" (click)="cerrarAviso()">Entendido</button>
-    </div>
-  </div>
-</div>
-}
-@if (categoriaAEliminar(); as cat) {
-<div class="modal-overlay" (click)="cancelarEliminar()">
-  <div class="modal modal-sm" role="alertdialog" aria-modal="true" (click)="$event.stopPropagation()">
-    <div class="confirm-body">
-      <div class="confirm-icon" aria-hidden="true">🗑️</div>
-      <h2>¿Eliminar categoría?</h2>
-      <p>
-        Estás por eliminar <strong>"{{ cat.nombre }}"</strong>.
-        Esta acción no se puede deshacer.
-      </p>
-    </div>
-    <div class="modal-footer confirm-footer">
-      <button class="mbtn mbtn-ghost" type="button" (click)="cancelarEliminar()">Cancelar</button>
-      <button class="mbtn mbtn-danger" type="button" (click)="confirmarEliminar()">Sí, eliminar</button>
-    </div>
-  </div>
-</div>
-}
-@if (mensajeExito(); as msg) {
-<div class="modal-overlay" (click)="cerrarExito()">
-  <div class="modal" role="alertdialog" aria-modal="true" (click)="$event.stopPropagation()">
-    <div class="modal-header">
-      <div class="modal-icon" aria-hidden="true">✅</div>
-      <div class="modal-heading">
-        <h2>Eliminada</h2>
-      </div>
-      <button class="modal-close" type="button" aria-label="Cerrar" (click)="cerrarExito()">✕</button>
-    </div>
-    <div class="modal-body">
-      <p>{{ msg }}</p>
-    </div>
-    <div class="modal-footer">
-      <button class="mbtn colorBoton" type="button" (click)="cerrarExito()">Aceptar</button>
-    </div>
-  </div>
-</div>
-}
+<!-- PARA ELIMINAR: componentes en shared/components/confirm-dialog y aviso-dialog -->
+<app-confirm-dialog [nombre]="categoriaAEliminar()?.nombre ?? null" titulo="¿Eliminar categoria?"
+  (confirmar)="confirmarEliminar()" (cancelar)="cancelarEliminar()" />
+
+<app-aviso-dialog [mensaje]="mensajeExito()" titulo="Producto categoria" (cerrar)="cerrarExito()" />
+
+<app-aviso-dialog [mensaje]="mensajeError()" titulo="No se pudo eliminar" tipo="error" boton="Entendido"
+  (cerrar)="cerrarAviso()" />
+
+
 
 <style>
   /*  ========BOTON ======== */
@@ -219,110 +173,6 @@
     .btn-accion {
       flex: 1 1 100%;
       justify-content: center;
-    }
-  }
-
-  /*-------Alerta para eliminar-------*/
-  .modal-sm {
-    max-width: 400px;
-  }
-
-  .confirm-body {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 0.5rem;
-    padding: 2rem 1.5rem 1.25rem;
-    text-align: center;
-  }
-
-  .confirm-icon {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    width: 3.5rem;
-    height: 3.5rem;
-    margin-bottom: 0.25rem;
-    border-radius: 50%;
-    background: #fee2e2;
-    font-size: 1.6rem;
-  }
-
-  .confirm-body h2 {
-    margin: 0;
-    font-size: 1.125rem;
-    font-weight: 600;
-    color: #111827;
-  }
-
-  .confirm-body p {
-    margin: 0;
-    font-size: 0.875rem;
-    line-height: 1.5;
-    color: #6b7280;
-  }
-
-  .confirm-body strong {
-    color: #111827;
-  }
-
-  .confirm-footer {
-    justify-content: center;
-  }
-
-  .mbtn-danger {
-    background: #dc2626;
-    color: #fff;
-    box-shadow: 0 4px 12px rgb(220 38 38 / 0.3);
-  }
-
-  .mbtn-danger:hover {
-    background: #b91c1c;
-  }
-
-  /*----------------------------------*/
-  .modal-overlay {
-    position: fixed;
-    inset: 0;
-    z-index: 1000;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    padding: 1rem;
-    background: rgb(15 23 42 / 0.55);
-    backdrop-filter: blur(4px);
-    animation: overlay-in 0.2s ease-out;
-  }
-
-  .modal {
-    width: 100%;
-    max-width: 480px;
-    background: #fff;
-    border-radius: 16px;
-    overflow: hidden;
-    box-shadow: 0 25px 50px -12px rgb(0 0 0 / 0.35);
-    animation: modal-in 0.25s cubic-bezier(0.16, 1, 0.3, 1);
-  }
-
-  @keyframes overlay-in {
-    from {
-      opacity: 0;
-    }
-
-    to {
-      opacity: 1;
-    }
-  }
-
-  @keyframes modal-in {
-    from {
-      opacity: 0;
-      transform: translateY(16px) scale(0.96);
-    }
-
-    to {
-      opacity: 1;
-      transform: translateY(0) scale(1);
     }
   }
 
