@@ -4,9 +4,11 @@ import { PageHeader } from '@/app/shared/components/page-header/page-header';
 import { EmptyState } from '@/app/shared/components/empty-state/empty-state';
 import { UsuarioService } from '../../services/usuario.service';
 import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
+import { ConfirmDialog } from '@/app/shared/components/confirm-dialog/confirm-dialog';
+import { AvisoDialog } from '@/app/shared/components/aviso-dialog/aviso-dialog';
 @Component({
   selector: 'app-usuario-list',
-  imports: [RouterLink, PageHeader, EmptyState, ReactiveFormsModule],
+  imports: [RouterLink, PageHeader, EmptyState, ReactiveFormsModule,ConfirmDialog,AvisoDialog],
   templateUrl: './usuario-list.html',
 })
 export class UsuarioList implements OnInit {

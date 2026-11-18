@@ -4,10 +4,12 @@ import { PageHeader } from '@/app/shared/components/page-header/page-header';
 import { EmptyState } from '@/app/shared/components/empty-state/empty-state';
 import { ClienteService } from '../../services/cliente.service';
 import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
+import { ConfirmDialog } from '@/app/shared/components/confirm-dialog/confirm-dialog';
+import { AvisoDialog } from '@/app/shared/components/aviso-dialog/aviso-dialog';
 
 @Component({
   selector: 'app-cliente-list',
-  imports: [RouterLink, PageHeader, EmptyState, ReactiveFormsModule],
+  imports: [RouterLink, PageHeader, EmptyState, ReactiveFormsModule,ConfirmDialog,AvisoDialog],
   templateUrl: './cliente-list.html',
 })
 export class ClienteList implements OnInit {
@@ -24,7 +26,7 @@ export class ClienteList implements OnInit {
   //para eliminar
   protected readonly mensajeError = signal<string | null>(null);
   protected readonly mensajeExito = signal<string | null>(null);
-  protected readonly clienteaAEliminar = signal<any>(null);
+  protected readonly clienteAEliminar = signal<any>(null);
 
   //------------- LISTADO PERSONA ---------------//
   funObtenerPersona() {
@@ -105,25 +107,25 @@ export class ClienteList implements OnInit {
   //------------- ELIMINAR CATEGORIA ---------------//
   //abre el modal de confirmación (el botón de la papelera ya lo llama)
   funEliminarCliente(per: any) {
-    this.clienteaAEliminar.set(per);
+    this.clienteAEliminar.set(per);
   }
 
   cancelarEliminar() {
-    this.clienteaAEliminar.set(null);
+    this.clienteAEliminar.set(null);
   }
 
   confirmarEliminar() {
-    const cat = this.clienteaAEliminar();
+    const cat = this.clienteAEliminar();
     if (!cat) return;
 
     this.clienteService.funEliminar(cat.id).subscribe({
       next: () => {
-        this.clienteaAEliminar.set(null);
+        this.clienteAEliminar.set(null);
         this.funObtenerPersona();
         this.mensajeExito.set(`El cliente "${cat.nombre}" se eliminó exitosamente.`);
       },
       error: (err) => {
-        this.clienteaAEliminar.set(null);
+        this.clienteAEliminar.set(null);
         this.mensajeError.set(err.error?.message ?? 'No se pudo eliminar el cliente');
       },
     });
@@ -133,9 +135,11 @@ export class ClienteList implements OnInit {
     this.crearCliente.set(compra);
   }
   cerrarModal() {
-    this.crearCliente.set(false);
-    this.clienteForm.reset({ nombre: '', gmail: '', telefono: "", direccion: "", docIdentidad: "" });
-  }
+  this.crearCliente.set(false);
+  this.user_id.set(-1);   // <- agregar
+  this.errorServidor.set([]);
+  this.clienteForm.reset({ nombre: '', gmail: '', telefono: '', direccion: '', docIdentidad: '' });
+}
   @HostListener('document:keydown.escape')
   onEscape() {
     if (this.crearCliente()) this.cerrarModal();

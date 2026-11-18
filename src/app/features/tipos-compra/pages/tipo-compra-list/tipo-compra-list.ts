@@ -4,10 +4,12 @@ import { PageHeader } from '@/app/shared/components/page-header/page-header';
 import { EmptyState } from '@/app/shared/components/empty-state/empty-state';
 import { TipoCompraService } from '../../services/tipo-compra.service';
 import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
+import { ConfirmDialog } from '@/app/shared/components/confirm-dialog/confirm-dialog';
+import { AvisoDialog } from '@/app/shared/components/aviso-dialog/aviso-dialog';
 
 @Component({
   selector: 'app-tipo-compra-list',
-  imports: [RouterLink, PageHeader, EmptyState, ReactiveFormsModule],
+  imports: [RouterLink, PageHeader, EmptyState, ReactiveFormsModule,ConfirmDialog,AvisoDialog],
   templateUrl: './tipo-compra-list.html',
 })
 export class TipoCompraList implements OnInit {

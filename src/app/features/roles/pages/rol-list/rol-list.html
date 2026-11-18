@@ -209,62 +209,15 @@
   </div>
 </div>
 }
-@if (mensajeError(); as msg) {
-<div class="modal-overlay" (click)="cerrarAviso()">
-  <div class="modal" role="alertdialog" aria-modal="true" (click)="$event.stopPropagation()">
-    <div class="modal-header">
-      <div class="modal-icon" aria-hidden="true">⚠️</div>
-      <div class="modal-heading">
-        <h2>No se pudo eliminar</h2>
-      </div>
-      <button class="modal-close" type="button" aria-label="Cerrar" (click)="cerrarAviso()">✕</button>
-    </div>
-    <div class="modal-body">
-      <p>{{ msg }}</p>
-    </div>
-    <div class="modal-footer">
-      <button class="mbtn colorBoton" type="button" (click)="cerrarAviso()">Entendido</button>
-    </div>
-  </div>
-</div>
-}
-@if (rolaAEliminar(); as cat) {
-<div class="modal-overlay" (click)="cancelarEliminar()">
-  <div class="modal modal-sm" role="alertdialog" aria-modal="true" (click)="$event.stopPropagation()">
-    <div class="confirm-body">
-      <div class="confirm-icon" aria-hidden="true">🗑️</div>
-      <h2>¿Eliminar rol?</h2>
-      <p>
-        Estás por eliminar <strong>"{{ cat.nombre }}"</strong>.
-        Esta acción no se puede deshacer.
-      </p>
-    </div>
-    <div class="modal-footer confirm-footer">
-      <button class="mbtn mbtn-ghost" type="button" (click)="cancelarEliminar()">Cancelar</button>
-      <button class="mbtn mbtn-danger" type="button" (click)="confirmarEliminar()">Sí, eliminar</button>
-    </div>
-  </div>
-</div>
-}
-@if (mensajeExito(); as msg) {
-<div class="modal-overlay" (click)="cerrarExito()">
-  <div class="modal" role="alertdialog" aria-modal="true" (click)="$event.stopPropagation()">
-    <div class="modal-header">
-      <div class="modal-icon" aria-hidden="true">✅</div>
-      <div class="modal-heading">
-        <h2>Eliminada</h2>
-      </div>
-      <button class="modal-close" type="button" aria-label="Cerrar" (click)="cerrarExito()">✕</button>
-    </div>
-    <div class="modal-body">
-      <p>{{ msg }}</p>
-    </div>
-    <div class="modal-footer">
-      <button class="mbtn colorBoton" type="button" (click)="cerrarExito()">Aceptar</button>
-    </div>
-  </div>
-</div>
-}
+<!-- PARA ELIMINAR: componentes en shared/components/confirm-dialog y aviso-dialog -->
+<app-confirm-dialog [nombre]="rolaAEliminar()?.nombre ?? null" titulo="¿Eliminar rol?"
+  (confirmar)="confirmarEliminar()" (cancelar)="cancelarEliminar()" />
+
+<app-aviso-dialog [mensaje]="mensajeExito()" titulo="Rol eliminado" (cerrar)="cerrarExito()" />
+
+<app-aviso-dialog [mensaje]="mensajeError()" titulo="No se pudo eliminar" tipo="error" boton="Entendido"
+  (cerrar)="cerrarAviso()" />
+
 <style>
   /* ======== BOTON ==========*/
   .acciones {
@@ -315,66 +268,6 @@
       justify-content: center;
     }
   }
-
-  /*-------Alerta para eliminar-------*/
-  .modal-sm {
-    max-width: 400px;
-  }
-
-  .confirm-body {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 0.5rem;
-    padding: 2rem 1.5rem 1.25rem;
-    text-align: center;
-  }
-
-  .confirm-icon {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    width: 3.5rem;
-    height: 3.5rem;
-    margin-bottom: 0.25rem;
-    border-radius: 50%;
-    background: #fee2e2;
-    font-size: 1.6rem;
-  }
-
-  .confirm-body h2 {
-    margin: 0;
-    font-size: 1.125rem;
-    font-weight: 600;
-    color: #111827;
-  }
-
-  .confirm-body p {
-    margin: 0;
-    font-size: 0.875rem;
-    line-height: 1.5;
-    color: #6b7280;
-  }
-
-  .confirm-body strong {
-    color: #111827;
-  }
-
-  .confirm-footer {
-    justify-content: center;
-  }
-
-  .mbtn-danger {
-    background: #dc2626;
-    color: #fff;
-    box-shadow: 0 4px 12px rgb(220 38 38 / 0.3);
-  }
-
-  .mbtn-danger:hover {
-    background: #b91c1c;
-  }
-
-  /*----------------------------------*/
   /* Cabecera */
   .perm-head {
     display: flex;
