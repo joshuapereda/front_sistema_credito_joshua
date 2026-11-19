@@ -6,6 +6,8 @@ import { ClienteService } from '../../services/cliente.service';
 import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ConfirmDialog } from '@/app/shared/components/confirm-dialog/confirm-dialog';
 import { AvisoDialog } from '@/app/shared/components/aviso-dialog/aviso-dialog';
+import { ClienteInterface } from '../../interfaces/ClienteInterface';
+import { HttpErrorResponse, HttpResponse } from '@angular/common/http';
 
 @Component({
   selector: 'app-cliente-list',
@@ -16,25 +18,25 @@ export class ClienteList implements OnInit {
   ngOnInit(): void {
     this.funObtenerPersona();
   }
-  private readonly personas = signal<any>([]);
+  private readonly personas = signal<ClienteInterface[]>([]);
   private readonly clienteService = inject(ClienteService);
   protected readonly crearCliente = signal(false);
   //mostrar validaciones del back
   protected readonly errorServidor = signal<string[]>([]);
   //si edito o no - obtener id
-  protected readonly user_id = signal<any>(-1);
+  protected readonly user_id = signal<number>(-1);
   //para eliminar
   protected readonly mensajeError = signal<string | null>(null);
   protected readonly mensajeExito = signal<string | null>(null);
-  protected readonly clienteAEliminar = signal<any>(null);
+  protected readonly clienteAEliminar = signal<ClienteInterface | null>(null);
 
   //------------- LISTADO PERSONA ---------------//
   funObtenerPersona() {
     this.clienteService.funListarPersona().subscribe({
-      next: (res: any) => {
+      next: (res: ClienteInterface[]) => {
         this.personas.set(res);
       },
-      error: (error) => {
+      error: (error: HttpErrorResponse) => {
         console.log(error);
       }
     })
@@ -92,9 +94,9 @@ export class ClienteList implements OnInit {
     }
   }
   //------------- EDITAR CATEGORIA ---------------//
-  funEditarCliente(per: any) {
+  funEditarCliente(per: ClienteInterface) {
     //almacenar el id al dar click
-    this.user_id.set(per.id)
+    this.user_id.set(per.id!)
     //precargar los datos ya registrado
     this.clienteForm.patchValue({
       nombre: per.nombre,
@@ -106,7 +108,7 @@ export class ClienteList implements OnInit {
   }
   //------------- ELIMINAR CATEGORIA ---------------//
   //abre el modal de confirmación (el botón de la papelera ya lo llama)
-  funEliminarCliente(per: any) {
+  funEliminarCliente(per: ClienteInterface) {
     this.clienteAEliminar.set(per);
   }
 
@@ -118,7 +120,7 @@ export class ClienteList implements OnInit {
     const cat = this.clienteAEliminar();
     if (!cat) return;
 
-    this.clienteService.funEliminar(cat.id).subscribe({
+    this.clienteService.funEliminar(cat.id!).subscribe({
       next: () => {
         this.clienteAEliminar.set(null);
         this.funObtenerPersona();

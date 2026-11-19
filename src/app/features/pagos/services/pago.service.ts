@@ -1,6 +1,8 @@
 import { HttpClient } from '@angular/common/http';
 import { inject, Service } from '@angular/core';
 import { environment } from '@/environments/environment';
+import { PagoInterface, PagoRequest } from '../Interfaces/PagoInterface';
+import { CompraInterface } from '../../compras/interfaces/CompraInterface';
 
 @Service()
 export class PagoService {
@@ -10,15 +12,15 @@ export class PagoService {
 
   //---------------- FUNCIONES ----------------//
   funListarPago() {
-    return this.http.get<any[]>(`${this.urlBase}/api/pago`);
+    return this.http.get<PagoInterface[]>(`${this.urlBase}/api/pago`);
   }
   funListarCompra() {
-    return this.http.get<any[]>(`${this.urlBase}/api/compra`);
+    return this.http.get<CompraInterface[]>(`${this.urlBase}/api/compra`);
   }
-  funGuarda(datos: any) {
+  funGuarda(datos: PagoRequest) {
     return this.http.post(`${this.urlBase}/api/pago`, datos);
   }
-  funEditar(id: number, datos: any) {
+  funEditar(id: number, datos: PagoRequest) {
     return this.http.put(`${this.urlBase}/api/pago/${id}`, datos);
   }
 }

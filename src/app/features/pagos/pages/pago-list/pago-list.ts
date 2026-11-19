@@ -5,6 +5,9 @@ import { EmptyState } from '@/app/shared/components/empty-state/empty-state';
 import { PagoService } from '../../services/pago.service';
 import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { CurrencyPipe, DatePipe, DecimalPipe } from '@angular/common';
+import { PagoInterface, PagoRequest } from '../../Interfaces/PagoInterface';
+import { CompraInterface } from '@/app/features/compras/interfaces/CompraInterface';
+import { HttpErrorResponse } from '@angular/common/http';
 
 @Component({
   selector: 'app-pago-list',
@@ -16,22 +19,22 @@ export class PagoList implements OnInit {
    this.funObtenerPago();
    this.funObtenerCompra();
   }
-  protected readonly pagos=signal<any[]>([]);
-  protected readonly compras=signal<any[]>([]);
+  protected readonly pagos=signal<PagoInterface[]>([]);
+  protected readonly compras=signal<CompraInterface[]>([]);
   private readonly pagoService = inject(PagoService);
   protected readonly crearPago = signal(false);
   //si edito o no - obtener id
-  protected readonly user_id = signal<any>(-1);
+  protected readonly user_id = signal<number>(-1);
   protected readonly compraEditandoId = signal<number | null>(null);
   protected readonly montoOriginal = signal<number>(0);
 
   //------------- LISTADO COMPRA --------------//
   funObtenerCompra(){
     this.pagoService.funListarCompra().subscribe({
-      next:(res:any)=>{
+      next:(res:CompraInterface[])=>{
         this.compras.set(res);
       },
-      error:(error)=>{
+      error:(error:HttpErrorResponse)=>{
         console.log(error);
       }
     })
@@ -44,10 +47,10 @@ export class PagoList implements OnInit {
   //------------- LISTADO PAGO ---------------//
   funObtenerPago(){
     this.pagoService.funListarPago().subscribe({
-      next:(res:any)=>{
+      next:(res:PagoInterface[])=>{
         this.pagos.set(res);
       },
-      error:(error)=>{
+      error:(error:HttpErrorResponse)=>{
         console.log(error);
       }
     })
@@ -76,7 +79,8 @@ export class PagoList implements OnInit {
         return;
       }
       const { compraId, monto } = this.pagoForm.getRawValue();
-      const pago = {compraId, monto };
+      if (compraId === null || monto === null) return;
+      const pago: PagoRequest = { compraId, monto };
 
       this.pagoService.funEditar(this.user_id(), pago).subscribe({
         next: () => {
@@ -92,12 +96,8 @@ export class PagoList implements OnInit {
     }
 
     const { monto, compraId } = this.pagoForm.getRawValue();
-
-    const pago = {
-      monto,
-      compraId,
-
-    };
+    if (compraId === null || monto === null) return;
+    const pago: PagoRequest = { monto, compraId };
 
     this.pagoService.funGuarda(pago).subscribe({
       next: () => {
@@ -109,7 +109,7 @@ export class PagoList implements OnInit {
     });
   }}
   //------------- EDITAR ---------------//
-  funEditarPago(pg: any) {
+  funEditarPago(pg: PagoInterface) {
      console.log('compra encontrada:', this.compras().find(c => c.id === pg.compraId));
     //almacenar el id al dar click
     this.user_id.set(pg.id)

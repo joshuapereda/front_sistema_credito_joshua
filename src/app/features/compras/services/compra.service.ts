@@ -1,8 +1,12 @@
 import { HttpClient } from '@angular/common/http';
 import { inject, Service } from '@angular/core';
-import { Observable } from 'rxjs';
 import { environment } from '@/environments/environment';
-import { Compra, CompraRequest } from '../models/compra.model';
+import { CompraInterface, CompraRequest } from '../interfaces/CompraInterface';
+import { ClienteInterface } from '../../clientes/interfaces/ClienteInterface';
+import { UsuarioInterface } from '../../usuarios/Interfaces/UsuarioInterface';
+import { TipoCompraInterface } from '../../tipos-compra/Interfaces/TipoCompraInterface';
+import { ProductoInterface } from '../../productos/interfaces/ProductoInterface';
+import { CategoriaInterface } from '../../categorias/interfaces/CategoriaInterface';
 
 @Service()
 export class CompraService {
@@ -11,33 +15,33 @@ export class CompraService {
   http = inject(HttpClient);
   //---------------- FUNCIONES ----------------//
   funListarCompra() {
-    return this.http.get<any[]>(`${this.urlBase}/api/compra`);
+    return this.http.get<CompraInterface[]>(`${this.urlBase}/api/compra`);
   }
   funListarCliente() {
-    return this.http.get<any[]>(`${this.urlBase}/api/clientes`);
+    return this.http.get<ClienteInterface[]>(`${this.urlBase}/api/clientes`);
   }
   funListarUsuario() {
-    return this.http.get<any[]>(`${this.urlBase}/api/usuarios`);
-  }
-  funListarTipoCompra() {
-    return this.http.get<any[]>(`${this.urlBase}/api/tipoCompras`);
-  }
-  funListarCategoria() {
-    return this.http.get<any[]>(`${this.urlBase}/api/categorias`);
+    return this.http.get<UsuarioInterface[]>(`${this.urlBase}/api/usuarios`);
   }
   funListarProducto() {
-    return this.http.get<any[]>(`${this.urlBase}/api/productos`);
+    return this.http.get<ProductoInterface[]>(`${this.urlBase}/api/productos`);
   }
-  funGuarda(datos: any) {
+  funListarTipoCompra() {
+    return this.http.get<TipoCompraInterface[]>(`${this.urlBase}/api/tipoCompras`);
+  }
+  funListarCategoria() {
+    return this.http.get<CategoriaInterface[]>(`${this.urlBase}/api/categorias`);
+  }
+  funGuarda(datos: CompraRequest) {
     return this.http.post(`${this.urlBase}/api/compra`, datos);
   }
-  funGuardaProducto(datos: any) {
+  funGuardaProducto(datos: FormData) {
     return this.http.post(`${this.urlBase}/api/productos`, datos);
   }
-  funGuardaCliente(datos: any) {
+  funGuardaCliente(datos: ClienteInterface) {
     return this.http.post(`${this.urlBase}/api/clientes`, datos);
   }
-  funEditar(id: number, datos: any) {
+  funEditar(id: number, datos: CompraRequest) {
     return this.http.put(`${this.urlBase}/api/compra/${id}`, datos);
   }
 }

@@ -6,6 +6,8 @@ import { TipoCompraService } from '../../services/tipo-compra.service';
 import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ConfirmDialog } from '@/app/shared/components/confirm-dialog/confirm-dialog';
 import { AvisoDialog } from '@/app/shared/components/aviso-dialog/aviso-dialog';
+import { TipoCompraInterface } from '../../Interfaces/TipoCompraInterface';
+import { HttpErrorResponse } from '@angular/common/http';
 
 @Component({
   selector: 'app-tipo-compra-list',
@@ -18,7 +20,7 @@ export class TipoCompraList implements OnInit {
   }
 
   //Variable que va almacenar los tipos de compra
-  private readonly tipoCompras = signal<any>([]);
+  private readonly tipoCompras = signal<TipoCompraInterface[]>([]);
   //Inyectar servicios
   private readonly tipoCompraService = inject(TipoCompraService);
   //abrir modal con el nombre
@@ -27,19 +29,19 @@ export class TipoCompraList implements OnInit {
   readonly id = input<string>();
   protected readonly esEdicion = computed(() => !!this.id());
   //si edito o no - obtener id
-  protected readonly user_id = signal<any>(-1);
+  protected readonly user_id = signal<number>(-1);
   //para eliminar
   protected readonly mensajeError = signal<string | null>(null);
   protected readonly mensajeExito = signal<string | null>(null);
-  protected readonly tCompraAEliminar = signal<any>(null);
+  protected readonly tCompraAEliminar = signal<TipoCompraInterface | null>(null);
 
   //------------- LISTADO TIPO DE COMPRA ---------------//
   funObjtenerTipoCompra() {
     this.tipoCompraService.funListarTipoCompra().subscribe({
-      next: (res: any) => {
+      next: (res: TipoCompraInterface[]) => {
         this.tipoCompras.set(res);
       },
-      error: (error) => {
+      error: (error:HttpErrorResponse) => {
         console.log(error);
       }
     })
@@ -59,8 +61,8 @@ export class TipoCompraList implements OnInit {
         this.tcompraForm.markAllAsTouched();
         return;
       }
-      const { nombre, descripcion } = this.tcompraForm.getRawValue();
-      const tcompra = { nombre, descripcion };
+      const { nombre, descripcion,esCredito } = this.tcompraForm.getRawValue();
+      const tcompra = { nombre, descripcion,esCredito };
 
       this.tipoCompraService.funEditar(this.user_id(), tcompra).subscribe({
         next: () => {
@@ -86,9 +88,9 @@ export class TipoCompraList implements OnInit {
     }
   }
   //------------- EDITAR ---------------//
-  funEditarTipoCompra(tp: any) {
+  funEditarTipoCompra(tp: TipoCompraInterface) {
     //almacenar el id al dar click
-    this.user_id.set(tp.id)
+    this.user_id.set(tp.id!)
     //precargar los datos ya registrado
     this.tcompraForm.patchValue({
       nombre: tp.nombre,
@@ -98,7 +100,7 @@ export class TipoCompraList implements OnInit {
   }
   //----------- ELIMINAR TIPO DE COMPRA -------------//
   //abre el modal de confirmación (el botón de la papelera ya lo llama)
-  funEliminarCategoria(tp: any) {
+  funEliminarCategoria(tp: TipoCompraInterface) {
     this.tCompraAEliminar.set(tp);
   }
 
@@ -110,10 +112,10 @@ export class TipoCompraList implements OnInit {
     const cat = this.tCompraAEliminar();
     if (!cat) return;
 
-    this.tipoCompraService.funEliminar(cat.id).subscribe({
+    this.tipoCompraService.funEliminar(cat.id!).subscribe({
       next: () => {
         this.tCompraAEliminar.set(null);
-        this.funGuardarTipoCompra();
+        this.funObjtenerTipoCompra();
         this.mensajeExito.set(`El tipo de compra "${cat.nombre}" se eliminó exitosamente.`);
       },
       error: (err) => {

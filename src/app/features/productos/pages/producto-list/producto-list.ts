@@ -1,4 +1,4 @@
-import { Component, computed, HostListener, inject, OnInit, signal, ViewEncapsulation } from '@angular/core';
+import { Component, computed, HostListener, inject, OnInit, signal } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { PageHeader } from '@/app/shared/components/page-header/page-header';
 import { EmptyState } from '@/app/shared/components/empty-state/empty-state';
@@ -6,6 +6,9 @@ import { ProductoService } from '../../services/producto.service';
 import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ConfirmDialog } from '@/app/shared/components/confirm-dialog/confirm-dialog';
 import { AvisoDialog } from '@/app/shared/components/aviso-dialog/aviso-dialog';
+import { ProductoInterface } from '../../interfaces/ProductoInterface';
+import { CategoriaInterface } from '@/app/features/categorias/interfaces/CategoriaInterface';
+import { HttpErrorResponse } from '@angular/common/http';
 
 @Component({
   selector: 'app-producto-list',
@@ -17,24 +20,24 @@ export class ProductoList implements OnInit {
     this.funObtenerProducto();
     this.funObtenerCategoria();
   }
-  protected readonly productos = signal<any>([]);
-  protected readonly categorias = signal<any>([]);
+  protected readonly productos = signal<ProductoInterface[]>([]);
+  protected readonly categorias = signal<CategoriaInterface[]>([]);
   protected readonly productoService = inject(ProductoService);
   protected readonly crearProducto = signal(false);
   //si edito o no
-  protected readonly user_id = signal<any>(-1);
+  protected readonly user_id = signal<number>(-1);
   //para eliminar
   protected readonly mensajeError = signal<string | null>(null);
   protected readonly mensajeExito = signal<string | null>(null);
-  protected readonly productoAEliminar = signal<any>(null);
+  protected readonly productoAEliminar = signal<ProductoInterface | null>(null);
 
   //------------- LISTADO CATEGORIA ---------------//
   funObtenerCategoria() {
     this.productoService.funListarCategoria().subscribe({
-      next: (res: any) => {
+      next: (res: CategoriaInterface[]) => {
         this.categorias.set(res);
       },
-      error: (error) => {
+      error: (error:HttpErrorResponse) => {
         console.log(error);
       }
     })
@@ -51,10 +54,10 @@ export class ProductoList implements OnInit {
   //------------- LISTADO PRODUCTO ---------------//
   funObtenerProducto() {
     this.productoService.funListarProducto().subscribe({
-      next: (res: any) => {
+      next: (res: ProductoInterface[]) => {
         this.productos.set(res);
       },
-      error: (error) => {
+      error: (error:HttpErrorResponse) => {
         console.log(error);
       }
     })
@@ -63,9 +66,9 @@ export class ProductoList implements OnInit {
   //---------------- FORMULARIO ----------------//
   protected readonly productoForm = new FormGroup({
     nombre: new FormControl('', { nonNullable: true, validators: [Validators.required] }),
-    precioVenta: new FormControl('', { nonNullable: true, validators: [Validators.required] }),
-    precioCompra: new FormControl('', { nonNullable: true, validators: [Validators.required] }),
-    categoriaId: new FormControl('', { nonNullable: true, validators: [Validators.required] }),
+    precioVenta: new FormControl<number | null>(null, Validators.required),
+    precioCompra: new FormControl<number | null>(null, Validators.required),
+    categoriaId: new FormControl<number | null>(null, Validators.required),
     foto: new FormControl<File | null>(null),
   });
   //------------- GUARDAR ---------------//
@@ -80,9 +83,9 @@ export class ProductoList implements OnInit {
       const { nombre, precioVenta,precioCompra,categoriaId, foto } = this.productoForm.getRawValue();
       const formData = new FormData();
       formData.append('nombre', nombre);
-      formData.append('precioVenta', precioVenta);
-      formData.append('precioCompra', precioCompra);
-      formData.append('categoriaId', categoriaId);
+      formData.append('precioVenta', String(precioVenta));
+      formData.append('precioCompra', String(precioCompra));
+      formData.append('categoriaId', String(categoriaId));
       if (foto) formData.append('foto', foto); //solo si eligió una nueva
 
       this.productoService.funEditar(this.user_id(), formData).subscribe({
@@ -126,19 +129,20 @@ export class ProductoList implements OnInit {
 
   }
   //------------- EDITAR CATEGORIA ---------------//
-  funEditarProducto(p: any) {
+  funEditarProducto(p: ProductoInterface) {
     this.user_id.set(p.id);
     this.productoForm.patchValue({
       nombre: p.nombre,
-      precioVenta: p.precioVenta,
-      precioCompra: p.precioCompra,
-      categoriaId: p.categoriaId,
+      precioVenta:p.precioVenta,
+      precioCompra:p.precioCompra,
+      categoriaId:p.categoriaId,
       foto: null,
     });
+    this.crearProducto.set(true);
   }
   //------------- ELIMINAR CATEGORIA ---------------//
   //abre el modal de confirmación (el botón de la papelera ya lo llama)
-  funEliminarProducto(pro: any) {
+  funEliminarProducto(pro: ProductoInterface) {
     this.productoAEliminar.set(pro);
   }
 
@@ -176,7 +180,7 @@ export class ProductoList implements OnInit {
   }
   cerrarModal() {
     this.crearProducto.set(false);
-    this.productoForm.reset({ nombre: '', precioVenta: '', precioCompra: "", categoriaId: "", foto: null });
+    this.productoForm.reset({ nombre: '', precioVenta: null, precioCompra: null, categoriaId: null, foto: null });
   }
   @HostListener('document:keydown.escape')
   onEscape() {

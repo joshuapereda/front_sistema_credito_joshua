@@ -1,6 +1,7 @@
 import { HttpClient } from '@angular/common/http';
 import { inject, Service } from '@angular/core';
 import { environment } from '@/environments/environment';
+import { ClienteInterface } from '../interfaces/ClienteInterface';
 
 @Service()
 export class ClienteService {
@@ -10,12 +11,12 @@ export class ClienteService {
 
   //---------------- FUNCIONES ----------------//
   funListarPersona() {
-    return this.http.get<any[]>(`${this.urlBase}/api/clientes`);
+    return this.http.get<ClienteInterface[]>(`${this.urlBase}/api/clientes`);
   }
-  funGuarda(datos: any) {
+  funGuarda(datos: ClienteInterface) {
     return this.http.post(`${this.urlBase}/api/clientes`, datos);
   }
-  funEditar(id: number, datos: any) {
+  funEditar(id: number, datos: ClienteInterface) {
     return this.http.put(`${this.urlBase}/api/clientes/${id}`, datos);
   }
   funEliminar(id: number) {
