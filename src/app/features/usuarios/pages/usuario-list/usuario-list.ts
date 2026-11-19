@@ -6,6 +6,10 @@ import { UsuarioService } from '../../services/usuario.service';
 import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ConfirmDialog } from '@/app/shared/components/confirm-dialog/confirm-dialog';
 import { AvisoDialog } from '@/app/shared/components/aviso-dialog/aviso-dialog';
+import { UsuarioInterface } from '../../Interfaces/UsuarioInterface';
+import { ClienteInterface } from '@/app/features/clientes/interfaces/ClienteInterface';
+import { RolInterface } from '@/app/features/roles/Interfaces/RolInterface';
+
 @Component({
   selector: 'app-usuario-list',
   imports: [RouterLink, PageHeader, EmptyState, ReactiveFormsModule,ConfirmDialog,AvisoDialog],
@@ -17,9 +21,9 @@ export class UsuarioList implements OnInit {
     this.funObtenerPersona();
     this.funObtenerRoles();
   }
-  protected readonly usuarios = signal<any>([]);
-  protected readonly personas = signal<any>([]);
-  protected readonly roles = signal<any>([]);
+  protected readonly usuarios = signal<UsuarioInterface[]>([]);
+  protected readonly personas = signal<ClienteInterface[]>([]);
+  protected readonly roles = signal<RolInterface[]>([]);
   protected readonly usuarioService = inject(UsuarioService);
   protected readonly crearUsuario = signal(false);
   //si edito o no - obtener id (-1 = creando)
@@ -27,7 +31,7 @@ export class UsuarioList implements OnInit {
   //para eliminar
   protected readonly mensajeError = signal<string | null>(null);
   protected readonly mensajeExito = signal<string | null>(null);
-  protected readonly usuarioAEliminar = signal<any>(null);
+  protected readonly usuarioAEliminar = signal<UsuarioInterface|null>(null);
 
   //------------- LISTADO PERSONA ---------------//
   funObtenerPersona() {
@@ -44,7 +48,7 @@ export class UsuarioList implements OnInit {
   protected readonly personaPorId = computed(() => {
     const mapa = new Map<number, string>();
     for (const per of this.personas()) {
-      mapa.set(per.id, per.nombre);
+      mapa.set(per.id!, per.nombre);
     }
     return mapa;
   });
@@ -64,7 +68,7 @@ export class UsuarioList implements OnInit {
   protected readonly rolePorId = computed(() => {
     const mapa = new Map<number, string>();
     for (const rol of this.roles()) {
-      mapa.set(rol.id, rol.nombre);
+      mapa.set(rol.id!, rol.nombre);
     }
     return mapa;
   });
@@ -112,7 +116,13 @@ export class UsuarioList implements OnInit {
         return;
       }
       const { username, passwprd, personaId, rolesId } = this.usuarioForm.getRawValue();
-      const usuario = { username, passwprd, personaId, rolesId };
+      //la contraseña solo se envía si el usuario escribió una nueva
+      const usuario: UsuarioInterface = {
+        username,
+        personaId: personaId!,
+        rolesId,
+        ...(passwprd ? { passwprd } : {}),
+      };
 
       this.usuarioService.funEditar(this.user_id(), usuario).subscribe({
         next: () => {
@@ -128,8 +138,7 @@ export class UsuarioList implements OnInit {
         return;
       }
       const { username, passwprd, personaId, rolesId } = this.usuarioForm.getRawValue();
-      const usuario = { username, passwprd, personaId, rolesId };
-
+      const usuario: UsuarioInterface = { username, passwprd, personaId: personaId!, rolesId };
       this.usuarioService.funGuarda(usuario).subscribe({
         next: () => {
           this.funObtenerUsuarios();
@@ -140,9 +149,9 @@ export class UsuarioList implements OnInit {
     }
   }
   //------------- EDITAR ---------------//
-  funEditarUsuario(user: any) {
+  funEditarUsuario(user: UsuarioInterface) {
     //almacenar el id al dar click
-    this.user_id.set(user.id)
+    this.user_id.set(user.id!)
     //precargar los datos ya registrado
     this.usuarioForm.patchValue({
       username: user.username,
@@ -157,7 +166,7 @@ export class UsuarioList implements OnInit {
   }
   //------------- ELIMINAR CATEGORIA ---------------//
   //abre el modal de confirmación (el botón de la papelera ya lo llama)
-  funEliminarUsuario(user: any) {
+  funEliminarUsuario(user: UsuarioInterface) {
     this.usuarioAEliminar.set(user);
   }
 
@@ -169,7 +178,7 @@ export class UsuarioList implements OnInit {
     const cat = this.usuarioAEliminar();
     if (!cat) return;
 
-    this.usuarioService.funEliminar(cat.id).subscribe({
+    this.usuarioService.funEliminar(cat.id!).subscribe({
       next: () => {
         this.usuarioAEliminar.set(null);
         this.funObtenerUsuarios();

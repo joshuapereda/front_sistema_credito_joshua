@@ -5,9 +5,16 @@ import { PageHeader } from '@/app/shared/components/page-header/page-header';
 import { EmptyState } from '@/app/shared/components/empty-state/empty-state';
 import { CompraService } from '../../services/compra.service';
 import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
+import { CompraInterface, CompraRequest } from '../../interfaces/CompraInterface';
+import { ClienteInterface } from '@/app/features/clientes/interfaces/ClienteInterface';
+import { UsuarioInterface } from '@/app/features/usuarios/Interfaces/UsuarioInterface';
+import { ProductoInterface } from '@/app/features/productos/interfaces/ProductoInterface';
+import { CategoriaInterface } from '@/app/features/categorias/interfaces/CategoriaInterface';
+import { HttpErrorResponse } from '@angular/common/http';
+import { TipoCompraInterface } from '@/app/features/tipos-compra/Interfaces/TipoCompraInterface';
 
 interface ItemCarrito {
-  producto: any;
+  producto: Pick<ProductoInterface, 'id' | 'nombre' | 'precioVenta'>;
   cantidad: number;
 }
 
@@ -18,14 +25,15 @@ interface ItemCarrito {
 })
 export class CompraList implements OnInit {
   //Relaciones
-  protected readonly compras = signal<any[]>([]);
-  protected readonly clientes = signal<any[]>([]);
-  protected readonly usuarios = signal<any[]>([]);
-  protected readonly tcompras = signal<any[]>([]);
-  protected readonly productos = signal<any[]>([]);
-  protected readonly categorias = signal<any>([]);
+  protected readonly compras = signal<CompraInterface[]>([]);
+  protected readonly clientes = signal<ClienteInterface[]>([]);
+  protected readonly usuarios = signal<UsuarioInterface[]>([]);
+  protected readonly tcompras = signal<TipoCompraInterface[]>([]);
+  protected readonly productos = signal<ProductoInterface[]>([]);
+  protected readonly categorias = signal<CategoriaInterface[]>([]);
+
   protected readonly compraService = inject(CompraService);
-  protected readonly compraSeleccionada = signal<any | null>(null);
+  protected readonly compraSeleccionada = signal<CompraInterface | null>(null);
   protected readonly crearVenta = signal(false);
   protected readonly crearCliente = signal(false);
   protected readonly crearProducto = signal(false);
@@ -45,44 +53,44 @@ export class CompraList implements OnInit {
   //---------------- LISTADOS ----------------//
   funObtenerCliente() {
     this.compraService.funListarCliente().subscribe({
-      next: (res: any) => this.clientes.set(res),
-      error: (e) => console.log(e),
+      next: (res: ClienteInterface[]) => this.clientes.set(res),
+      error: (e: HttpErrorResponse) => console.log(e),
     });
   }
 
   funObtenerUsuario() {
     this.compraService.funListarUsuario().subscribe({
-      next: (res: any) => this.usuarios.set(res),
-      error: (e) => console.log(e),
+      next: (res: UsuarioInterface[]) => this.usuarios.set(res),
+      error: (e: HttpErrorResponse) => console.log(e),
     });
   }
 
   funObtenerTipoCompra() {
     this.compraService.funListarTipoCompra().subscribe({
-      next: (res: any) => this.tcompras.set(res),
-      error: (e) => console.log(e),
+      next: (res: TipoCompraInterface[]) => this.tcompras.set(res),
+      error: (e: HttpErrorResponse) => console.log(e),
     });
   }
 
   funObtenerProducto() {
     this.compraService.funListarProducto().subscribe({
-      next: (res: any) => this.productos.set(res),
-      error: (e) => console.log(e),
+      next: (res: ProductoInterface[]) => this.productos.set(res),
+      error: (e: HttpErrorResponse) => console.log(e),
     });
   }
 
   funObtenerVenta() {
     this.compraService.funListarCompra().subscribe({
-      next: (res: any) => this.compras.set(res),
-      error: (e) => console.log(e),
+      next: (res: CompraInterface[]) => this.compras.set(res),
+      error: (e: HttpErrorResponse) => console.log(e),
     });
   }
   funObtenerCategoria() {
     this.compraService.funListarCategoria().subscribe({
-      next: (res: any) => {
+      next: (res: CategoriaInterface[]) => {
         this.categorias.set(res);
       },
-      error: (error) => {
+      error: (error: HttpErrorResponse) => {
         console.log(error);
       }
     })
@@ -122,7 +130,7 @@ export class CompraList implements OnInit {
   protected readonly cantidadSel = signal(1);
 
   protected readonly total = computed(() =>
-    this.carrito().reduce((s, i) => s + (i.producto.precio ?? 0) * i.cantidad, 0)
+    this.carrito().reduce((s, i) => s + (i.producto.precioVenta ?? 0) * i.cantidad, 0)
   );
 
   agregarProducto() {
@@ -173,10 +181,11 @@ export class CompraList implements OnInit {
 
     const { clienteId, usuarioId, tipoCompraId } = this.ventaForm.getRawValue();
 
-    const venta = {
-      clienteId,
-      usuarioId,
-      tipoCompraId,
+    //el ! es seguro: el formulario ya validó que no son null
+    const venta: CompraRequest = {
+      clienteId: clienteId!,
+      usuarioId: usuarioId!,
+      tipoCompraId: tipoCompraId!,
       detalles: this.carrito().map((i) => ({
         productoId: i.producto.id,
         cantidad: i.cantidad,
@@ -194,7 +203,7 @@ export class CompraList implements OnInit {
         this.cerrarModal();
         this.funObtenerVenta();
       },
-      error: (err) => {
+      error: (err: HttpErrorResponse) => {
         const msg = err.error?.message;
         this.errorServidor.set(
           Array.isArray(msg)
@@ -205,7 +214,7 @@ export class CompraList implements OnInit {
     });
   }
   //------------- EDITAR ---------------//
-  funEditarCompra(com: any) {
+  funEditarCompra(com: CompraInterface) {
     // 1. almacenar SOLO el id al dar click (así sabemos que es edición)
     this.compraEditId.set(com.id);
 
@@ -217,13 +226,13 @@ export class CompraList implements OnInit {
     });
 
     // 3. precargar el CARRITO: cada detalle de la compra pasa a ser un item { producto, cantidad }
-    const items: ItemCarrito[] = (com.detalles ?? []).map((d: any) => ({
+    const items: ItemCarrito[] = com.detalles.map((d) => ({
       // buscar el producto completo en la lista (tiene nombre, precio, etc.)
       producto: this.productos().find((p) => p.id === d.productoId) ?? {
         // respaldo si la lista de productos no cargó todavía
         id: d.productoId,
         nombre: d.nombreProducto,
-        precio: d.precioUnitario,
+        precioVenta: d.precioUnitario,
       },
       cantidad: d.cantidad,
     }));
@@ -231,6 +240,7 @@ export class CompraList implements OnInit {
 
     // 4. limpiar errores viejos y abrir el modal
     this.errorServidor.set([]);
+    this.crearVenta.set(true);
   }
   //------------- GUARDAR PERSONA ---------------//
   funGuardarCliente() {
@@ -245,9 +255,11 @@ export class CompraList implements OnInit {
 
     this.compraService.funGuardaCliente(cliente).subscribe({
       next: () => {
+        //refrescar la lista para que aparezca en el select
+        this.funObtenerCliente();
         this.cerrarModalCliente();
       },
-      error: (err) => {
+      error: (err: HttpErrorResponse) => {
         const msg = err.error?.message;
         this.errorServidor.set(
           Array.isArray(msg) ? msg : [msg ?? 'No se pudo guardar el cliente.']
@@ -273,9 +285,11 @@ export class CompraList implements OnInit {
 
     this.compraService.funGuardaProducto(formData).subscribe({
       next: () => {
+        //refrescar la lista para que aparezca en el select
+        this.funObtenerProducto();
         this.cerrarModalProducto();
       },
-      error: (error) => console.log(error),
+      error: (error: HttpErrorResponse) => console.log(error),
     });
   }
   //Subir foto
@@ -288,12 +302,12 @@ export class CompraList implements OnInit {
 
   }
   //---------------- MODALES ----------------//
-  abrir(compra: any) {
+  abrir(compra: CompraInterface) {
     this.compraSeleccionada.set(compra);
   }
 
-  abrirVenta(compra: any) {
-    this.crearVenta.set(compra);
+  abrirVenta(abierto: boolean) {
+    this.crearVenta.set(abierto);
   }
 
   cerrarModalDetalle() {
@@ -302,6 +316,8 @@ export class CompraList implements OnInit {
 
   cerrarModal() {
     this.crearVenta.set(false);
+    //volver a modo "crear"
+    this.compraEditId.set(null);
     this.ventaForm.reset({ clienteId: null, usuarioId: null, tipoCompraId: null });
     this.carrito.set([]);
     this.productoSel.set(null);
@@ -309,33 +325,28 @@ export class CompraList implements OnInit {
     this.errorServidor.set([]);
   }
 
-  @HostListener('document:keydown.escape')
-  onEscape() {
-    if (this.crearVenta()) this.cerrarModal();
-    else this.compraSeleccionada.set(null);
-  }
-
-  abrirCliente(compra: any) {
-    this.crearCliente.set(compra);
+  abrirCliente(abierto: boolean) {
+    this.crearCliente.set(abierto);
   }
   cerrarModalCliente() {
     this.crearCliente.set(false);
     this.clienteForm.reset({ nombre: '', gmail: '', telefono: "", direccion: "", docIdentidad: "" });
   }
-  @HostListener('document:keydown.escape')
-  onEscapeCliente() {
-    if (this.crearCliente()) this.cerrarModal();
-  }
 
-  abrirProducto(compra: any) {
-    this.crearProducto.set(compra);
+  abrirProducto(abierto: boolean) {
+    this.crearProducto.set(abierto);
   }
   cerrarModalProducto() {
     this.crearProducto.set(false);
     this.productoForm.reset({ nombre: '', precioVenta: '', precioCompra: "", categoriaId: "", foto: null });
   }
+
+  //un solo listener de Escape: cierra primero el modal que esté encima
   @HostListener('document:keydown.escape')
-  onEscapeProducto() {
-    if (this.crearProducto()) this.cerrarModal();
+  onEscape() {
+    if (this.crearCliente()) this.cerrarModalCliente();
+    else if (this.crearProducto()) this.cerrarModalProducto();
+    else if (this.crearVenta()) this.cerrarModal();
+    else this.compraSeleccionada.set(null);
   }
 }

@@ -131,7 +131,7 @@
               class="flex items-center justify-end gap-1 opacity-60 transition-opacity group-hover:opacity-100 focus-within:opacity-100">
               <!-- el (click) va en el button, y solo llama a funEditarCompra -->
               <button type="button" class="icon-btn" title="Editar compra" aria-label="Editar compra"
-                (click)="abrirVenta(true);funEditarCompra(com)">
+                (click)="funEditarCompra(com)">
                 <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75"
                   aria-hidden="true">
                   <path stroke-linecap="round" stroke-linejoin="round"
@@ -314,7 +314,7 @@
               (change)="productoSel.set($any($event.target).value ? +$any($event.target).value : null)">
               <option value="">Selecciona un producto</option>
               @for (p of productos(); track p.id) {
-              <option [value]="p.id">{{ p.nombre }} · {{ p.precio | currency: 'PEN' : 'S/ ' }}</option>
+              <option [value]="p.id">{{ p.nombre }} · {{ p.precioVenta| currency: 'PEN' : 'S/ ' }}</option>
               }
             </select>
             <input class="field-input qty" type="number" min="1" [value]="cantidadSel()"
@@ -331,7 +331,7 @@
             <span class="cart-name">{{ i.producto.nombre }}</span>
             <input class="field-input qty" type="number" min="1" [value]="i.cantidad"
               (change)="cambiarCantidad(i.producto.id, +$any($event.target).value)" />
-            <span class="cart-sub">{{ i.producto.precio * i.cantidad | currency: 'PEN' : 'S/ ' }}</span>
+            <span class="cart-sub">{{ i.producto.precioVenta * i.cantidad | currency: 'PEN' : 'S/ ' }}</span>
             <button class="cart-del" type="button" aria-label="Quitar"
               (click)="quitarProducto(i.producto.id)">✕</button>
           </div>

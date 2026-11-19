@@ -6,36 +6,39 @@ import { CategoriaService } from '../../services/categoria.service';
 import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ConfirmDialog } from '@/app/shared/components/confirm-dialog/confirm-dialog';
 import { AvisoDialog } from '@/app/shared/components/aviso-dialog/aviso-dialog';
+import { CategoriaInterface } from '../../interfaces/CategoriaInterface';
+import { HttpErrorResponse } from '@angular/common/http';
 
 @Component({
   selector: 'app-categoria-list',
-  imports: [RouterLink, PageHeader, EmptyState, ReactiveFormsModule,ConfirmDialog,AvisoDialog],
+  imports: [RouterLink, PageHeader, EmptyState, ReactiveFormsModule, ConfirmDialog, AvisoDialog],
   templateUrl: './categoria-list.html',
 })
 export class CategoriaList implements OnInit {
-  ngOnInit(): void {
-    this.funObtenerCategoria();
-  }
   //aca va almacenar los usuarios
-  protected readonly categorias = signal<any>([]);
+  protected readonly categorias = signal<CategoriaInterface[]>([]);
   //inyectar servivio
   protected readonly categoriaService = inject(CategoriaService);
   //abrir modal con el nombre de
   protected readonly crearCategoria = signal(false);
   //si edito o no - obtener id
-  protected readonly user_id = signal<any>(-1);
+  protected readonly user_id = signal<number>(-1);
   //para eliminar
   protected readonly mensajeError = signal<string | null>(null);
   protected readonly mensajeExito = signal<string | null>(null);
-  protected readonly categoriaAEliminar = signal<any>(null);
+  protected readonly categoriaAEliminar = signal<CategoriaInterface | null>(null);
+
+  ngOnInit(): void {
+    this.funObtenerCategoria();
+  }
 
   //------------- LISTADO CATEGORIA ---------------//
   funObtenerCategoria() {
     this.categoriaService.funListarCategoria().subscribe({
-      next: (res: any) => {
+      next: (res: CategoriaInterface[]) => {
         this.categorias.set(res);
       },
-      error(err) {
+      error: (err: HttpErrorResponse) => {
         console.log(err);
       },
     })
@@ -99,7 +102,7 @@ export class CategoriaList implements OnInit {
 
   }
   //------------- EDITAR ---------------//
-  funEditarCategoria(cat: any) {
+  funEditarCategoria(cat: CategoriaInterface) {
     //almacenar el id al dar click
     this.user_id.set(cat.id)
     //precargar los datos ya registrado
@@ -111,7 +114,7 @@ export class CategoriaList implements OnInit {
   }
   //------------- ELIMINAR CATEGORIA ---------------//
   //abre el modal de confirmación (el botón de la papelera ya lo llama)
-  funEliminarCategoria(cat: any) {
+  funEliminarCategoria(cat: CategoriaInterface) {
     this.categoriaAEliminar.set(cat);
   }
 
@@ -129,7 +132,7 @@ export class CategoriaList implements OnInit {
         this.funObtenerCategoria();
         this.mensajeExito.set(`La categoría "${cat.nombre}" se eliminó exitosamente.`);
       },
-      error: (err) => {
+      error: (err: HttpErrorResponse) => {
         this.categoriaAEliminar.set(null);
         this.mensajeError.set(err.error?.message ?? 'No se pudo eliminar la categoría');
       },
@@ -150,7 +153,7 @@ export class CategoriaList implements OnInit {
     if (this.crearCategoria()) this.cerrarModal();
   }
   //------------------------------------//
-   cerrarExito() {
+  cerrarExito() {
     this.mensajeExito.set(null);
   }
 

@@ -6,6 +6,8 @@ import { PermisoService } from '../../services/permiso.service';
 import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ConfirmDialog } from '@/app/shared/components/confirm-dialog/confirm-dialog';
 import { AvisoDialog } from '@/app/shared/components/aviso-dialog/aviso-dialog';
+import { PermisoInterface } from '../../Interfaces/PermisoInterface';
+import { HttpErrorResponse } from '@angular/common/http';
 
 @Component({
   selector: 'app-permiso-list',
@@ -16,7 +18,7 @@ export class PermisoList implements OnInit {
   ngOnInit(): void {
     this.funObtenerPermiso();
   }
-  protected readonly permisos = signal<any[]>([]);
+  protected readonly permisos = signal<PermisoInterface[]>([]);
   private readonly permisoService = inject(PermisoService);
   protected readonly crearPermiso = signal(false);
   //si edito o no - obtener id (-1 = creando)
@@ -24,17 +26,17 @@ export class PermisoList implements OnInit {
   //para eliminar
   protected readonly mensajeError = signal<string | null>(null);
   protected readonly mensajeExito = signal<string | null>(null);
-  protected readonly permisoAEliminar = signal<any>(null);
+  protected readonly permisoAEliminar = signal<PermisoInterface|null>(null);
 
   //------------- LISTADO PERMISO ---------------//
   funObtenerPermiso() {
     this.permisoService.funListarPermiso().subscribe({
-      next: (permi: any) => {
+      next: (permi: PermisoInterface[]) => {
         //guardar en permisos
         this.permisos.set(permi);
       },
 
-      error: (error) => {
+      error: (error:HttpErrorResponse) => {
         console.log(error);
       }
     })
@@ -81,9 +83,9 @@ export class PermisoList implements OnInit {
     });
   }}
   //------------- EDITAR CATEGORIA ---------------//
-  funEditarPermiso(cat: any) {
+  funEditarPermiso(cat: PermisoInterface) {
     //almacenar el id al dar click
-    this.user_id.set(cat.id)
+    this.user_id.set(cat.id!)
     //precargar los datos ya registrado
     this.permisoForm.patchValue({
       nombre: cat.nombre,
@@ -93,7 +95,7 @@ export class PermisoList implements OnInit {
   }
    //------------- ELIMINAR CATEGORIA ---------------//
   //abre el modal de confirmación (el botón de la papelera ya lo llama)
-  funEliminarCategoria(permi: any) {
+  funEliminarCategoria(permi: PermisoInterface) {
     this.permisoAEliminar.set(permi);
   }
 
@@ -105,7 +107,7 @@ export class PermisoList implements OnInit {
     const cat = this.permisoAEliminar();
     if (!cat) return;
 
-    this.permisoService.funEliminar(cat.id).subscribe({
+    this.permisoService.funEliminar(cat.id!).subscribe({
       next: () => {
         this.permisoAEliminar.set(null);
         this.funObtenerPermiso();

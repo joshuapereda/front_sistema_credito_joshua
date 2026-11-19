@@ -6,6 +6,9 @@ import { RolService } from '../../services/rol.service';
 import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ConfirmDialog } from '@/app/shared/components/confirm-dialog/confirm-dialog';
 import { AvisoDialog } from '@/app/shared/components/aviso-dialog/aviso-dialog';
+import { RolInterface } from '../../Interfaces/RolInterface';
+import { PermisoInterface } from '@/app/features/permisos/Interfaces/PermisoInterface';
+import { HttpErrorResponse } from '@angular/common/http';
 
 @Component({
   selector: 'app-rol-list',
@@ -17,27 +20,27 @@ export class RolList implements OnInit {
     this.funObtenerRol();
     this.funObtenerPermiso();
   }
-  protected readonly roles = signal<any>([]);
-  protected readonly permisos = signal<any>([]);
+  protected readonly roles = signal<RolInterface[]>([]);
+  protected readonly permisos = signal<PermisoInterface[]>([]);
   protected readonly rolService = inject(RolService);
   protected readonly crearRol = signal(false);
   // Orden de las columnas
   private readonly ordenAcciones = ['LISTAR', 'CREAR', 'ACTUALIZAR', 'ELIMINAR'];
   protected readonly busquedaPermiso = signal('');
   //si edito o no - obtener id
-  protected readonly user_id = signal<any>(-1);
+  protected readonly user_id = signal<number>(-1);
   //para eliminar
   protected readonly mensajeError = signal<string | null>(null);
   protected readonly mensajeExito = signal<string | null>(null);
-  protected readonly rolaAEliminar = signal<any>(null);
+  protected readonly rolaAEliminar = signal<RolInterface | null>(null);
 
   //------------- LISTADO PERMISO ---------------//
   funObtenerPermiso() {
     this.rolService.funListarPermisos().subscribe({
-      next: (res: any) => {
+      next: (res: PermisoInterface[]) => {
         this.permisos.set(res);
       },
-      error: (error) => {
+      error: (error:HttpErrorResponse) => {
         console.log(error);
       }
     })
@@ -46,7 +49,7 @@ export class RolList implements OnInit {
   protected readonly permisoPorId = computed(() => {
     const mapa = new Map<number, string>();
     for (const per of this.permisos()) {
-      mapa.set(per.id, per.nombre);
+      mapa.set(per.id!, per.nombre);
     }
     return mapa;
   });
@@ -54,10 +57,10 @@ export class RolList implements OnInit {
   //------------- LISTADO ROL ---------------//
   funObtenerRol() {
     this.rolService.funListarRoles().subscribe({
-      next: (res: any) => {
+      next: (res: RolInterface[]) => {
         this.roles.set(res);
       },
-      error: (error) => {
+      error: (error:HttpErrorResponse) => {
         console.log(error);
       }
     })
@@ -113,30 +116,6 @@ export class RolList implements OnInit {
         error: (error) => console.log(error),
       });
     }
-  }
-  //------------- EDITAR CATEGORIA ---------------//
-  funEditarRol(rol: any) {
-    //almacenar el id al dar click
-    this.user_id.set(rol.id)
-    //precargar los datos ya registrado
-    this.rolForm.patchValue({
-      nombre: rol.nombre,
-      descripcion: rol.descripcion,
-      permisosId: rol.permisosId,
-    });
-  }
-  //------------- MODAL ---------------//
-  abrir(compra: any) {
-    this.crearRol.set(compra);
-  }
-
-  cerrarModal() {
-    this.crearRol.set(false);
-    this.rolForm.reset({ nombre: '', descripcion: '', permisosId: [] });
-  }
-  @HostListener('document:keydown.escape')
-  onEscape() {
-    if (this.crearRol()) this.cerrarModal();
   }
   //----------------------------------------------------------------------//
   //     PARA MOSTRARDE FORMA MAS ORDENADA LA SELECCION DE LOS PERMISOS   //
@@ -218,12 +197,36 @@ export class RolList implements OnInit {
     const visibles = this.modulos().flatMap(m => m.ids);
     return visibles.length > 0 && visibles.every(id => this.permisoMarcado(id));
   }
-  //------------- ELIMINAR CATEGORIA ---------------//
-  //abre el modal de confirmación (el botón de la papelera ya lo llama)
-  funEliminarRol(rol: any) {
-    this.rolaAEliminar.set(rol);
+  //------------- EDITAR ---------------//
+  funEditarRol(rol: RolInterface) {
+    //almacenar el id al dar click
+    this.user_id.set(rol.id!)
+    //precargar los datos ya registrado
+    this.rolForm.patchValue({
+      nombre: rol.nombre,
+      descripcion: rol.descripcion,
+      permisosId: rol.permisosId,
+    });
   }
 
+  //------------- ELIMINAR CATEGORIA ---------------//
+  //abre el modal de confirmación (el botón de la papelera ya lo llama)
+  funEliminarRol(rol: RolInterface) {
+    this.rolaAEliminar.set(rol);
+  }
+  //------------- MODAL ---------------//
+  abrir(compra: any) {
+    this.crearRol.set(compra);
+  }
+
+  cerrarModal() {
+    this.crearRol.set(false);
+    this.rolForm.reset({ nombre: '', descripcion: '', permisosId: [] });
+  }
+  @HostListener('document:keydown.escape')
+  onEscape() {
+    if (this.crearRol()) this.cerrarModal();
+  }
   cancelarEliminar() {
     this.rolaAEliminar.set(null);
   }
@@ -232,7 +235,7 @@ export class RolList implements OnInit {
     const cat = this.rolaAEliminar();
     if (!cat) return;
 
-    this.rolService.funEliminar(cat.id).subscribe({
+    this.rolService.funEliminar(cat.id!).subscribe({
       next: () => {
         this.rolaAEliminar.set(null);
         this.funObtenerRol();
