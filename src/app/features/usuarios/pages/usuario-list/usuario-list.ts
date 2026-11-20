@@ -3,16 +3,18 @@ import { RouterLink } from '@angular/router';
 import { PageHeader } from '@/app/shared/components/page-header/page-header';
 import { EmptyState } from '@/app/shared/components/empty-state/empty-state';
 import { UsuarioService } from '../../services/usuario.service';
-import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
+import { FormControl, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ConfirmDialog } from '@/app/shared/components/confirm-dialog/confirm-dialog';
 import { AvisoDialog } from '@/app/shared/components/aviso-dialog/aviso-dialog';
-import { UsuarioInterface } from '../../Interfaces/UsuarioInterface';
+import { UsuarioFilterCriteria, UsuarioInterface } from '../../Interfaces/UsuarioInterface';
 import { ClienteInterface } from '@/app/features/clientes/interfaces/ClienteInterface';
 import { RolInterface } from '@/app/features/roles/Interfaces/RolInterface';
+import { MatPaginatorModule, PageEvent } from '@angular/material/paginator';
+import { PageableRequest } from '@/app/shared/interfaces/pageable.interface';
 
 @Component({
   selector: 'app-usuario-list',
-  imports: [RouterLink, PageHeader, EmptyState, ReactiveFormsModule,ConfirmDialog,AvisoDialog],
+  imports: [RouterLink, PageHeader, EmptyState, ReactiveFormsModule,ConfirmDialog,AvisoDialog, FormsModule, MatPaginatorModule],
   templateUrl: './usuario-list.html',
 })
 export class UsuarioList implements OnInit {
@@ -32,6 +34,11 @@ export class UsuarioList implements OnInit {
   protected readonly mensajeError = signal<string | null>(null);
   protected readonly mensajeExito = signal<string | null>(null);
   protected readonly usuarioAEliminar = signal<UsuarioInterface|null>(null);
+  //paginacion y filtro
+  protected readonly totalElementos = signal(0);
+  protected readonly pageIndex = signal(0);
+  protected readonly pageSize = signal(5);
+  protected filterValue = '';
 
   //------------- LISTADO PERSONA ---------------//
   funObtenerPersona() {
@@ -75,14 +82,38 @@ export class UsuarioList implements OnInit {
 
   //------------- LISTADO USUARIO ---------------//
   funObtenerUsuarios() {
-    this.usuarioService.funListarUsuario().subscribe({
-      next: (res: any) => {
-        this.usuarios.set(res);
+  //Paginacion y filtrado
+    const req: PageableRequest<UsuarioFilterCriteria> = {
+        pageNumber: this.pageIndex(),
+        pageSize: this.pageSize(),
+        sortField: 'id',
+        sortOrder: 'desc',
+        criterials: null,
+        filterValue: this.filterValue,
+    };
+    this.usuarioService.funPaginarUsuario(req).subscribe({
+      next: (res) => {
+        this.usuarios.set(res.content);
+        this.totalElementos.set(res.totalElements);
       },
       error: (error) => {
         console.log(error);
       }
     })
+  }
+  cambiarPagina(e: PageEvent) {
+    this.pageIndex.set(e.pageIndex);
+    this.pageSize.set(e.pageSize);
+    this.funObtenerUsuarios();
+  }
+
+  buscar() {
+    this.pageIndex.set(0);
+    this.funObtenerUsuarios();
+  }
+  limpiar() {
+    this.filterValue = '';
+    this.buscar();
   }
 
   //---------------- FORMULARIO ----------------//

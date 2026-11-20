@@ -34,3 +34,9 @@ export interface CompraRequest {
   tipoCompraId: number;
   detalles: DetalleCompraRequest[];
 }
+//Filtros
+export interface CompraFilterCriteria {
+  tipoCompra?: string | null;
+  nombreCliente?: string | null;
+  estadoCompra?: string | null;
+}

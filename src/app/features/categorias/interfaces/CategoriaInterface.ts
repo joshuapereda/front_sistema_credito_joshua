@@ -4,3 +4,7 @@ export interface CategoriaInterface {
   descripcion:string;
   foto?: string | null;
 }
+//Filtros
+export interface CategoriaFilterCriteria {
+  nombre?: string | null;
+}

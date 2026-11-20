@@ -16,6 +16,10 @@ export interface PagoRequest {
   monto: number;
   compraId: number;
 }
+//filtros
+export interface PagoFilterCriteria{
+  nombreCliente?: string | null;
+}
 /*
   INTERFACES vs ANY
 

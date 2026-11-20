@@ -8,3 +8,8 @@ export interface UsuarioInterface {
   nombrePersona?: string;
   rolesId: number[];
 }
+//Filtros
+export interface UsuarioFilterCriteria {
+  username?: string | null;
+  nombrePersona?: string | null;
+}

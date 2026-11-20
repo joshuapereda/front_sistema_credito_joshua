@@ -1,8 +1,9 @@
 import { HttpClient } from '@angular/common/http';
 import { inject, Service } from '@angular/core';
 import { environment } from '@/environments/environment';
-import { RolInterface } from '../Interfaces/RolInterface';
+import { RolFilterCriteria, RolInterface } from '../Interfaces/RolInterface';
 import { PermisoInterface } from '../../permisos/Interfaces/PermisoInterface';
+import { PageableRequest, PageableResponse } from '@/app/shared/interfaces/pageable.interface';
 
 @Service()
 export class RolService {
@@ -12,7 +13,10 @@ export class RolService {
   funListarRoles() {
     return this.http.get<RolInterface[]>(`${this.urlBase}/api/roles`);
   }
-
+  //Lista pero con paginacion
+  funPaginarPago(req: PageableRequest<RolFilterCriteria>) {
+      return this.http.post<PageableResponse<RolInterface>>(`${this.urlBase}/api/roles/pagination`, req);
+  }
   funListarPermisos() {
     return this.http.get<PermisoInterface[]>(`${this.urlBase}/api/permisos`);
   }

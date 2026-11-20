@@ -4,3 +4,7 @@ export interface PermisoInterface{
   recurso: string;
   accion: string;
 }
+//Filtros
+export interface PermisoFilterCriteria {
+  nombre?: string | null;
+}

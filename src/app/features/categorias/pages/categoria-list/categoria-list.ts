@@ -3,15 +3,17 @@ import { RouterLink } from '@angular/router';
 import { PageHeader } from '@/app/shared/components/page-header/page-header';
 import { EmptyState } from '@/app/shared/components/empty-state/empty-state';
 import { CategoriaService } from '../../services/categoria.service';
-import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
+import { FormControl, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ConfirmDialog } from '@/app/shared/components/confirm-dialog/confirm-dialog';
 import { AvisoDialog } from '@/app/shared/components/aviso-dialog/aviso-dialog';
-import { CategoriaInterface } from '../../interfaces/CategoriaInterface';
+import { CategoriaFilterCriteria, CategoriaInterface } from '../../interfaces/CategoriaInterface';
 import { HttpErrorResponse } from '@angular/common/http';
+import { MatPaginatorModule, PageEvent } from '@angular/material/paginator';
+import { PageableRequest } from '@/app/shared/interfaces/pageable.interface';
 
 @Component({
   selector: 'app-categoria-list',
-  imports: [RouterLink, PageHeader, EmptyState, ReactiveFormsModule, ConfirmDialog, AvisoDialog],
+  imports: [RouterLink, PageHeader, EmptyState, ReactiveFormsModule, ConfirmDialog, AvisoDialog, FormsModule, MatPaginatorModule],
   templateUrl: './categoria-list.html',
 })
 export class CategoriaList implements OnInit {
@@ -27,6 +29,11 @@ export class CategoriaList implements OnInit {
   protected readonly mensajeError = signal<string | null>(null);
   protected readonly mensajeExito = signal<string | null>(null);
   protected readonly categoriaAEliminar = signal<CategoriaInterface | null>(null);
+  //paginacion y filtro
+  protected readonly totalElementos = signal(0);
+  protected readonly pageIndex = signal(0);
+  protected readonly pageSize = signal(5);
+  protected filterValue = '';
 
   ngOnInit(): void {
     this.funObtenerCategoria();
@@ -34,16 +41,39 @@ export class CategoriaList implements OnInit {
 
   //------------- LISTADO CATEGORIA ---------------//
   funObtenerCategoria() {
-    this.categoriaService.funListarCategoria().subscribe({
-      next: (res: CategoriaInterface[]) => {
-        this.categorias.set(res);
+    //Paginacion y filtrado
+    const req: PageableRequest<CategoriaFilterCriteria> = {
+        pageNumber: this.pageIndex(),
+        pageSize: this.pageSize(),
+        sortField: 'id',
+        sortOrder: 'desc',
+        criterials: null,
+        filterValue: this.filterValue,
+    };
+    this.categoriaService.funPaginarPago(req).subscribe({
+      next: (res) => {
+        this.categorias.set(res.content);
+        this.totalElementos.set(res.totalElements);
       },
       error: (err: HttpErrorResponse) => {
         console.log(err);
       },
     })
   }
+  cambiarPagina(e: PageEvent) {
+    this.pageIndex.set(e.pageIndex);
+    this.pageSize.set(e.pageSize);
+    this.funObtenerCategoria();
+  }
 
+  buscar() {
+    this.pageIndex.set(0);
+    this.funObtenerCategoria();
+  }
+  limpiar() {
+    this.filterValue = '';
+    this.buscar();
+  }
   //---------------- FORMULARIO ----------------//
   protected readonly categoriaForm = new FormGroup({
     nombre: new FormControl('', { nonNullable: true, validators: [Validators.required] }),

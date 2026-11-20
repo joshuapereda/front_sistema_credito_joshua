@@ -1,7 +1,8 @@
 import { HttpClient } from '@angular/common/http';
 import { inject, Service } from '@angular/core';
 import { environment } from '@/environments/environment';
-import { ClienteInterface } from '../interfaces/ClienteInterface';
+import { ClienteFilterCriteria, ClienteInterface } from '../interfaces/ClienteInterface';
+import { PageableRequest, PageableResponse } from '@/app/shared/interfaces/pageable.interface';
 
 @Service()
 export class ClienteService {
@@ -12,6 +13,10 @@ export class ClienteService {
   //---------------- FUNCIONES ----------------//
   funListarPersona() {
     return this.http.get<ClienteInterface[]>(`${this.urlBase}/api/clientes`);
+  }
+  //Lista pero con paginacion
+  funPaginarCliente(req: PageableRequest<ClienteFilterCriteria>) {
+        return this.http.post<PageableResponse<ClienteInterface>>(`${this.urlBase}/api/clientes/pagination`, req);
   }
   funGuarda(datos: ClienteInterface) {
     return this.http.post(`${this.urlBase}/api/clientes`, datos);

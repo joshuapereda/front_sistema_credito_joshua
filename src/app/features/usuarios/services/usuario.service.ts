@@ -2,10 +2,11 @@
 import { HttpClient } from '@angular/common/http';
 import { inject, Injectable } from '@angular/core';
 import { environment } from '@/environments/environment';
-import { UsuarioInterface } from '../Interfaces/UsuarioInterface';
+import { UsuarioFilterCriteria, UsuarioInterface } from '../Interfaces/UsuarioInterface';
 import { ClienteInterface } from '../../clientes/interfaces/ClienteInterface';
 import { RolInterface } from '../../roles/Interfaces/RolInterface';
 import { UsuarioRequest } from '../models/usuario.model';
+import { PageableRequest, PageableResponse } from '@/app/shared/interfaces/pageable.interface';
 
 
 @Injectable({
@@ -19,6 +20,10 @@ export class UsuarioService {
   //---------------- FUNCIONES ----------------//
   funListarUsuario() {
     return this.http.get<UsuarioInterface[]>(`${this.urlBase}/api/usuarios`);
+  }
+  //Lista pero con paginacion
+  funPaginarUsuario(req: PageableRequest<UsuarioFilterCriteria>) {
+    return this.http.post<PageableResponse<UsuarioInterface>>(`${this.urlBase}/api/usuarios/pagination`, req);
   }
   funListarPersona() {
     return this.http.get<ClienteInterface[]>(`${this.urlBase}/api/clientes`);

@@ -1,8 +1,9 @@
 import { HttpClient } from '@angular/common/http';
 import { inject, Service } from '@angular/core';
 import { environment } from '@/environments/environment';
-import { ProductoInterface } from '../interfaces/ProductoInterface';
+import { ProductoFilterCriteria, ProductoInterface } from '../interfaces/ProductoInterface';
 import { CategoriaInterface } from '../../categorias/interfaces/CategoriaInterface';
+import { PageableRequest, PageableResponse } from '@/app/shared/interfaces/pageable.interface';
 
 @Service()
 export class ProductoService {
@@ -12,6 +13,10 @@ export class ProductoService {
   //---------------- FUNCIONES ----------------//
   funListarProducto() {
     return this.http.get<ProductoInterface[]>(`${this.urlBase}/api/productos`);
+  }
+  //Lista pero con paginacion
+  funPaginarProducto(req: PageableRequest<ProductoFilterCriteria>) {
+      return this.http.post<PageableResponse<ProductoInterface>>(`${this.urlBase}/api/productos/pagination`, req);
   }
   funListarCategoria() {
     return this.http.get<CategoriaInterface[]>(`${this.urlBase}/api/categorias`);

@@ -1,12 +1,13 @@
 import { HttpClient } from '@angular/common/http';
 import { inject, Service } from '@angular/core';
 import { environment } from '@/environments/environment';
-import { CompraInterface, CompraRequest } from '../interfaces/CompraInterface';
+import { CompraFilterCriteria, CompraInterface, CompraRequest } from '../interfaces/CompraInterface';
 import { ClienteInterface } from '../../clientes/interfaces/ClienteInterface';
 import { UsuarioInterface } from '../../usuarios/Interfaces/UsuarioInterface';
 import { TipoCompraInterface } from '../../tipos-compra/Interfaces/TipoCompraInterface';
 import { ProductoInterface } from '../../productos/interfaces/ProductoInterface';
 import { CategoriaInterface } from '../../categorias/interfaces/CategoriaInterface';
+import { PageableRequest, PageableResponse } from '@/app/shared/interfaces/pageable.interface';
 
 @Service()
 export class CompraService {
@@ -16,6 +17,9 @@ export class CompraService {
   //---------------- FUNCIONES ----------------//
   funListarCompra() {
     return this.http.get<CompraInterface[]>(`${this.urlBase}/api/compra`);
+  }
+  funPaginarCompra(req: PageableRequest<CompraFilterCriteria>) {
+    return this.http.post<PageableResponse<CompraInterface>>(`${this.urlBase}/api/compra/pagination`, req);
   }
   funListarCliente() {
     return this.http.get<ClienteInterface[]>(`${this.urlBase}/api/clientes`);
