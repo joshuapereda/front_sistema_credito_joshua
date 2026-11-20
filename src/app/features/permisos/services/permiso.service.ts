@@ -1,7 +1,8 @@
 import { HttpClient } from '@angular/common/http';
 import { inject, Service } from '@angular/core';
 import { environment } from '@/environments/environment';
-import { PermisoInterface } from '../Interfaces/PermisoInterface';
+import { PermisoFilterCriteria, PermisoInterface } from '../Interfaces/PermisoInterface';
+import { PageableRequest, PageableResponse } from '@/app/shared/interfaces/pageable.interface';
 
 @Service()
 export class PermisoService {
@@ -12,6 +13,10 @@ export class PermisoService {
   //---------------- FUNCIONES ----------------//
   funListarPermiso() {
     return this.http.get<PermisoInterface[]>(`${this.urlBase}/api/permisos`);
+  }
+  //Lista pero con paginacion
+  funPaginarPermiso(req: PageableRequest<PermisoFilterCriteria>) {
+    return this.http.post<PageableResponse<PermisoInterface>>(`${this.urlBase}/api/permisos/pagination`, req);
   }
   funGuarda(datos: PermisoInterface) {
     return this.http.post(`${this.urlBase}/api/permisos`, datos);

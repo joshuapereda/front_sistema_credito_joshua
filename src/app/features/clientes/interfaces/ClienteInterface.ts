@@ -7,3 +7,7 @@ export interface ClienteInterface {
   docIdentidad:string;
 }
 
+export interface ClienteFilterCriteria {
+  docIdentidad?: string | null;
+  nombrePersona?: string | null;
+}

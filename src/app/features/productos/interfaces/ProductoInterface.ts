@@ -6,3 +6,8 @@ export interface ProductoInterface {
   categoriaId: number;
   foto: string | null;
 }
+//Filtros
+export interface ProductoFilterCriteria {
+  nombre?: string | null;
+  nombreCategoria?: string | null;
+}

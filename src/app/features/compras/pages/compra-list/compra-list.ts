@@ -4,14 +4,16 @@ import { CurrencyPipe, DatePipe } from '@angular/common';
 import { PageHeader } from '@/app/shared/components/page-header/page-header';
 import { EmptyState } from '@/app/shared/components/empty-state/empty-state';
 import { CompraService } from '../../services/compra.service';
-import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
-import { CompraInterface, CompraRequest } from '../../interfaces/CompraInterface';
+import { FormControl, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
+import { CompraFilterCriteria, CompraInterface, CompraRequest } from '../../interfaces/CompraInterface';
 import { ClienteInterface } from '@/app/features/clientes/interfaces/ClienteInterface';
 import { UsuarioInterface } from '@/app/features/usuarios/Interfaces/UsuarioInterface';
 import { ProductoInterface } from '@/app/features/productos/interfaces/ProductoInterface';
 import { CategoriaInterface } from '@/app/features/categorias/interfaces/CategoriaInterface';
 import { HttpErrorResponse } from '@angular/common/http';
 import { TipoCompraInterface } from '@/app/features/tipos-compra/Interfaces/TipoCompraInterface';
+import { MatPaginatorModule, PageEvent } from '@angular/material/paginator';
+import { PageableRequest } from '@/app/shared/interfaces/pageable.interface';
 
 interface ItemCarrito {
   producto: Pick<ProductoInterface, 'id' | 'nombre' | 'precioVenta'>;
@@ -20,7 +22,7 @@ interface ItemCarrito {
 
 @Component({
   selector: 'app-compra-list',
-  imports: [RouterLink, PageHeader, EmptyState, CurrencyPipe, DatePipe, ReactiveFormsModule],
+  imports: [RouterLink, PageHeader, EmptyState, CurrencyPipe, DatePipe, ReactiveFormsModule, FormsModule, MatPaginatorModule],
   templateUrl: './compra-list.html',
 })
 export class CompraList implements OnInit {
@@ -40,6 +42,11 @@ export class CompraList implements OnInit {
   protected readonly errorServidor = signal<string[]>([]);
   //si edito o no: null = estoy creando, número = id de la compra que edito
   protected readonly compraEditId = signal<number | null>(null);
+  //paginacion y filtro
+  protected readonly totalElementos = signal(0);
+  protected readonly pageIndex = signal(0);
+  protected readonly pageSize = signal(5);
+  protected filterValue = '';
 
   ngOnInit(): void {
     this.funObtenerVenta();
@@ -78,13 +85,6 @@ export class CompraList implements OnInit {
       error: (e: HttpErrorResponse) => console.log(e),
     });
   }
-
-  funObtenerVenta() {
-    this.compraService.funListarCompra().subscribe({
-      next: (res: CompraInterface[]) => this.compras.set(res),
-      error: (e: HttpErrorResponse) => console.log(e),
-    });
-  }
   funObtenerCategoria() {
     this.compraService.funListarCategoria().subscribe({
       next: (res: CategoriaInterface[]) => {
@@ -103,6 +103,40 @@ export class CompraList implements OnInit {
     }
     return mapa;
   });
+  //----------------LISTAR  ----------------//
+  funObtenerVenta() {
+    //Paginacion y filtrado
+    const req: PageableRequest<CompraFilterCriteria> = {
+      pageNumber: this.pageIndex(),
+      pageSize: this.pageSize(),
+      sortField: 'id',
+      sortOrder: 'desc',
+      criterials: null,
+      filterValue: this.filterValue,
+    };
+
+    this.compraService.funPaginarCompra(req).subscribe({
+      next: (res) => {
+        this.compras.set(res.content);
+        this.totalElementos.set(res.totalElements);
+      },
+      error: (e: HttpErrorResponse) => console.log(e),
+    });
+  }
+  cambiarPagina(e: PageEvent) {
+    this.pageIndex.set(e.pageIndex);
+    this.pageSize.set(e.pageSize);
+    this.funObtenerVenta();
+  }
+
+  buscar() {
+    this.pageIndex.set(0);
+    this.funObtenerVenta();
+  }
+  limpiar() {
+    this.filterValue = '';
+    this.buscar();
+  }
   //---------------- FORMULARIO ----------------//
   protected readonly ventaForm = new FormGroup({
     clienteId: new FormControl<number | null>(null, Validators.required),

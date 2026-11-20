@@ -3,15 +3,17 @@ import { RouterLink } from '@angular/router';
 import { PageHeader } from '@/app/shared/components/page-header/page-header';
 import { EmptyState } from '@/app/shared/components/empty-state/empty-state';
 import { PagoService } from '../../services/pago.service';
-import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
+import { FormControl, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
 import { CurrencyPipe, DatePipe, DecimalPipe } from '@angular/common';
-import { PagoInterface, PagoRequest } from '../../Interfaces/PagoInterface';
+import { PagoFilterCriteria, PagoInterface, PagoRequest } from '../../Interfaces/PagoInterface';
 import { CompraInterface } from '@/app/features/compras/interfaces/CompraInterface';
 import { HttpErrorResponse } from '@angular/common/http';
+import { PageableRequest } from '@/app/shared/interfaces/pageable.interface';
+import { MatPaginatorModule, PageEvent } from '@angular/material/paginator';
 
 @Component({
   selector: 'app-pago-list',
-  imports: [RouterLink, PageHeader, EmptyState,ReactiveFormsModule,CurrencyPipe,DatePipe,DecimalPipe],
+  imports: [RouterLink, PageHeader, EmptyState,ReactiveFormsModule,CurrencyPipe,DatePipe,DecimalPipe, FormsModule, MatPaginatorModule],
   templateUrl: './pago-list.html',
 })
 export class PagoList implements OnInit {
@@ -27,6 +29,11 @@ export class PagoList implements OnInit {
   protected readonly user_id = signal<number>(-1);
   protected readonly compraEditandoId = signal<number | null>(null);
   protected readonly montoOriginal = signal<number>(0);
+  //paginacion y filtro
+  protected readonly totalElementos = signal(0);
+  protected readonly pageIndex = signal(0);
+  protected readonly pageSize = signal(5);
+  protected filterValue = '';
 
   //------------- LISTADO COMPRA --------------//
   funObtenerCompra(){
@@ -44,16 +51,41 @@ export class PagoList implements OnInit {
     const c = this.compras().find(x => x.id === id);
     return c ? `#${c.id} · ${c.cliente}` : '—';
   }
-  //------------- LISTADO PAGO ---------------//
+  //------------- LISTADO ---------------//
   funObtenerPago(){
-    this.pagoService.funListarPago().subscribe({
-      next:(res:PagoInterface[])=>{
-        this.pagos.set(res);
+    //Paginacion y filtrado
+    const req: PageableRequest<PagoFilterCriteria> = {
+          pageNumber: this.pageIndex(),
+          pageSize: this.pageSize(),
+          sortField: 'id',
+          sortOrder: 'desc',
+          criterials: null,
+          filterValue: this.filterValue,
+    };
+    //funPaginarPago-OBTIENE UN LISTADO EPRO CON PAGINACION
+    //funListarPago-LISTA PERO SIN PAGINACION
+    this.pagoService.funPaginarPago(req).subscribe({
+      next:(res)=>{
+        this.pagos.set(res.content);
+        this.totalElementos.set(res.totalElements);
       },
       error:(error:HttpErrorResponse)=>{
         console.log(error);
       }
     })
+  }
+  cambiarPagina(e: PageEvent) {
+    this.pageIndex.set(e.pageIndex);
+    this.pageSize.set(e.pageSize);
+    this.funObtenerPago();
+  }
+   buscar() {
+    this.pageIndex.set(0);
+    this.funObtenerPago();
+  }
+  limpiar() {
+    this.filterValue = '';
+    this.buscar();
   }
 
   //---------------- FORMULARIO ----------------//
