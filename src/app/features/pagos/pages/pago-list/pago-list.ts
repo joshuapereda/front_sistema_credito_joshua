@@ -1,4 +1,4 @@
-import { Component, computed, HostListener, inject, OnInit, signal } from '@angular/core';
+import { Component, computed, HostListener, inject, OnInit, signal, TemplateRef, ViewChild } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { PageHeader } from '@/app/shared/components/page-header/page-header';
 import { EmptyState } from '@/app/shared/components/empty-state/empty-state';
@@ -10,10 +10,12 @@ import { CompraInterface } from '@/app/features/compras/interfaces/CompraInterfa
 import { HttpErrorResponse } from '@angular/common/http';
 import { PageableRequest } from '@/app/shared/interfaces/pageable.interface';
 import { MatPaginatorModule, PageEvent } from '@angular/material/paginator';
+import { TicketPago } from '../../ticket-pago/ticket-pago';
+import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 
 @Component({
   selector: 'app-pago-list',
-  imports: [RouterLink, PageHeader, EmptyState,ReactiveFormsModule,CurrencyPipe,DatePipe,DecimalPipe, FormsModule, MatPaginatorModule],
+  imports: [RouterLink, PageHeader, EmptyState,ReactiveFormsModule,CurrencyPipe,DatePipe,DecimalPipe, FormsModule, MatPaginatorModule,TicketPago,MatDialogModule],
   templateUrl: './pago-list.html',
 })
 export class PagoList implements OnInit {
@@ -34,6 +36,9 @@ export class PagoList implements OnInit {
   protected readonly pageIndex = signal(0);
   protected readonly pageSize = signal(5);
   protected filterValue = '';
+  //impresion
+  //Te da el “abridor de ventanas” de Angular Material. Sin esto no puedes abrir el diálogo.
+  private readonly dialog = inject(MatDialog);
 
   //------------- LISTADO COMPRA --------------//
   funObtenerCompra(){
@@ -168,5 +173,13 @@ export class PagoList implements OnInit {
   @HostListener('document:keydown.escape')
   onEscape() {
     if (this.crearPago()) this.cerrarModal();
+  }
+    //==================Impresion======================//
+  @ViewChild('ticketDialog') ticketDialog!: TemplateRef<any>;
+  pagoTicket : any;
+
+  abrirTicket(pago: any) {
+    this.pagoTicket = pago;             // guarda el pago de esa fila
+    this.dialog.open(this.ticketDialog);    // abre el diálogo con el molde
   }
 }

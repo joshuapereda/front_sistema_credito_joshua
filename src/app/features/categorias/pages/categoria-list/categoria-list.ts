@@ -10,6 +10,7 @@ import { CategoriaFilterCriteria, CategoriaInterface } from '../../interfaces/Ca
 import { HttpErrorResponse } from '@angular/common/http';
 import { MatPaginatorModule, PageEvent } from '@angular/material/paginator';
 import { PageableRequest } from '@/app/shared/interfaces/pageable.interface';
+import { environment } from '@/environments/environment';
 
 @Component({
   selector: 'app-categoria-list',
@@ -74,6 +75,19 @@ export class CategoriaList implements OnInit {
     this.filterValue = '';
     this.buscar();
   }
+  //------------- IMÁGENES ---------------//
+    private readonly SIN_FOTO = '/img/sin-foto.svg';
+    getImagen(foto: string | null | undefined): string {
+      return foto
+        ? `${environment.apiUrl}/api/files/${encodeURIComponent(foto)}`  // foto real, pedida al backend
+        : this.SIN_FOTO;                                                  // sin foto: imagen por defecto
+    }
+
+    onImgError(event: Event) {
+      const img = event.target as HTMLImageElement;
+      if (img.src.includes('no-image.png')) return;
+      img.src = this.SIN_FOTO;
+    }
   //---------------- FORMULARIO ----------------//
   protected readonly categoriaForm = new FormGroup({
     nombre: new FormControl('', { nonNullable: true, validators: [Validators.required] }),

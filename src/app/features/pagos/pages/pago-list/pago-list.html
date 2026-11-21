@@ -30,69 +30,69 @@
 <app-empty-state titulo="Aún no hay pagos"
   mensaje="Registra el primer abono para empezar a reducir los saldos de las compras a crédito." />
 } @else {
-<section class="rounded-2xl border border-gray-200 bg-white">
+<section class="overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-sm">
   <div class="overflow-x-auto">
     <table class="min-w-full text-sm">
-      <thead>
-        <tr class="border-b border-gray-200 text-left text-xs font-medium text-gray-500">
-          <th scope="col" class="px-6 py-3.5">N°</th>
-          <th scope="col" class="px-6 py-3.5">CLIENTE</th>
-          <th scope="col" class="px-6 py-3.5">FECHA</th>
-          <th scope="col" class="px-6 py-3.5 text-right">MONTO</th>
-          <th scope="col" class="w-64 px-6 py-3.5">ESTAD0 DE COMPRA</th>
-          <th scope="col" class="px-6 py-3.5 text-right">ACCION</th>
+      <thead class="bg-gray-50">
+        <tr class="border-b border-gray-200 text-xs font-semibold uppercase tracking-wider text-gray-500">
+          <th scope="col" class="px-5 py-3 text-left">N°</th>
+          <th scope="col" class="px-5 py-3 text-left">Cliente</th>
+          <th scope="col" class="px-5 py-3 text-left">Fecha</th>
+          <th scope="col" class="px-5 py-3 text-right">Monto</th>
+          <th scope="col" class="w-72 px-5 py-3 text-left">Estado de compra</th>
+          <th scope="col" class="px-5 py-3 text-center">Acciones</th>
         </tr>
       </thead>
 
       <tbody class="divide-y divide-gray-100">
         @for (pg of pagos(); track pg.id) {
-        <tr class="group transition-colors hover:bg-gray-50/70">
-          <td class="whitespace-nowrap px-6 py-4 font-medium text-gray-400 tabular-nums">#{{ pg.id }}</td>
+        <tr class="transition-colors hover:bg-gray-50/70">
+          <td class="whitespace-nowrap px-5 py-4 align-middle font-mono text-xs text-gray-400">#{{ pg.id }}</td>
 
-          <td class="px-6 py-4 font-medium text-gray-900">{{ pg.nombreClienteCompra }}</td>
+          <td class="px-5 py-4 align-middle">
+            <div class="flex items-center gap-3">
+              <div class="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-fuchsia-100 text-sm font-semibold text-fuchsia-700">
+                {{ pg.nombreClienteCompra.charAt(0).toUpperCase() }}
+              </div>
+              <span class="font-medium text-gray-900">{{ pg.nombreClienteCompra }}</span>
+            </div>
+          </td>
 
-          <td class="whitespace-nowrap px-6 py-4">
-            <p class="text-gray-900">{{ pg.fechaHora | date: 'dd/MM/yyyy' }}</p>
+          <td class="whitespace-nowrap px-5 py-4 align-middle">
+            <p class="font-medium text-gray-900">{{ pg.fechaHora | date: 'dd/MM/yyyy' }}</p>
             <p class="text-xs text-gray-500">{{ pg.fechaHora | date: 'hh:mm a' }}</p>
           </td>
 
-          <td class="whitespace-nowrap px-6 py-4 text-right font-semibold text-gray-900 tabular-nums">
+          <td class="whitespace-nowrap px-5 py-4 text-right align-middle font-semibold text-gray-900 tabular-nums">
             {{ pg.monto | currency: 'PEN' : 'S/ ' }}
           </td>
 
-          <td class="px-6 py-4">
-            <div class="flex items-center justify-between gap-3">
-              @if (+pg.saldoRestante <= 0) { <span class="badge badge-ok">Pagado</span>
-                } @else {
-                <span class="badge badge-pending">Debe {{ pg.saldoRestante | currency: 'PEN' : 'S/ ' }}</span>
-                }
-                <span class="text-xs text-gray-500 tabular-nums">de {{ pg.totalCompra | currency: 'PEN' : 'S/ '
-                  }}</span>
+          <td class="px-5 py-4 align-middle">
+            <div class="flex items-center justify-between gap-3 whitespace-nowrap">
+              @if (+pg.saldoRestante <= 0) {
+              <span class="badge badge-ok">Pagado</span>
+              } @else {
+              <span class="badge badge-pending">Debe {{ pg.saldoRestante | currency: 'PEN' : 'S/ ' }}</span>
+              }
+              <span class="text-xs text-gray-500 tabular-nums">de {{ pg.totalCompra | currency: 'PEN' : 'S/ ' }}</span>
             </div>
-            <div class="progress mt-2" role="progressbar" aria-label="Porcentaje pagado de la compra" aria-valuemin="0"
-              aria-valuemax="100"
-              [attr.aria-valuenow]="(((+pg.totalCompra - +pg.saldoRestante) / +pg.totalCompra) * 100) | number: '1.0-0'">
+            <div class="progress mt-2" role="progressbar" aria-label="Porcentaje pagado de la compra"
+              aria-valuemin="0" aria-valuemax="100">
               <span class="progress-bar"
                 [style.width.%]="((+pg.totalCompra - +pg.saldoRestante) / +pg.totalCompra) * 100"></span>
             </div>
           </td>
 
-          <td class="px-6 py-4">
-            <div
-              class="flex items-center justify-end gap-1 opacity-60 transition-opacity group-hover:opacity-100 focus-within:opacity-100">
-              <button type="button" class="icon-btn" title="Editar pago" aria-label="Editar pago">
-                <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75"
-                  aria-hidden="true" (click)="abrir(true);funEditarPago(pg)">
-                  <path stroke-linecap="round" stroke-linejoin="round"
-                    d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931z" />
-                </svg>
+          <td class="px-5 py-4 align-middle">
+            <div class="flex items-center justify-center gap-2">
+              <button type="button" (click)="abrirTicket(pg)" title="Imprimir ticket" aria-label="Imprimir ticket"
+                class="inline-flex h-8 w-8 items-center justify-center rounded-lg border border-gray-200 bg-white text-gray-600 shadow-sm transition-colors hover:border-fuchsia-300 hover:bg-fuchsia-50 hover:text-fuchsia-700">
+                <i class="bi bi-printer"></i>
               </button>
-              <!--<button type="button" class="icon-btn icon-btn-danger" title="Eliminar pago" aria-label="Eliminar pago">
-                <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" aria-hidden="true">
-                  <path stroke-linecap="round" stroke-linejoin="round"
-                    d="M14.74 9l-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 01-2.244 2.077H8.084a2.25 2.25 0 01-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 00-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 013.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 00-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 00-7.5 0" />
-                </svg>
-              </button>-->
+              <button type="button" (click)="funEditarPago(pg)" title="Editar compra" aria-label="Editar compra"
+                class="inline-flex h-8 w-8 items-center justify-center rounded-lg border border-gray-200 bg-white text-gray-600 shadow-sm transition-colors hover:border-amber-300 hover:bg-amber-50 hover:text-amber-700">
+                <i class="bi bi-pencil"></i>
+              </button>
             </div>
           </td>
         </tr>
@@ -102,9 +102,23 @@
   </div>
 </section>
 }
+<!--PAGINACION-->
 <mat-paginator [length]="totalElementos()" [pageSize]="pageSize()" [pageIndex]="pageIndex()"
   [pageSizeOptions]="[5, 10, 25]" (page)="cambiarPagina($event)" showFirstLastButtons>
 </mat-paginator>
+<!--TICKET-->
+<!--llama al <app-ticket-compra>-->
+<ng-template #ticketDialog>
+  <h2 mat-dialog-title class="no-print">Ticket</h2>
+  <mat-dialog-content>
+    @if (pagoTicket) {
+      <app-ticket-pago [pago]="pagoTicket"></app-ticket-pago>
+    }
+  </mat-dialog-content>
+  <mat-dialog-actions class="no-print">
+    <button type="button" mat-dialog-close>Cerrar</button>
+  </mat-dialog-actions>
+</ng-template>
 @if (crearPago(); as c) {
 <div class="modal-overlay" (click)="cerrarModal()">
   <div class="modal" role="dialog" aria-modal="true" aria-labelledby="modal-titulo" (click)="$event.stopPropagation()">

@@ -1,0 +1,54 @@
+<!--================CONTENIDO===================-->
+<!--app-ticket llama al ticket global donde vamos implementar -->
+<app-ticket>
+  <p class="titulo">TICKET DE VENTA</p>
+  <p class="numero">N° {{ compra.id }}</p>
+
+  <div class="sep"></div>
+
+  <p><b>Fecha:</b> {{ compra.fechaHora | date:'dd/MM/yyyy hh:mm a' }}</p>
+  <p><b>Cliente:</b> {{ compra.cliente }}</p>
+  <p><b>Vendedor:</b> {{ compra.usuario }}</p>
+  <p><b>Tipo:</b> {{ compra.tipoCompra === 'Credito' ? 'Crédito' : compra.tipoCompra }}</p>
+
+  <div class="sep"></div>
+
+  <table>
+    <thead>
+      <tr>
+        <th class="izq">CANT</th>
+        <th class="izq">DESCRIPCIÓN</th>
+        <th class="der">IMPORTE</th>
+      </tr>
+    </thead>
+    <tbody>
+      @for (d of compra.detalles; track d.productoId) {
+      <tr>
+        <td class="izq">{{ d.cantidad }}</td>
+        <td class="izq">{{ d.nombreProducto }}
+          <br><span class="unit">P.U. {{ d.precioUnitario | currency:'PEN':'S/ ' }}</span>
+        </td>
+        <td class="der">{{ d.subtotal | currency:'PEN':'S/ ' }}</td>
+      </tr>
+      }
+    </tbody>
+  </table>
+
+  <div class="sep"></div>
+
+  <div class="fila total">
+    <span>TOTAL</span>
+    <span>{{ compra.total | currency:'PEN':'S/ ' }}</span>
+  </div>
+  <div class="fila">
+    <span>Pagado</span>
+    <span>{{ compra.total - compra.saldo | currency:'PEN':'S/ ' }}</span>
+  </div>
+  @if (compra.saldo > 0) {
+  <div class="fila debe">
+    <span>SALDO PENDIENTE</span>
+    <span>{{ compra.saldo | currency:'PEN':'S/ ' }}</span>
+  </div>
+  }
+</app-ticket>
+

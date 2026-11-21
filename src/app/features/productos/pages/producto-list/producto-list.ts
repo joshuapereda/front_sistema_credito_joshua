@@ -11,10 +11,11 @@ import { CategoriaInterface } from '@/app/features/categorias/interfaces/Categor
 import { HttpErrorResponse } from '@angular/common/http';
 import { MatPaginatorModule, PageEvent } from '@angular/material/paginator';
 import { PageableRequest } from '@/app/shared/interfaces/pageable.interface';
+import { environment } from '@/environments/environment';
 
 @Component({
   selector: 'app-producto-list',
-  imports: [RouterLink, PageHeader, EmptyState, ReactiveFormsModule,ConfirmDialog,AvisoDialog, FormsModule, MatPaginatorModule],
+  imports: [RouterLink, PageHeader, EmptyState, ReactiveFormsModule, ConfirmDialog, AvisoDialog, FormsModule, MatPaginatorModule],
   templateUrl: './producto-list.html',
 })
 export class ProductoList implements OnInit {
@@ -44,7 +45,7 @@ export class ProductoList implements OnInit {
       next: (res: CategoriaInterface[]) => {
         this.categorias.set(res);
       },
-      error: (error:HttpErrorResponse) => {
+      error: (error: HttpErrorResponse) => {
         console.log(error);
       }
     })
@@ -62,24 +63,24 @@ export class ProductoList implements OnInit {
   funObtenerProducto() {
     //Paginacion y filtrado
     const req: PageableRequest<ProductoFilterCriteria> = {
-        pageNumber: this.pageIndex(),
-        pageSize: this.pageSize(),
-        sortField: 'id',
-        sortOrder: 'desc',
-        criterials: null,
-        filterValue: this.filterValue,
+      pageNumber: this.pageIndex(),
+      pageSize: this.pageSize(),
+      sortField: 'id',
+      sortOrder: 'desc',
+      criterials: null,
+      filterValue: this.filterValue,
     };
     this.productoService.funPaginarProducto(req).subscribe({
       next: (res) => {
         this.productos.set(res.content);
         this.totalElementos.set(res.totalElements);
       },
-      error: (error:HttpErrorResponse) => {
+      error: (error: HttpErrorResponse) => {
         console.log(error);
       }
     })
   }
-   cambiarPagina(e: PageEvent) {
+  cambiarPagina(e: PageEvent) {
     this.pageIndex.set(e.pageIndex);
     this.pageSize.set(e.pageSize);
     this.funObtenerProducto();
@@ -92,6 +93,19 @@ export class ProductoList implements OnInit {
   limpiar() {
     this.filterValue = '';
     this.buscar();
+  }
+  //------------- IMÁGENES ---------------//
+  private readonly SIN_FOTO = '/img/sin-foto.svg';
+  getImagen(foto: string | null | undefined): string {
+    return foto
+      ? `${environment.apiUrl}/api/files/${encodeURIComponent(foto)}`  // foto real, pedida al backend
+      : this.SIN_FOTO;                                                  // sin foto: imagen por defecto
+  }
+
+  onImgError(event: Event) {
+    const img = event.target as HTMLImageElement;
+    if (img.src.includes('no-image.png')) return;
+    img.src = this.SIN_FOTO;
   }
 
   //---------------- FORMULARIO ----------------//
@@ -111,7 +125,7 @@ export class ProductoList implements OnInit {
         this.productoForm.markAllAsTouched();
         return;
       }
-      const { nombre, precioVenta,precioCompra,categoriaId, foto } = this.productoForm.getRawValue();
+      const { nombre, precioVenta, precioCompra, categoriaId, foto } = this.productoForm.getRawValue();
       const formData = new FormData();
       formData.append('nombre', nombre);
       formData.append('precioVenta', String(precioVenta));
@@ -126,28 +140,28 @@ export class ProductoList implements OnInit {
         },
         error: (err) => console.error('Error al editar la categoría', err),
       });
-    }else{
+    } else {
       if (this.productoForm.invalid) {
-      this.productoForm.markAllAsTouched();
-      return;
-    }
+        this.productoForm.markAllAsTouched();
+        return;
+      }
 
-    const { nombre, precioVenta, precioCompra, categoriaId, foto } = this.productoForm.getRawValue();
+      const { nombre, precioVenta, precioCompra, categoriaId, foto } = this.productoForm.getRawValue();
 
-    const formData = new FormData();
-    formData.append('nombre', nombre);
-    formData.append('precioVenta', String(precioVenta));
-    formData.append('precioCompra', String(precioCompra));
-    formData.append('categoriaId', String(categoriaId));
-    if (foto) formData.append('foto', foto);
+      const formData = new FormData();
+      formData.append('nombre', nombre);
+      formData.append('precioVenta', String(precioVenta));
+      formData.append('precioCompra', String(precioCompra));
+      formData.append('categoriaId', String(categoriaId));
+      if (foto) formData.append('foto', foto);
 
-    this.productoService.funGuarda(formData).subscribe({
-      next: () => {
-        this.cerrarModal();
-        this.funObtenerProducto();
-      },
-      error: (error) => console.log(error),
-    });
+      this.productoService.funGuarda(formData).subscribe({
+        next: () => {
+          this.cerrarModal();
+          this.funObtenerProducto();
+        },
+        error: (error) => console.log(error),
+      });
     }
   }
   //Subir foto
@@ -164,9 +178,9 @@ export class ProductoList implements OnInit {
     this.user_id.set(p.id);
     this.productoForm.patchValue({
       nombre: p.nombre,
-      precioVenta:p.precioVenta,
-      precioCompra:p.precioCompra,
-      categoriaId:p.categoriaId,
+      precioVenta: p.precioVenta,
+      precioCompra: p.precioCompra,
+      categoriaId: p.categoriaId,
       foto: null,
     });
     this.crearProducto.set(true);

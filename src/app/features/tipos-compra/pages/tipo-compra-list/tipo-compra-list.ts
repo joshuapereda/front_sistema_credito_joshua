@@ -100,7 +100,7 @@ export class TipoCompraList implements OnInit {
   }
   //----------- ELIMINAR TIPO DE COMPRA -------------//
   //abre el modal de confirmación (el botón de la papelera ya lo llama)
-  funEliminarCategoria(tp: TipoCompraInterface) {
+  funEliminarTipoCompra(tp: TipoCompraInterface) {
     this.tCompraAEliminar.set(tp);
   }
 
