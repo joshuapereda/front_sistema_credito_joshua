@@ -1,0 +1,20 @@
+<!--=================CABECERA=====================-->
+<div id="ticket" class="ticket">
+  <div class="cabecera">
+    <p class="marca">BOUTIQUE</p>
+    <p class="nombre">KATTE Y VALENTINO</p>
+    <p class="giro">Woman and Men</p>
+  </div>
+
+  <div class="sep-doble"></div>
+  <!--Indica que luego podemosm llamar al contenido desde otro componente -->
+  <ng-content></ng-content>
+
+  <div class="sep-doble"></div>
+<!--=================BODY=====================-->
+  <p class="pie">¡Gracias por su preferencia!</p>
+  <p class="pie chico">Vuelva pronto</p>
+</div>
+
+<button type="button" class="no-print btn-imprimir" (click)="imprimir()">🖨️ Imprimir ticket</button>
+

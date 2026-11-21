@@ -126,7 +126,7 @@ export class PermisoList implements OnInit {
   }
    //------------- ELIMINAR CATEGORIA ---------------//
   //abre el modal de confirmación (el botón de la papelera ya lo llama)
-  funEliminarCategoria(permi: PermisoInterface) {
+  funEliminarPermiso(permi: PermisoInterface) {
     this.permisoAEliminar.set(permi);
   }
 

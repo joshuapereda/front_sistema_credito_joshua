@@ -202,3 +202,35 @@
     animation: none;
   }
 }
+@media print {
+  body > *:not(.cdk-overlay-container) { display: none !important; }
+
+  .cdk-overlay-backdrop { display: none !important; }
+
+  .cdk-overlay-container,
+  .cdk-global-overlay-wrapper,
+  .cdk-overlay-pane,
+  .mat-mdc-dialog-container,
+  .mat-mdc-dialog-surface,
+  .mat-mdc-dialog-content {
+    position: static !important;
+    display: block !important;
+    transform: none !important;
+    width: auto !important;
+    max-height: none !important;
+    overflow: visible !important;
+    box-shadow: none !important;
+    padding: 0 !important;
+  }
+
+  .mat-mdc-dialog-title,
+  .mat-mdc-dialog-actions,
+  [mat-dialog-title],
+  [mat-dialog-actions],
+  [mat-dialog-close],
+  .no-print {
+    display: none !important;
+  }
+
+  @page { size: 80mm auto; margin: 0; }
+}

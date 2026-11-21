@@ -1,4 +1,4 @@
-import { Component, computed, HostListener, inject, OnInit, signal } from '@angular/core';
+import { Component, computed, HostListener, inject, OnInit, signal, TemplateRef, ViewChild } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { CurrencyPipe, DatePipe } from '@angular/common';
 import { PageHeader } from '@/app/shared/components/page-header/page-header';
@@ -14,6 +14,8 @@ import { HttpErrorResponse } from '@angular/common/http';
 import { TipoCompraInterface } from '@/app/features/tipos-compra/Interfaces/TipoCompraInterface';
 import { MatPaginatorModule, PageEvent } from '@angular/material/paginator';
 import { PageableRequest } from '@/app/shared/interfaces/pageable.interface';
+import { TicketCompra } from '../../ticket-compra/ticket-compra';
+import {  MatDialog, MatDialogModule } from '@angular/material/dialog';
 
 interface ItemCarrito {
   producto: Pick<ProductoInterface, 'id' | 'nombre' | 'precioVenta'>;
@@ -22,7 +24,7 @@ interface ItemCarrito {
 
 @Component({
   selector: 'app-compra-list',
-  imports: [RouterLink, PageHeader, EmptyState, CurrencyPipe, DatePipe, ReactiveFormsModule, FormsModule, MatPaginatorModule],
+  imports: [RouterLink, PageHeader, EmptyState, CurrencyPipe, DatePipe, ReactiveFormsModule, FormsModule, MatPaginatorModule,TicketCompra,MatDialogModule],
   templateUrl: './compra-list.html',
 })
 export class CompraList implements OnInit {
@@ -47,6 +49,9 @@ export class CompraList implements OnInit {
   protected readonly pageIndex = signal(0);
   protected readonly pageSize = signal(5);
   protected filterValue = '';
+  //impresion
+  //Te da el “abridor de ventanas” de Angular Material. Sin esto no puedes abrir el diálogo.
+  private readonly dialog = inject(MatDialog);
 
   ngOnInit(): void {
     this.funObtenerVenta();
@@ -382,5 +387,13 @@ export class CompraList implements OnInit {
     else if (this.crearProducto()) this.cerrarModalProducto();
     else if (this.crearVenta()) this.cerrarModal();
     else this.compraSeleccionada.set(null);
+  }
+  //==================Impresion======================//
+  @ViewChild('ticketDialog') ticketDialog!: TemplateRef<any>;
+  compraTicket : any;
+
+  abrirTicket(compra: any) {
+    this.compraTicket = compra;             // guarda la compra de esa fila
+    this.dialog.open(this.ticketDialog);    // abre el diálogo con el molde
   }
 }

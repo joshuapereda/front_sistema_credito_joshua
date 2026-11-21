@@ -1,0 +1,68 @@
+.ticket {
+  width: 72mm;
+  margin: 0 auto;
+  padding: 3mm 2mm;
+  font-family: 'Courier New', monospace;
+  font-size: 12px;
+  line-height: 1.35;
+  color: #000;
+  background: #fff;
+}
+
+.cabecera { text-align: center; }
+.marca { margin: 0; font-size: 11px; letter-spacing: 4px; }
+.nombre { margin: 2px 0; font-size: 20px; font-weight: 700; letter-spacing: 1px; }
+.giro { margin: 0; font-size: 11px; }
+
+.sep-doble { border-top: 3px double #000; margin: 6px 0; }
+
+.pie { text-align: center; margin: 2px 0; font-weight: 700; }
+.pie.chico { font-weight: 400; font-size: 11px; }
+
+.btn-imprimir {
+  display: block;
+  margin: 12px auto 0;
+  padding: 8px 20px;
+  border: none;
+  border-radius: 8px;
+  background: #BC1FC2;
+  color: #fff;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+}
+.btn-imprimir:hover { filter: brightness(1.1); }
+
+@media print {
+  body > *:not(.cdk-overlay-container) { display: none !important; }
+
+  .cdk-overlay-backdrop { display: none !important; }
+
+  .cdk-overlay-container,
+  .cdk-global-overlay-wrapper,
+  .cdk-overlay-pane,
+  .mat-mdc-dialog-container,
+  .mat-mdc-dialog-surface,
+  .mat-mdc-dialog-content {
+    position: static !important;
+    display: block !important;
+    transform: none !important;
+    width: auto !important;
+    max-height: none !important;
+    overflow: visible !important;
+    box-shadow: none !important;
+    padding: 0 !important;
+  }
+
+  .mat-mdc-dialog-title,
+  .mat-mdc-dialog-actions,
+  [mat-dialog-title],
+  [mat-dialog-actions],
+  [mat-dialog-close] {
+    display: none !important;
+  }
+
+  .no-print { display: none !important; }
+
+  @page { size: 80mm auto; margin: 0; }
+}
