@@ -13,6 +13,7 @@ describe('MainLayout', () => {
   let el: HTMLElement;
 
   beforeEach(async () => {
+    localStorage.removeItem('sc.tema');
     await TestBed.configureTestingModule({
       imports: [MainLayout],
       providers: [
@@ -51,5 +52,20 @@ describe('MainLayout', () => {
     el.querySelector<HTMLAnchorElement>('a[href="/clientes"]')!.click();
     await fixture.whenStable();
     expect(menu.classList).toContain('-translate-x-full');
+  });
+
+  it('el botón cambia entre día y noche, y al salir quita el tema', async () => {
+    const html = document.documentElement;
+    const boton = () => el.querySelector<HTMLButtonElement>('header button[title^="Cambiar a modo"]')!;
+    expect(html.dataset['tema']).toBe('dia');
+    expect(boton().title).toBe('Cambiar a modo noche');
+
+    boton().click();
+    await fixture.whenStable();
+    expect(html.dataset['tema']).toBe('noche');
+    expect(boton().title).toBe('Cambiar a modo día');
+
+    fixture.destroy();
+    expect(html.dataset['tema']).toBeUndefined();
   });
 });
