@@ -2,6 +2,10 @@ import { Component, ElementRef, HostListener, inject, OnInit, signal, ViewChild 
 import { RouterLink } from '@angular/router';
 import { PageHeader } from '@/app/shared/components/page-header/page-header';
 import { EmptyState } from '@/app/shared/components/empty-state/empty-state';
+import { ErrorCampo } from '@/app/shared/components/error-campo/error-campo';
+import { ErroresServidor } from '@/app/shared/components/errores-servidor/errores-servidor';
+import { aplicarErroresServidor } from '@/app/shared/validators/errores-servidor';
+import { noVacio, reglas } from '@/app/shared/validators/reglas';
 import { CategoriaService } from '../../services/categoria.service';
 import { FormControl, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ConfirmDialog } from '@/app/shared/components/confirm-dialog/confirm-dialog';
@@ -14,7 +18,7 @@ import { environment } from '@/environments/environment';
 
 @Component({
   selector: 'app-categoria-list',
-  imports: [RouterLink, PageHeader, EmptyState, ReactiveFormsModule, ConfirmDialog, AvisoDialog, FormsModule, MatPaginatorModule],
+  imports: [RouterLink, PageHeader, EmptyState, ReactiveFormsModule, ConfirmDialog, AvisoDialog, FormsModule, MatPaginatorModule, ErrorCampo, ErroresServidor],
   templateUrl: './categoria-list.html',
 })
 export class CategoriaList implements OnInit {
@@ -26,6 +30,8 @@ export class CategoriaList implements OnInit {
   protected readonly crearCategoria = signal(false);
   //si edito o no - obtener id
   protected readonly user_id = signal<number>(-1);
+  //errores del back que no son de un campo
+  protected readonly errorServidor = signal<string[]>([]);
   //para eliminar
   protected readonly mensajeError = signal<string | null>(null);
   protected readonly mensajeExito = signal<string | null>(null);
@@ -90,12 +96,23 @@ export class CategoriaList implements OnInit {
     }
   //---------------- FORMULARIO ----------------//
   protected readonly categoriaForm = new FormGroup({
-    nombre: new FormControl('', { nonNullable: true, validators: [Validators.required] }),
-    descripcion: new FormControl('', { nonNullable: true, validators: [Validators.required] }),
+    nombre: new FormControl('', { nonNullable: true,
+      validators: reglas(
+        [noVacio, 'El nombre de la categoría es obligatorio'],
+        [Validators.maxLength(50), 'El nombre no puede superar los 50 caracteres'],
+      ),
+    }),
+    descripcion: new FormControl('', { nonNullable: true,
+      validators: reglas(
+        [noVacio, 'La descripción es obligatoria'],
+        [Validators.maxLength(200), 'La descripción no puede superar los 200 caracteres'],
+      ),
+    }),
     foto: new FormControl<File | null>(null),
   });
   //------------- GUARDAR CATEGORIA ---------------//
   funGuardarCategoria() {
+    this.errorServidor.set([]); //borra los errores anteriores
     //validar si esta editando o creando
     if (this.user_id() !== -1) {
       //EDITAR
@@ -114,7 +131,7 @@ export class CategoriaList implements OnInit {
           this.funObtenerCategoria();
           this.cerrarModal();
         },
-        error: (err) => console.error('Error al editar la categoría', err),
+        error: (err) => this.errorServidor.set(aplicarErroresServidor(this.categoriaForm, err)),
       });
     } else {
       //CREAR
@@ -133,7 +150,7 @@ export class CategoriaList implements OnInit {
           this.funObtenerCategoria();
           this.cerrarModal();
         },
-        error: (err) => console.error('Error al guardar la categoría', err),
+        error: (err) => this.errorServidor.set(aplicarErroresServidor(this.categoriaForm, err)),
       });
     }
   }
@@ -188,6 +205,7 @@ export class CategoriaList implements OnInit {
   }
   @ViewChild('fotoInput') fotoInput?: ElementRef<HTMLInputElement>;
   cerrarModal() {
+    this.errorServidor.set([]);
     this.crearCategoria.set(false);
     this.categoriaForm.reset({ nombre: '', descripcion: '', foto: null });
     if (this.fotoInput) this.fotoInput.nativeElement.value = '';
