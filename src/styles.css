@@ -4,6 +4,7 @@
 @import '@fontsource/ibm-plex-mono/400.css';
 @import '@fontsource/ibm-plex-mono/500.css';
 @import 'tailwindcss';
+@import './tema.css';
 
 /*
  * Sistema visual
@@ -33,10 +34,12 @@
   --color-accent-ink: #b33a21;
   --color-accent-soft: #f8e3dc;
 
-  /* Marca Valentino (los mismos del login): menú y barra superior */
-  --color-marca: #ff1493; /* fucsia */
-  --color-marca-verde: #39ff14; /* verde neón: solo detalles pequeños */
-  --color-noche: #0a0a0a; /* negro del menú */
+  /* Menú y barra superior. Cada tema (día / noche) les da su color en tema.css */
+  --color-menu: #f0e3eb;
+  --color-menu-texto: #54434f;
+  --color-menu-suave: #6a5664;
+  --color-barra: #f8f2f6;
+  --color-marca-texto: #9c0f62; /* fucsia de la empresa */
 
   --color-ok: #3c7a4f;
   --color-ok-soft: #e1eddf;
@@ -148,45 +151,26 @@
 
 /* ───────── Piezas gráficas (login y layout) ───────── */
 
-/* Menú lateral: negro con un brillo fucsia muy suave arriba, como el login */
-.menu-lateral {
-  background: radial-gradient(
-      circle at 0% 0%,
-      color-mix(in srgb, var(--color-marca) 16%, transparent),
-      transparent 42%
-    )
-    var(--color-noche);
-}
-.menu-lateral :focus-visible {
-  outline-color: var(--color-marca-verde);
-}
+/* Menú lateral */
 .menu-scroll {
   scrollbar-width: thin;
   scrollbar-color: transparent transparent; /* aparece solo al pasar el mouse */
 }
 .menu-scroll:hover,
 .menu-scroll:focus-within {
-  scrollbar-color: rgb(255 255 255 / 0.2) transparent;
+  scrollbar-color: var(--color-line-strong) transparent;
 }
 /* Opción activa */
 .nav-activo,
 .nav-activo:hover {
-  color: #fff;
-  background: color-mix(in srgb, var(--color-marca) 14%, transparent);
+  color: var(--color-marca-texto);
+  background: color-mix(in srgb, var(--color-marca-texto) 11%, transparent);
 }
 .nav-activo .nav-marca {
   opacity: 1;
 }
 .nav-activo .nav-icono {
-  color: var(--color-marca);
-}
-/* Barra superior: línea fina que va de fucsia a gris */
-.barra-superior::after {
-  content: '';
-  position: absolute;
-  inset: auto 0 0 0;
-  height: 1px;
-  background: linear-gradient(to right, var(--color-marca), #e5e7eb 38%);
+  color: var(--color-marca-texto);
 }
 
 /* Login: franja superior color tinta con renglones suaves; abajo, papel */
