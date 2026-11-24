@@ -2,6 +2,10 @@ import { Component, computed, HostListener, inject, OnInit, signal, TemplateRef,
 import { RouterLink } from '@angular/router';
 import { PageHeader } from '@/app/shared/components/page-header/page-header';
 import { EmptyState } from '@/app/shared/components/empty-state/empty-state';
+import { ErrorCampo } from '@/app/shared/components/error-campo/error-campo';
+import { ErroresServidor } from '@/app/shared/components/errores-servidor/errores-servidor';
+import { aplicarErroresServidor } from '@/app/shared/validators/errores-servidor';
+import { digitos, noVacio, reglas } from '@/app/shared/validators/reglas';
 import { PagoService } from '../../services/pago.service';
 import { FormControl, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
 import { CurrencyPipe, DatePipe, DecimalPipe } from '@angular/common';
@@ -15,7 +19,7 @@ import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 
 @Component({
   selector: 'app-pago-list',
-  imports: [RouterLink, PageHeader, EmptyState,ReactiveFormsModule,CurrencyPipe,DatePipe,DecimalPipe, FormsModule, MatPaginatorModule,TicketPago,MatDialogModule],
+  imports: [RouterLink, PageHeader, EmptyState,ReactiveFormsModule,CurrencyPipe,DatePipe,DecimalPipe, FormsModule, MatPaginatorModule,TicketPago,MatDialogModule, ErrorCampo, ErroresServidor],
   templateUrl: './pago-list.html',
 })
 export class PagoList implements OnInit {
@@ -29,6 +33,8 @@ export class PagoList implements OnInit {
   protected readonly crearPago = signal(false);
   //si edito o no - obtener id
   protected readonly user_id = signal<number>(-1);
+  //errores del back que no son de un campo
+  protected readonly errorServidor = signal<string[]>([]);
   protected readonly compraEditandoId = signal<number | null>(null);
   protected readonly montoOriginal = signal<number>(0);
   //paginacion y filtro
@@ -95,8 +101,18 @@ export class PagoList implements OnInit {
 
   //---------------- FORMULARIO ----------------//
   protected readonly pagoForm = new FormGroup({
-    compraId: new FormControl<number | null>(null, Validators.required),
-    monto: new FormControl<number | null>(null, [Validators.required, Validators.min(0.01)]),
+    compraId: new FormControl<number | null>(null, {
+      validators: reglas(
+        [noVacio, 'La compra es obligatoria'],
+      ),
+    }),
+    monto: new FormControl<number | null>(null, {
+      validators: reglas(
+        [noVacio, 'El monto es obligatorio'],
+        [Validators.min(0.01), 'El monto debe ser mayor a 0'],
+        [digitos(10, 2), 'El monto admite hasta 10 enteros y 2 decimales'],
+      ),
+    }),
   });
   protected readonly comprasPendientes = computed(() =>
   this.compras().filter(c => c.saldo > 0 || c.id === this.compraEditandoId())
@@ -108,6 +124,7 @@ export class PagoList implements OnInit {
   }
   //------------- GUARDAR PAGO ---------------//
   funGuardarPago() {
+    this.errorServidor.set([]); //borra los errores anteriores
     //validar si esta editando o creando
     if (this.user_id() !== -1) {
       //EDITAR
@@ -124,7 +141,7 @@ export class PagoList implements OnInit {
           this.funObtenerPago();
           this.cerrarModal();
         },
-        error: (err) => console.error('Error al editar el pago', err),
+        error: (err) => this.errorServidor.set(aplicarErroresServidor(this.pagoForm, err)),
       });
     } else {
     if (this.pagoForm.invalid) {
@@ -142,7 +159,7 @@ export class PagoList implements OnInit {
         this.funObtenerPago();
         this.funObtenerCompra(); // refresca el saldo
       },
-      error: (error) => console.log(error),
+      error: (err) => this.errorServidor.set(aplicarErroresServidor(this.pagoForm, err)),
     });
   }}
   //------------- EDITAR ---------------//
@@ -164,6 +181,7 @@ export class PagoList implements OnInit {
     this.crearPago.set(compra);
   }
   cerrarModal() {
+    this.errorServidor.set([]);
   this.crearPago.set(false);
   this.pagoForm.reset({ monto: null, compraId: null });
   this.user_id.set(-1);

@@ -146,6 +146,7 @@
             </option>
             }
           </select>
+          <app-error-campo [control]="pagoForm.controls.compraId" />
         </div>
 
         <div class="field">
@@ -155,10 +156,9 @@
             <input class="field-input" id="monto" type="text" inputmode="decimal" placeholder="0.00"
               formControlName="monto" autofocus />
           </div>
-          @if (pagoForm.controls.monto.touched && pagoForm.controls.monto.invalid) {
-          <p class="field-error">Ingresa el monto del pago.</p>
-          }
+          <app-error-campo [control]="pagoForm.controls.monto" />
         </div>
+        <app-errores-servidor [mensajes]="errorServidor()" />
       </div>
 
       <footer class="modal-footer">
