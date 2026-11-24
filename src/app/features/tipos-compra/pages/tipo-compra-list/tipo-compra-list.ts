@@ -2,6 +2,10 @@ import { Component, computed, HostListener, inject, input, OnInit, signal } from
 import { RouterLink } from '@angular/router';
 import { PageHeader } from '@/app/shared/components/page-header/page-header';
 import { EmptyState } from '@/app/shared/components/empty-state/empty-state';
+import { ErrorCampo } from '@/app/shared/components/error-campo/error-campo';
+import { ErroresServidor } from '@/app/shared/components/errores-servidor/errores-servidor';
+import { aplicarErroresServidor } from '@/app/shared/validators/errores-servidor';
+import { noVacio, reglas } from '@/app/shared/validators/reglas';
 import { TipoCompraService } from '../../services/tipo-compra.service';
 import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ConfirmDialog } from '@/app/shared/components/confirm-dialog/confirm-dialog';
@@ -11,7 +15,7 @@ import { HttpErrorResponse } from '@angular/common/http';
 
 @Component({
   selector: 'app-tipo-compra-list',
-  imports: [RouterLink, PageHeader, EmptyState, ReactiveFormsModule,ConfirmDialog,AvisoDialog],
+  imports: [RouterLink, PageHeader, EmptyState, ReactiveFormsModule,ConfirmDialog,AvisoDialog, ErrorCampo, ErroresServidor],
   templateUrl: './tipo-compra-list.html',
 })
 export class TipoCompraList implements OnInit {
@@ -30,6 +34,8 @@ export class TipoCompraList implements OnInit {
   protected readonly esEdicion = computed(() => !!this.id());
   //si edito o no - obtener id
   protected readonly user_id = signal<number>(-1);
+  //errores del back que no son de un campo
+  protected readonly errorServidor = signal<string[]>([]);
   //para eliminar
   protected readonly mensajeError = signal<string | null>(null);
   protected readonly mensajeExito = signal<string | null>(null);
@@ -48,12 +54,24 @@ export class TipoCompraList implements OnInit {
   }
   //---------------- FORMULARIO ----------------//
   protected readonly tcompraForm = new FormGroup({
-    nombre: new FormControl('', { nonNullable: true, validators: [Validators.required] }),
-    descripcion: new FormControl('', { nonNullable: true, validators: [Validators.required] }),
+    nombre: new FormControl('', { nonNullable: true,
+      validators: reglas(
+        [noVacio, 'El nombre del tipo de compra es obligatorio'],
+        [Validators.maxLength(50), 'El nombre no puede superar los 50 caracteres'],
+        [Validators.pattern(/^[A-Za-zÀ-ÿñÑ ]*$/), 'El nombre solo puede contener letras y espacios'],
+      ),
+    }),
+    descripcion: new FormControl('', { nonNullable: true,
+      validators: reglas(
+        [noVacio, 'La descripción es obligatoria'],
+        [Validators.maxLength(200), 'La descripción no puede superar los 200 caracteres'],
+      ),
+    }),
     esCredito: new FormControl(false, { nonNullable: true }),
   });
   //------------- GUARDAR PERSONA ---------------//
   funGuardarTipoCompra() {
+    this.errorServidor.set([]); //borra los errores anteriores
     //validar si esta editando o creando
     if (this.user_id() !== -1) {
       //EDITAR
@@ -69,7 +87,7 @@ export class TipoCompraList implements OnInit {
           this.funObjtenerTipoCompra();
           this.cerrarModal();
         },
-        error: (err) => console.error('Error al editar el tipo de compra', err),
+        error: (err) => this.errorServidor.set(aplicarErroresServidor(this.tcompraForm, err)),
       });
     } else {
       //validar si el formualrio esta vacio
@@ -83,7 +101,7 @@ export class TipoCompraList implements OnInit {
           this.cerrarModal();
           this.funObjtenerTipoCompra()
         },
-        error: (error) => { console.log(error) }
+        error: (err) => this.errorServidor.set(aplicarErroresServidor(this.tcompraForm, err)),
       });
     }
   }
@@ -137,6 +155,7 @@ export class TipoCompraList implements OnInit {
     this.crearTipoCompra.set(compra);
   }
   cerrarModal() {
+    this.errorServidor.set([]);
     this.crearTipoCompra.set(false);
     this.tcompraForm.reset({ nombre: '', descripcion: '', esCredito: false });
   }
