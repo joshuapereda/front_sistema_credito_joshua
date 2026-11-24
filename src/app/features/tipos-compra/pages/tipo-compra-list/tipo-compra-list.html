@@ -79,17 +79,13 @@
           <label class="field-label" for="nombre">Nombre</label>
           <input class="field-input" id="nombre" type="text" placeholder="Ej: Contado, Crédito 30 días"
             formControlName="nombre" autofocus />
-          @if (tcompraForm.controls.nombre.touched && tcompraForm.controls.nombre.invalid) {
-          <p class="field-error">El nombre es obligatorio.</p>
-          }
+          <app-error-campo [control]="tcompraForm.controls.nombre" />
         </div>
         <div class="field">
           <label class="field-label" for="descripcion">Descripción</label>
           <textarea class="field-input" id="descripcion" rows="3" placeholder="Describe brevemente este tipo de compra"
             formControlName="descripcion"></textarea>
-          @if (tcompraForm.controls.descripcion.touched && tcompraForm.controls.descripcion.invalid) {
-          <p class="field-error">La descripción es obligatoria.</p>
-          }
+          <app-error-campo [control]="tcompraForm.controls.descripcion" />
         </div>
         <label class="switch-row">
           <span class="switch-text">
@@ -98,6 +94,7 @@
           </span>
           <input class="switch" type="checkbox" formControlName="esCredito" />
         </label>
+        <app-errores-servidor [mensajes]="errorServidor()" />
       </div>
       <div class="modal-footer">
         <button class="mbtn mbtn-ghost" type="button" (click)="cerrarModal()">Cancelar</button>

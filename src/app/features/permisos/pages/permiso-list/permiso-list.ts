@@ -2,6 +2,10 @@ import { Component, HostListener, inject, OnInit, signal } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { PageHeader } from '@/app/shared/components/page-header/page-header';
 import { EmptyState } from '@/app/shared/components/empty-state/empty-state';
+import { ErrorCampo } from '@/app/shared/components/error-campo/error-campo';
+import { ErroresServidor } from '@/app/shared/components/errores-servidor/errores-servidor';
+import { aplicarErroresServidor } from '@/app/shared/validators/errores-servidor';
+import { noVacio, reglas } from '@/app/shared/validators/reglas';
 import { PermisoService } from '../../services/permiso.service';
 import { FormControl, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ConfirmDialog } from '@/app/shared/components/confirm-dialog/confirm-dialog';
@@ -13,7 +17,7 @@ import { PageableRequest } from '@/app/shared/interfaces/pageable.interface';
 
 @Component({
   selector: 'app-permiso-list',
-  imports: [RouterLink, PageHeader, EmptyState, ReactiveFormsModule,ConfirmDialog,AvisoDialog, FormsModule, MatPaginatorModule],
+  imports: [RouterLink, PageHeader, EmptyState, ReactiveFormsModule,ConfirmDialog,AvisoDialog, FormsModule, MatPaginatorModule, ErrorCampo, ErroresServidor],
   templateUrl: './permiso-list.html',
 })
 export class PermisoList implements OnInit {
@@ -25,6 +29,8 @@ export class PermisoList implements OnInit {
   protected readonly crearPermiso = signal(false);
   //si edito o no - obtener id (-1 = creando)
   protected readonly user_id = signal<number>(-1);
+  //errores del back que no son de un campo
+  protected readonly errorServidor = signal<string[]>([]);
   //para eliminar
   protected readonly mensajeError = signal<string | null>(null);
   protected readonly mensajeExito = signal<string | null>(null);
@@ -75,12 +81,29 @@ export class PermisoList implements OnInit {
 
   //---------------- FORMULARIO ----------------//
   protected readonly permisoForm = new FormGroup({
-    nombre: new FormControl('', { nonNullable: true, validators: [Validators.required] }),
-    recurso: new FormControl('', { nonNullable: true, validators: [Validators.required] }),
-    accion: new FormControl('', { nonNullable: true, validators: [Validators.required] }),
+    nombre: new FormControl('', { nonNullable: true,
+      validators: reglas(
+        [noVacio, 'El nombre del permiso es obligatorio'],
+        [Validators.maxLength(100), 'El nombre no puede superar los 100 caracteres'],
+      ),
+    }),
+    recurso: new FormControl('', { nonNullable: true,
+      validators: reglas(
+        [noVacio, 'El recurso es obligatorio'],
+        [Validators.maxLength(50), 'El recurso no puede superar los 50 caracteres'],
+        [Validators.pattern(/^[A-Za-z_]+$/), 'El recurso solo puede contener letras y guion bajo'],
+      ),
+    }),
+    accion: new FormControl('', { nonNullable: true,
+      validators: reglas(
+        [noVacio, 'La acción es obligatoria'],
+        [Validators.pattern(/^(CREAR|LEER|ACTUALIZAR|ELIMINAR)$/i), 'La acción debe ser CREAR, LEER, ACTUALIZAR o ELIMINAR'],
+      ),
+    }),
   });
   //------------- GUARDAR PERMISO --------------//
   funGuardarPermiso() {
+    this.errorServidor.set([]); //borra los errores anteriores
     //validar si esta editando o creando
     if (this.user_id() !== -1) {
       //EDITAR
@@ -96,7 +119,7 @@ export class PermisoList implements OnInit {
           this.funObtenerPermiso();
           this.cerrarModal();
         },
-        error: (err) => console.error('Error al editar los permisos', err),
+        error: (err) => this.errorServidor.set(aplicarErroresServidor(this.permisoForm, err)),
       });
     } else {
     //validar si el formualrio esta vacio
@@ -110,7 +133,7 @@ export class PermisoList implements OnInit {
         this.cerrarModal();
         this.funObtenerPermiso()
       },
-      error: (error) => { console.log(error) }
+      error: (err) => this.errorServidor.set(aplicarErroresServidor(this.permisoForm, err)),
     });
   }}
   //------------- EDITAR CATEGORIA ---------------//
@@ -155,6 +178,8 @@ export class PermisoList implements OnInit {
     this.crearPermiso.set(compra);
   }
   cerrarModal() {
+    this.errorServidor.set([]);
+    this.user_id.set(-1); //vuelve a modo "crear"
     this.crearPermiso.set(false);
     this.permisoForm.reset({ nombre: '', recurso: '', accion: "" });
   }

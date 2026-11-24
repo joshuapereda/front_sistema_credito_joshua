@@ -2,6 +2,11 @@ import { Component, HostListener, inject, OnInit, signal } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { PageHeader } from '@/app/shared/components/page-header/page-header';
 import { EmptyState } from '@/app/shared/components/empty-state/empty-state';
+import { ErrorCampo } from '@/app/shared/components/error-campo/error-campo';
+import { ErroresServidor } from '@/app/shared/components/errores-servidor/errores-servidor';
+import { aplicarErroresServidor } from '@/app/shared/validators/errores-servidor';
+import { noVacio, reglas } from '@/app/shared/validators/reglas';
+import { celularPeruValidator } from '@/app/shared/validators/celular-peru.validator';
 import { ClienteService } from '../../services/cliente.service';
 import { FormControl, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ConfirmDialog } from '@/app/shared/components/confirm-dialog/confirm-dialog';
@@ -13,7 +18,7 @@ import { PageableRequest } from '@/app/shared/interfaces/pageable.interface';
 
 @Component({
   selector: 'app-cliente-list',
-  imports: [RouterLink, PageHeader, EmptyState, ReactiveFormsModule,ConfirmDialog,AvisoDialog, FormsModule, MatPaginatorModule],
+  imports: [RouterLink, PageHeader, EmptyState, ReactiveFormsModule,ConfirmDialog,AvisoDialog, FormsModule, MatPaginatorModule, ErrorCampo, ErroresServidor],
   templateUrl: './cliente-list.html',
 })
 export class ClienteList implements OnInit {
@@ -74,14 +79,38 @@ export class ClienteList implements OnInit {
 
   //---------------- FORMULARIO ----------------//
   protected readonly clienteForm = new FormGroup({
-    nombre: new FormControl('', { nonNullable: true, validators: [Validators.required] }),
-    gmail: new FormControl('', { nonNullable: true }),
-    telefono: new FormControl('', { nonNullable: true, validators: [Validators.required, Validators.pattern(/^9\d{8}$/)] }),
-    direccion: new FormControl('', { nonNullable: true, validators: [Validators.required] }),
-    docIdentidad: new FormControl('', { nonNullable: true, validators: [Validators.required, Validators.pattern(/^\d{8}$/)] })
+    nombre: new FormControl('', { nonNullable: true,
+      validators: reglas(
+        [noVacio, 'El Nombre del Cliente es obligatorio'],
+        [Validators.maxLength(50), 'El Nombre del cliente no puede tener más de 50 caracteres'],
+      ),
+    }),
+    gmail: new FormControl('', { nonNullable: true,
+      validators: reglas(
+        [Validators.email, 'Por favor ingresa un Gmail valido'],
+      ),
+    }),
+    telefono: new FormControl('', { nonNullable: true,
+      validators: reglas(
+        [noVacio, 'El N° Teléfono es obligatorio'],
+        [celularPeruValidator, 'El N° Teléfono debe ser un celular peruano válido (9 dígitos, empieza con 9)'],
+      ),
+    }),
+    direccion: new FormControl('', { nonNullable: true,
+      validators: reglas(
+        [noVacio, 'La Direccion de la Cliente es obligatorio'],
+      ),
+    }),
+    docIdentidad: new FormControl('', { nonNullable: true,
+      validators: reglas(
+        [noVacio, 'El D° Identidad es obligatorio'],
+        [Validators.pattern(/^\d{8}$/), 'El D° Identidad debe tener 8 dígitos'],
+      ),
+    }),
   });
   //------------- GUARDAR PERSONA ---------------//
   funGuardarCliente() {
+    this.errorServidor.set([]); //borra los errores anteriores
     //validar si esta editando o creando
     if (this.user_id() !== -1) {
       //EDITAR
@@ -97,7 +126,7 @@ export class ClienteList implements OnInit {
           this.funObtenerPersona();
           this.cerrarModal();
         },
-        error: (err) => console.error('Error al editar el cliente', err),
+        error: (err) => this.errorServidor.set(aplicarErroresServidor(this.clienteForm, err)),
       });
     } else {
       this.errorServidor.set([]);
@@ -114,12 +143,7 @@ export class ClienteList implements OnInit {
           this.funObtenerPersona();
           this.cerrarModal();
         },
-        error: (err) => {
-          const msg = err.error?.message;
-          this.errorServidor.set(
-            Array.isArray(msg) ? msg : [msg ?? 'No se pudo guardar el cliente.']
-          );
-        },
+        error: (err) => this.errorServidor.set(aplicarErroresServidor(this.clienteForm, err)),
       });
     }
   }

@@ -108,25 +108,20 @@
           <label class="field-label" for="nombre">Nombre</label>
           <input class="field-input" id="nombre" type="text" placeholder="Ej: Masculino, Femenino"
             formControlName="nombre" autofocus />
-          @if (categoriaForm.controls.nombre.touched && categoriaForm.controls.nombre.invalid) {
-          <p class="field-error">El nombre es obligatorio.</p>
-          }
+          <app-error-campo [control]="categoriaForm.controls.nombre" />
         </div>
         <div class="field">
           <label class="field-label" for="descripcion">Descripción</label>
           <textarea class="field-input" id="descripcion" rows="3" placeholder="Describe brevemente esta categoria"
             formControlName="descripcion"></textarea>
-          @if (categoriaForm.controls.descripcion.touched && categoriaForm.controls.descripcion.invalid) {
-          <p class="field-error">La descripción es obligatoria.</p>
-          }
+          <app-error-campo [control]="categoriaForm.controls.descripcion" />
         </div>
         <div class="field">
           <label class="field-label" for="foto">Foto</label>
           <input class="field-input" id="foto" type="file" accept="image/*" (change)="onFotoSeleccionada($event)" />
-          @if (categoriaForm.controls.foto.touched && categoriaForm.controls.foto.invalid) {
-          <p class="field-error">La foto es obligatoria.</p>
-          }
+          <app-error-campo [control]="categoriaForm.controls.foto" />
         </div>
+        <app-errores-servidor [mensajes]="errorServidor()" />
       </div>
       <div class="modal-footer">
         <button class="mbtn mbtn-ghost" type="button" (click)="cerrarModal()">Cancelar</button>

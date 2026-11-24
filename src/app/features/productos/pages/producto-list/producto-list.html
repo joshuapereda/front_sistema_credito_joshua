@@ -114,9 +114,7 @@
             <label class="field-label" for="nombre">Nombre</label>
             <input class="field-input" id="nombre" type="text" placeholder="Ej: Nombre del producto"
               formControlName="nombre" autofocus />
-            @if (productoForm.controls.nombre.touched && productoForm.controls.nombre.invalid) {
-            <p class="field-error">El nombre es obligatorio.</p>
-            }
+            <app-error-campo [control]="productoForm.controls.nombre" />
           </div>
           <div class="field">
             <label class="field-label" for="categoriaId">Categoria</label>
@@ -126,9 +124,7 @@
               <option [ngValue]="cat.id">{{ cat.nombre }}</option>
               }
             </select>
-            @if (productoForm.controls.categoriaId.touched && productoForm.controls.categoriaId.invalid) {
-            <p class="field-error">El producto es obligatoria.</p>
-            }
+            <app-error-campo [control]="productoForm.controls.categoriaId" />
           </div>
         </div>
 
@@ -137,24 +133,21 @@
             <label class="field-label" for="precioVenta">Precio de venta</label>
             <input class="field-input" id="precioVenta" type="number" min="0" step="0.01" placeholder="Ej: S/200.00"
               formControlName="precioVenta" />
-            @if (productoForm.controls.precioVenta.touched && productoForm.controls.precioVenta.invalid) {
-            <p class="field-error">El precio de venta es obligatorio.</p>
-            }
+            <app-error-campo [control]="productoForm.controls.precioVenta" />
           </div>
 
           <div class="field">
             <label class="field-label" for="precioCompra">Precio de compra</label>
             <input class="field-input" id="precioCompra" type="number" min="0" step="0.01" placeholder="Ej: S/50.00"
               formControlName="precioCompra" />
-            @if (productoForm.controls.precioCompra.touched && productoForm.controls.precioCompra.invalid) {
-            <p class="field-error">El precio de compra es obligatorio.</p>
-            }
+            <app-error-campo [control]="productoForm.controls.precioCompra" />
           </div>
         </div>
         <div class="field">
           <label class="field-label" for="foto">Foto</label>
           <input class="field-input" id="foto" type="file" accept="image/*" (change)="onFotoSeleccionada($event)" />
         </div>
+        <app-errores-servidor [mensajes]="errorServidor()" />
       </div>
       <div class="modal-footer">
         <button class="mbtn mbtn-ghost" type="button" (click)="cerrarModal()">Cancelar</button>

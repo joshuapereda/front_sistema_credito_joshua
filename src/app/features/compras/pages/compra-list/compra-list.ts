@@ -3,9 +3,15 @@ import { RouterLink } from '@angular/router';
 import { CurrencyPipe, DatePipe } from '@angular/common';
 import { PageHeader } from '@/app/shared/components/page-header/page-header';
 import { EmptyState } from '@/app/shared/components/empty-state/empty-state';
+import { ErrorCampo } from '@/app/shared/components/error-campo/error-campo';
+import { ErroresServidor } from '@/app/shared/components/errores-servidor/errores-servidor';
+import { aplicarErroresServidor } from '@/app/shared/validators/errores-servidor';
+import { digitos, noVacio, reglas } from '@/app/shared/validators/reglas';
+import { celularPeruValidator } from '@/app/shared/validators/celular-peru.validator';
 import { CompraService } from '../../services/compra.service';
 import { FormControl, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
 import { CompraFilterCriteria, CompraInterface, CompraRequest } from '../../interfaces/CompraInterface';
+import { EstadoCompra } from '../../models/compra.model';
 import { ClienteInterface } from '@/app/features/clientes/interfaces/ClienteInterface';
 import { UsuarioInterface } from '@/app/features/usuarios/Interfaces/UsuarioInterface';
 import { ProductoInterface } from '@/app/features/productos/interfaces/ProductoInterface';
@@ -24,7 +30,7 @@ interface ItemCarrito {
 
 @Component({
   selector: 'app-compra-list',
-  imports: [RouterLink, PageHeader, EmptyState, CurrencyPipe, DatePipe, ReactiveFormsModule, FormsModule, MatPaginatorModule,TicketCompra,MatDialogModule],
+  imports: [RouterLink, PageHeader, EmptyState, CurrencyPipe, DatePipe, ReactiveFormsModule, FormsModule, MatPaginatorModule,TicketCompra,MatDialogModule, ErrorCampo, ErroresServidor],
   templateUrl: './compra-list.html',
 })
 export class CompraList implements OnInit {
@@ -49,6 +55,14 @@ export class CompraList implements OnInit {
   protected readonly pageIndex = signal(0);
   protected readonly pageSize = signal(5);
   protected filterValue = '';
+  //filtro por estado: null = todas
+  protected readonly estadoFiltro = signal<EstadoCompra | null>(null);
+  //un botón por cada elemento: 'valor' va al back, 'texto' se ve en pantalla
+  protected readonly opcionesEstado: { texto: string; valor: EstadoCompra | null }[] = [
+    { texto: 'Todas', valor: null },
+    { texto: 'Pendientes', valor: 'PENDIENTE' },
+    { texto: 'Pagadas', valor: 'PAGADO' },
+  ];
   //impresion
   //Te da el “abridor de ventanas” de Angular Material. Sin esto no puedes abrir el diálogo.
   private readonly dialog = inject(MatDialog);
@@ -116,7 +130,8 @@ export class CompraList implements OnInit {
       pageSize: this.pageSize(),
       sortField: 'id',
       sortOrder: 'desc',
-      criterials: null,
+      //filtros específicos del back (se suman a la búsqueda general)
+      criterials: { estadoCompra: this.estadoFiltro() },
       filterValue: this.filterValue,
     };
 
@@ -138,28 +153,89 @@ export class CompraList implements OnInit {
     this.pageIndex.set(0);
     this.funObtenerVenta();
   }
+  //se ejecuta al hacer clic en Todas / Pendientes / Pagadas
+  filtrarPorEstado(estado: EstadoCompra | null) {
+    this.estadoFiltro.set(estado); //guarda el estado elegido
+    this.buscar(); //vuelve a la página 1 y consulta al back
+  }
   limpiar() {
     this.filterValue = '';
     this.buscar();
   }
   //---------------- FORMULARIO ----------------//
   protected readonly ventaForm = new FormGroup({
-    clienteId: new FormControl<number | null>(null, Validators.required),
-    usuarioId: new FormControl<number | null>(null, Validators.required),
-    tipoCompraId: new FormControl<number | null>(null, Validators.required),
+    clienteId: new FormControl<number | null>(null, {
+      validators: reglas(
+        [noVacio, 'El cliente es obligatorio'],
+      ),
+    }),
+    usuarioId: new FormControl<number | null>(null, {
+      validators: reglas(
+        [noVacio, 'El usuario es obligatorio'],
+      ),
+    }),
+    tipoCompraId: new FormControl<number | null>(null, {
+      validators: reglas(
+        [noVacio, 'El tipo de compra es obligatorio'],
+      ),
+    }),
   });
   protected readonly clienteForm = new FormGroup({
-    nombre: new FormControl('', { nonNullable: true, validators: [Validators.required] }),
-    gmail: new FormControl('', { nonNullable: true }),
-    telefono: new FormControl('', { nonNullable: true, validators: [Validators.required, Validators.pattern(/^9\d{8}$/)] }),
-    direccion: new FormControl('', { nonNullable: true, validators: [Validators.required] }),
-    docIdentidad: new FormControl('', { nonNullable: true, validators: [Validators.required, Validators.pattern(/^\d{8}$/)] })
+    nombre: new FormControl('', { nonNullable: true,
+      validators: reglas(
+        [noVacio, 'El Nombre del Cliente es obligatorio'],
+        [Validators.maxLength(50), 'El Nombre del cliente no puede tener más de 50 caracteres'],
+      ),
+    }),
+    gmail: new FormControl('', { nonNullable: true,
+      validators: reglas(
+        [Validators.email, 'Por favor ingresa un Gmail valido'],
+      ),
+    }),
+    telefono: new FormControl('', { nonNullable: true,
+      validators: reglas(
+        [noVacio, 'El N° Teléfono es obligatorio'],
+        [celularPeruValidator, 'El N° Teléfono debe ser un celular peruano válido (9 dígitos, empieza con 9)'],
+      ),
+    }),
+    direccion: new FormControl('', { nonNullable: true,
+      validators: reglas(
+        [noVacio, 'La Direccion de la Cliente es obligatorio'],
+      ),
+    }),
+    docIdentidad: new FormControl('', { nonNullable: true,
+      validators: reglas(
+        [noVacio, 'El D° Identidad es obligatorio'],
+        [Validators.pattern(/^\d{8}$/), 'El D° Identidad debe tener 8 dígitos'],
+      ),
+    }),
   });
   protected readonly productoForm = new FormGroup({
-    nombre: new FormControl('', { nonNullable: true, validators: [Validators.required] }),
-    precioVenta: new FormControl('', { nonNullable: true, validators: [Validators.required] }),
-    precioCompra: new FormControl('', { nonNullable: true, validators: [Validators.required] }),
-    categoriaId: new FormControl('', { nonNullable: true, validators: [Validators.required] }),
+    nombre: new FormControl('', { nonNullable: true,
+      validators: reglas(
+        [noVacio, 'El nombre del producto es obligatorio'],
+        [Validators.maxLength(100), 'El nombre no puede superar los 100 caracteres'],
+      ),
+    }),
+    precioVenta: new FormControl('', { nonNullable: true,
+      validators: reglas(
+        [noVacio, 'El precio de venta es obligatorio'],
+        [Validators.min(0.01), 'El precio de venta debe ser mayor a 0'],
+        [digitos(8, 2), 'El precio de venta admite hasta 8 enteros y 2 decimales'],
+      ),
+    }),
+    precioCompra: new FormControl('', { nonNullable: true,
+      validators: reglas(
+        [noVacio, 'El precio de compra es obligatorio'],
+        [Validators.min(0.01), 'El precio de compra debe ser mayor a 0'],
+        [digitos(8, 2), 'El precio de compra admite hasta 8 enteros y 2 decimales'],
+      ),
+    }),
+    categoriaId: new FormControl('', { nonNullable: true,
+      validators: reglas(
+        [noVacio, 'Debes asignar una categoría al producto'],
+      ),
+    }),
     foto: new FormControl<File | null>(null),
   });
 
@@ -242,14 +318,8 @@ export class CompraList implements OnInit {
         this.cerrarModal();
         this.funObtenerVenta();
       },
-      error: (err: HttpErrorResponse) => {
-        const msg = err.error?.message;
-        this.errorServidor.set(
-          Array.isArray(msg)
-            ? msg
-            : [msg ?? (id === null ? 'No se pudo guardar la venta.' : 'No se pudo actualizar la venta.')]
-        );
-      },
+      error: (err: HttpErrorResponse) =>
+        this.errorServidor.set(aplicarErroresServidor(this.ventaForm, err)),
     });
   }
   //------------- EDITAR ---------------//
@@ -298,16 +368,13 @@ export class CompraList implements OnInit {
         this.funObtenerCliente();
         this.cerrarModalCliente();
       },
-      error: (err: HttpErrorResponse) => {
-        const msg = err.error?.message;
-        this.errorServidor.set(
-          Array.isArray(msg) ? msg : [msg ?? 'No se pudo guardar el cliente.']
-        );
-      },
+      error: (err: HttpErrorResponse) =>
+        this.errorServidor.set(aplicarErroresServidor(this.clienteForm, err)),
     });
   }
   //------------- GUARDAR PRODUCTO ---------------//
   funGuardarProducto() {
+    this.errorServidor.set([]); //borra los errores anteriores
     if (this.productoForm.invalid) {
       this.productoForm.markAllAsTouched();
       return;
@@ -328,7 +395,8 @@ export class CompraList implements OnInit {
         this.funObtenerProducto();
         this.cerrarModalProducto();
       },
-      error: (error: HttpErrorResponse) => console.log(error),
+      error: (err: HttpErrorResponse) =>
+        this.errorServidor.set(aplicarErroresServidor(this.productoForm, err)),
     });
   }
   //Subir foto
@@ -368,6 +436,7 @@ export class CompraList implements OnInit {
     this.crearCliente.set(abierto);
   }
   cerrarModalCliente() {
+    this.errorServidor.set([]);
     this.crearCliente.set(false);
     this.clienteForm.reset({ nombre: '', gmail: '', telefono: "", direccion: "", docIdentidad: "" });
   }
@@ -376,6 +445,7 @@ export class CompraList implements OnInit {
     this.crearProducto.set(abierto);
   }
   cerrarModalProducto() {
+    this.errorServidor.set([]);
     this.crearProducto.set(false);
     this.productoForm.reset({ nombre: '', precioVenta: '', precioCompra: "", categoriaId: "", foto: null });
   }

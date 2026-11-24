@@ -9,8 +9,8 @@ import { NotificacionService } from '@/app/core/services/notificacion.service';
  * por si el componente necesita reaccionar (por ejemplo, quitar un "cargando").
  * Para no mostrar el toast en una petición concreta, usar sinToastDeError() (core/http).
  *
- * El backend todavía no tiene manejo global de errores (HU-05): las reglas de negocio
- * llegan como HTTP 500 con el texto en `error.message`.
+ * El backend responde con su código (HU-05) y el texto en `error.message`. En las
+ * validaciones además manda `error.fieldErrors`, que cada formulario muestra en su campo.
  */
 export const errorInterceptor: HttpInterceptorFn = (req, next) => {
   const notificacion = inject(NotificacionService);
