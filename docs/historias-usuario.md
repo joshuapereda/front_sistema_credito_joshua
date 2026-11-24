@@ -76,3 +76,25 @@
 |---|---|
 | `categoria-list`, `permiso-list`, `producto-list`, `rol-list`, `tipo-compra-list` | `cerrarModal()` vuelve a modo "crear" |
 | `shared/validators/crear-despues-de-editar.spec.ts` (nuevo) | Lo prueba en 8 módulos |
+
+### HU-15 · Un solo diseño de errores y editar pagos
+
+**Como** vendedor
+**quiero** ver los errores con el mismo diseño en todos los formularios y poder editar un pago
+**para** reconocerlos rápido y corregir un monto mal escrito.
+
+**Criterios de aceptación**
+- **Dado** un error en cualquier formulario, **entonces** sale en el mismo recuadro rojo.
+- **Dado** un modal más alto que la pantalla, **entonces** se desplaza y Guardar queda a la vista.
+- **Dado** un pago, **cuando** hago clic en el lápiz, **entonces** se abre "Editar pago" con sus datos y puedo guardar.
+
+**Qué se cambió**
+
+| Archivo | Para qué sirve |
+|---|---|
+| `shared/components/errores-servidor` | El recuadro rojo, único diseño |
+| `shared/components/error-campo` | Usa ese recuadro en cada campo |
+| `styles.css` | El contenido del modal se desplaza |
+| `clientes` y `pagos` (html) | Campo en rojo igual que los demás |
+| `pago-list.ts` | `funEditarPago()` ahora abre el modal |
+| `pago-list.spec.ts` | Prueba el lápiz de editar |

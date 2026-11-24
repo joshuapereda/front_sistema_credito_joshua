@@ -89,7 +89,7 @@
                 class="inline-flex h-8 w-8 items-center justify-center rounded-lg border border-gray-200 bg-white text-gray-600 shadow-sm transition-colors hover:border-fuchsia-300 hover:bg-fuchsia-50 hover:text-fuchsia-700">
                 <i class="bi bi-printer"></i>
               </button>
-              <button type="button" (click)="funEditarPago(pg)" title="Editar compra" aria-label="Editar compra"
+              <button type="button" (click)="funEditarPago(pg)" title="Editar pago" aria-label="Editar pago"
                 class="inline-flex h-8 w-8 items-center justify-center rounded-lg border border-gray-200 bg-white text-gray-600 shadow-sm transition-colors hover:border-amber-300 hover:bg-amber-50 hover:text-amber-700">
                 <i class="bi bi-pencil"></i>
               </button>
@@ -124,8 +124,9 @@
   <div class="modal" role="dialog" aria-modal="true" aria-labelledby="modal-titulo" (click)="$event.stopPropagation()">
     <header class="modal-header">
       <div>
-        <h2 id="modal-titulo">Nuevo pago</h2>
-        <p>Elige la compra y registra el abono.</p>
+        <!--el título cambia según si crea o edita-->
+        <h2 id="modal-titulo">{{ user_id() === -1 ? 'Nuevo pago' : 'Editar pago' }}</h2>
+        <p>{{ user_id() === -1 ? 'Elige la compra y registra el abono.' : 'Corrige el monto del abono.' }}</p>
       </div>
       <button class="icon-btn" type="button" aria-label="Cerrar" (click)="cerrarModal()">
         <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
@@ -505,6 +506,7 @@
 
   .field-input.ng-touched.ng-invalid {
     border-color: #ef4444;
+    box-shadow: 0 0 0 4px rgb(239 68 68 / 0.1);
   }
 
   .input-prefix {

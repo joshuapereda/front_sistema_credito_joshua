@@ -139,6 +139,7 @@ export class PagoList implements OnInit {
       this.pagoService.funEditar(this.user_id(), pago).subscribe({
         next: () => {
           this.funObtenerPago();
+          this.funObtenerCompra(); // refresca el saldo
           this.cerrarModal();
         },
         error: (err) => this.errorServidor.set(aplicarErroresServidor(this.pagoForm, err)),
@@ -164,7 +165,6 @@ export class PagoList implements OnInit {
   }}
   //------------- EDITAR ---------------//
   funEditarPago(pg: PagoInterface) {
-     console.log('compra encontrada:', this.compras().find(c => c.id === pg.compraId));
     //almacenar el id al dar click
     this.user_id.set(pg.id)
     this.compraEditandoId.set(pg.compraId);
@@ -174,6 +174,7 @@ export class PagoList implements OnInit {
       compraId: pg.compraId,
       monto: pg.monto,
     });
+    this.abrir(true); //faltaba: sin esto el modal no se abría
   }
 
   //------------- MODAL ---------------//
