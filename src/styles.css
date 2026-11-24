@@ -33,6 +33,11 @@
   --color-accent-ink: #b33a21;
   --color-accent-soft: #f8e3dc;
 
+  /* Marca Valentino (los mismos del login): menú y barra superior */
+  --color-marca: #ff1493; /* fucsia */
+  --color-marca-verde: #39ff14; /* verde neón: solo detalles pequeños */
+  --color-noche: #0a0a0a; /* negro del menú */
+
   --color-ok: #3c7a4f;
   --color-ok-soft: #e1eddf;
   --color-warn: #a86a12;
@@ -143,12 +148,45 @@
 
 /* ───────── Piezas gráficas (login y layout) ───────── */
 
-/* Ítem activo del menú lateral */
-.nav-activo {
-  @apply bg-surface font-semibold text-ink shadow-[0_1px_0_var(--color-line),0_0_0_1px_var(--color-line)];
+/* Menú lateral: negro con un brillo fucsia muy suave arriba, como el login */
+.menu-lateral {
+  background: radial-gradient(
+      circle at 0% 0%,
+      color-mix(in srgb, var(--color-marca) 16%, transparent),
+      transparent 42%
+    )
+    var(--color-noche);
+}
+.menu-lateral :focus-visible {
+  outline-color: var(--color-marca-verde);
+}
+.menu-scroll {
+  scrollbar-width: thin;
+  scrollbar-color: transparent transparent; /* aparece solo al pasar el mouse */
+}
+.menu-scroll:hover,
+.menu-scroll:focus-within {
+  scrollbar-color: rgb(255 255 255 / 0.2) transparent;
+}
+/* Opción activa */
+.nav-activo,
+.nav-activo:hover {
+  color: #fff;
+  background: color-mix(in srgb, var(--color-marca) 14%, transparent);
 }
 .nav-activo .nav-marca {
   opacity: 1;
+}
+.nav-activo .nav-icono {
+  color: var(--color-marca);
+}
+/* Barra superior: línea fina que va de fucsia a gris */
+.barra-superior::after {
+  content: '';
+  position: absolute;
+  inset: auto 0 0 0;
+  height: 1px;
+  background: linear-gradient(to right, var(--color-marca), #e5e7eb 38%);
 }
 
 /* Login: franja superior color tinta con renglones suaves; abajo, papel */

@@ -120,3 +120,27 @@
 
 **Notas técnicas**
 - Se reutiliza `app-aviso-dialog`, el mismo modal de eliminar.
+
+## Épica: Diseño
+
+### HU-18 · Menú con los colores de la empresa
+
+**Como** dueño de Valentino
+**quiero** que el menú use los colores del login
+**para** que todo el sistema se vea de la misma marca.
+
+**Criterios de aceptación**
+- El menú es negro, con el nombre de la empresa en fucsia.
+- **Dado** que estoy en una opción, **entonces** solo esa se marca en fucsia, con su ícono.
+- El verde neón se usa solo en detalles pequeños.
+- **Dado** que uso celular, **entonces** el menú se abre con el botón y se cierra al elegir.
+- El contenido central (tablas y formularios) no cambia.
+
+**Qué se cambió**
+
+| Archivo | Para qué sirve |
+|---|---|
+| `core/layout/main-layout/main-layout.html` | Diseño del menú y la barra superior |
+| `core/layout/main-layout/main-layout.ts` | Un ícono por cada opción |
+| `styles.css` | Colores `marca`, `marca-verde` y `noche` |
+| `core/layout/main-layout/main-layout.spec.ts` (nuevo) | Pruebas del menú |
