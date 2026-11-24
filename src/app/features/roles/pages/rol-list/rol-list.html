@@ -110,18 +110,14 @@
             <label class="field-label" for="nombre">Nombre</label>
             <input class="field-input" id="nombre" type="text" placeholder="Ej: Admin" formControlName="nombre"
               autofocus />
-            @if (rolForm.controls.nombre.touched && rolForm.controls.nombre.invalid) {
-            <p class="field-error">El Nombre es obligatorio.</p>
-            }
+            <app-error-campo [control]="rolForm.controls.nombre" />
           </div>
 
           <div class="field">
             <label class="field-label" for="descripcion">Descripción</label>
             <textarea class="field-input" id="descripcion" rows="3" placeholder="Describe brevemente esta categoria"
               formControlName="descripcion"></textarea>
-            @if (rolForm.controls.descripcion.touched && rolForm.controls.descripcion.invalid) {
-            <p class="field-error">La descripción es obligatoria.</p>
-            }
+            <app-error-campo [control]="rolForm.controls.descripcion" />
           </div>
         </div>
 
@@ -206,12 +202,11 @@
             </table>
           </div>
 
-          @if (rolForm.controls.permisosId.touched && rolForm.controls.permisosId.invalid) {
-          <p class="field-error">Selecciona al menos un permiso.</p>
-          }
+          <app-error-campo [control]="rolForm.controls.permisosId" />
         </div>
 
 
+        <app-errores-servidor [mensajes]="errorServidor()" />
       </div>
       <div class="modal-footer">
         <button class="mbtn mbtn-ghost" type="button" (click)="cerrarModal()">Cancelar</button>

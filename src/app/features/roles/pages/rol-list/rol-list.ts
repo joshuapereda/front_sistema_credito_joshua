@@ -2,6 +2,10 @@ import { Component, computed, HostListener, inject, OnInit, signal } from '@angu
 import { RouterLink } from '@angular/router';
 import { PageHeader } from '@/app/shared/components/page-header/page-header';
 import { EmptyState } from '@/app/shared/components/empty-state/empty-state';
+import { ErrorCampo } from '@/app/shared/components/error-campo/error-campo';
+import { ErroresServidor } from '@/app/shared/components/errores-servidor/errores-servidor';
+import { aplicarErroresServidor } from '@/app/shared/validators/errores-servidor';
+import { noVacio, reglas } from '@/app/shared/validators/reglas';
 import { RolService } from '../../services/rol.service';
 import { FormControl, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ConfirmDialog } from '@/app/shared/components/confirm-dialog/confirm-dialog';
@@ -14,7 +18,7 @@ import { PageableRequest } from '@/app/shared/interfaces/pageable.interface';
 
 @Component({
   selector: 'app-rol-list',
-  imports: [RouterLink, PageHeader, EmptyState, ReactiveFormsModule,ConfirmDialog,AvisoDialog, FormsModule, MatPaginatorModule],
+  imports: [RouterLink, PageHeader, EmptyState, ReactiveFormsModule,ConfirmDialog,AvisoDialog, FormsModule, MatPaginatorModule, ErrorCampo, ErroresServidor],
   templateUrl: './rol-list.html',
 })
 export class RolList implements OnInit {
@@ -31,6 +35,8 @@ export class RolList implements OnInit {
   protected readonly busquedaPermiso = signal('');
   //si edito o no - obtener id
   protected readonly user_id = signal<number>(-1);
+  //errores del back que no son de un campo
+  protected readonly errorServidor = signal<string[]>([]);
   //para eliminar
   protected readonly mensajeError = signal<string | null>(null);
   protected readonly mensajeExito = signal<string | null>(null);
@@ -98,15 +104,27 @@ export class RolList implements OnInit {
 
   //---------------- FORMULARIO ----------------//
   protected readonly rolForm = new FormGroup({
-    nombre: new FormControl('', { nonNullable: true, validators: [Validators.required] }),
-    descripcion: new FormControl('', { nonNullable: true, validators: [Validators.required] }),
-    permisosId: new FormControl<number[]>([], {
-      nonNullable: true,
-      validators: [Validators.required, Validators.minLength(1)],
+    nombre: new FormControl('', { nonNullable: true,
+      validators: reglas(
+        [noVacio, 'El Nombre del rol es obligatorio'],
+      ),
+    }),
+    descripcion: new FormControl('', { nonNullable: true,
+      validators: reglas(
+        [noVacio, 'La descripción es obligatoria'],
+        [Validators.maxLength(200), 'La Descripción no puede superar los 200 caracteres'],
+        [Validators.pattern(/^[a-zA-ZÀ-ÿñÑ0-9 .,()\-]*$/), 'La Descripción contiene caracteres no permitidos'],
+      ),
+    }),
+    permisosId: new FormControl<number[]>([], { nonNullable: true,
+      validators: reglas(
+        [noVacio, 'Debe asignar al menos un Permiso al Rol'],
+      ),
     }),
   });
   //------------- GUARDAR ROL ---------------//
   funGuardarRol() {
+    this.errorServidor.set([]); //borra los errores anteriores
     //validar si esta editando o creando
     if (this.user_id() !== -1) {
       //EDITAR
@@ -122,7 +140,7 @@ export class RolList implements OnInit {
           this.funObtenerRol();
           this.cerrarModal();
         },
-        error: (err) => console.error('Error al editar el rol', err),
+        error: (err) => this.errorServidor.set(aplicarErroresServidor(this.rolForm, err)),
       });
     } else {
       if (this.rolForm.invalid) {
@@ -143,7 +161,7 @@ export class RolList implements OnInit {
           this.cerrarModal();
           this.funObtenerRol();
         },
-        error: (error) => console.log(error),
+        error: (err) => this.errorServidor.set(aplicarErroresServidor(this.rolForm, err)),
       });
     }
   }
@@ -250,6 +268,7 @@ export class RolList implements OnInit {
   }
 
   cerrarModal() {
+    this.errorServidor.set([]);
     this.crearRol.set(false);
     this.rolForm.reset({ nombre: '', descripcion: '', permisosId: [] });
   }
