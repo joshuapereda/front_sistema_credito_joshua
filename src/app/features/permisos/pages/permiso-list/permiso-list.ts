@@ -34,6 +34,8 @@ export class PermisoList implements OnInit {
   //para eliminar
   protected readonly mensajeError = signal<string | null>(null);
   protected readonly mensajeExito = signal<string | null>(null);
+  //título del aviso: cambia si se creó, editó o eliminó
+  protected readonly tituloExito = signal('');
   protected readonly permisoAEliminar = signal<PermisoInterface|null>(null);
   //paginacion y filtro
   protected readonly totalElementos = signal(0);
@@ -116,6 +118,7 @@ export class PermisoList implements OnInit {
 
       this.permisoService.funEditar(this.user_id(), permiso).subscribe({
         next: () => {
+          this.mostrarExito('Permiso actualizado', `El permiso "${this.permisoForm.controls.nombre.value}" se actualizó correctamente.`);
           this.funObtenerPermiso();
           this.cerrarModal();
         },
@@ -130,6 +133,7 @@ export class PermisoList implements OnInit {
 
     this.permisoService.funGuarda(this.permisoForm.getRawValue()).subscribe({
       next: () => {
+        this.mostrarExito('Permiso registrado', `El permiso "${this.permisoForm.controls.nombre.value}" se registró correctamente.`);
         this.cerrarModal();
         this.funObtenerPermiso()
       },
@@ -165,7 +169,7 @@ export class PermisoList implements OnInit {
       next: () => {
         this.permisoAEliminar.set(null);
         this.funObtenerPermiso();
-        this.mensajeExito.set(`EL permiso "${cat.nombre}" se eliminó exitosamente.`);
+        this.mostrarExito('Permiso eliminado', `El permiso "${cat.nombre}" se eliminó exitosamente.`);
       },
       error: (err) => {
         this.permisoAEliminar.set(null);
@@ -186,6 +190,12 @@ export class PermisoList implements OnInit {
   @HostListener('document:keydown.escape')
   onEscape() {
     if (this.crearPermiso()) this.cerrarModal();
+  }
+  //------------- AVISO DE ÉXITO ---------------//
+  //mismo modal verde para crear, editar y eliminar
+  mostrarExito(titulo: string, mensaje: string) {
+    this.tituloExito.set(titulo);
+    this.mensajeExito.set(mensaje);
   }
   cerrarExito() {
     this.mensajeExito.set(null);
