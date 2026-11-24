@@ -98,26 +98,21 @@
           <label class="field-label" for="nombre">Nombre</label>
           <input class="field-input" id="nombre" type="text" placeholder="Ej: Contado, Crédito 30 días"
             formControlName="nombre" autofocus />
-          @if (permisoForm.controls.nombre.touched && permisoForm.controls.nombre.invalid) {
-          <p class="field-error">El nombre es obligatorio.</p>
-          }
+          <app-error-campo [control]="permisoForm.controls.nombre" />
         </div>
         <div class="field">
           <label class="field-label" for="nombre">Recurso</label>
           <input class="field-input" id="recurso" type="text" placeholder="Ingresa un recurso" formControlName="recurso"
             autofocus />
-          @if (permisoForm.controls.nombre.touched && permisoForm.controls.nombre.invalid) {
-          <p class="field-error">El recurso es obligatoria.</p>
-          }
+          <app-error-campo [control]="permisoForm.controls.recurso" />
         </div>
         <div class="field">
           <label class="field-label" for="nombre">Accion</label>
           <input class="field-input" id="accion" type="text" placeholder="Ingresa la accion" formControlName="accion"
             autofocus />
-          @if (permisoForm.controls.nombre.touched && permisoForm.controls.nombre.invalid) {
-          <p class="field-error">La accion es obligatoria.</p>
-          }
+          <app-error-campo [control]="permisoForm.controls.accion" />
         </div>
+        <app-errores-servidor [mensajes]="errorServidor()" />
       </div>
       <div class="modal-footer">
         <button class="mbtn mbtn-ghost" type="button" (click)="cerrarModal()">Cancelar</button>
