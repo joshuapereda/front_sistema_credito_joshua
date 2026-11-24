@@ -179,6 +179,7 @@ export class PermisoList implements OnInit {
   }
   cerrarModal() {
     this.errorServidor.set([]);
+    this.user_id.set(-1); //vuelve a modo "crear"
     this.crearPermiso.set(false);
     this.permisoForm.reset({ nombre: '', recurso: '', accion: "" });
   }

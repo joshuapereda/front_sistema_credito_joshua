@@ -253,6 +253,7 @@ export class ProductoList implements OnInit {
   }
   cerrarModal() {
     this.errorServidor.set([]);
+    this.user_id.set(-1); //vuelve a modo "crear"
     this.crearProducto.set(false);
     this.productoForm.reset({ nombre: '', precioVenta: null, precioCompra: null, categoriaId: null, foto: null });
   }

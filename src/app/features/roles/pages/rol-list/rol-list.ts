@@ -269,6 +269,7 @@ export class RolList implements OnInit {
 
   cerrarModal() {
     this.errorServidor.set([]);
+    this.user_id.set(-1); //vuelve a modo "crear"
     this.crearRol.set(false);
     this.rolForm.reset({ nombre: '', descripcion: '', permisosId: [] });
   }

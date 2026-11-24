@@ -206,6 +206,7 @@ export class CategoriaList implements OnInit {
   @ViewChild('fotoInput') fotoInput?: ElementRef<HTMLInputElement>;
   cerrarModal() {
     this.errorServidor.set([]);
+    this.user_id.set(-1); //vuelve a modo "crear"
     this.crearCategoria.set(false);
     this.categoriaForm.reset({ nombre: '', descripcion: '', foto: null });
     if (this.fotoInput) this.fotoInput.nativeElement.value = '';

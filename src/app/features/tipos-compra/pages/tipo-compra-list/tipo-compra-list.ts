@@ -156,6 +156,7 @@ export class TipoCompraList implements OnInit {
   }
   cerrarModal() {
     this.errorServidor.set([]);
+    this.user_id.set(-1); //vuelve a modo "crear"
     this.crearTipoCompra.set(false);
     this.tcompraForm.reset({ nombre: '', descripcion: '', esCredito: false });
   }
