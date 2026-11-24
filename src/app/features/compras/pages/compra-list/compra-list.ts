@@ -6,6 +6,7 @@ import { EmptyState } from '@/app/shared/components/empty-state/empty-state';
 import { CompraService } from '../../services/compra.service';
 import { FormControl, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
 import { CompraFilterCriteria, CompraInterface, CompraRequest } from '../../interfaces/CompraInterface';
+import { EstadoCompra } from '../../models/compra.model';
 import { ClienteInterface } from '@/app/features/clientes/interfaces/ClienteInterface';
 import { UsuarioInterface } from '@/app/features/usuarios/Interfaces/UsuarioInterface';
 import { ProductoInterface } from '@/app/features/productos/interfaces/ProductoInterface';
@@ -49,6 +50,14 @@ export class CompraList implements OnInit {
   protected readonly pageIndex = signal(0);
   protected readonly pageSize = signal(5);
   protected filterValue = '';
+  //filtro por estado: null = todas
+  protected readonly estadoFiltro = signal<EstadoCompra | null>(null);
+  //un botón por cada elemento: 'valor' va al back, 'texto' se ve en pantalla
+  protected readonly opcionesEstado: { texto: string; valor: EstadoCompra | null }[] = [
+    { texto: 'Todas', valor: null },
+    { texto: 'Pendientes', valor: 'PENDIENTE' },
+    { texto: 'Pagadas', valor: 'PAGADO' },
+  ];
   //impresion
   //Te da el “abridor de ventanas” de Angular Material. Sin esto no puedes abrir el diálogo.
   private readonly dialog = inject(MatDialog);
@@ -116,7 +125,8 @@ export class CompraList implements OnInit {
       pageSize: this.pageSize(),
       sortField: 'id',
       sortOrder: 'desc',
-      criterials: null,
+      //filtros específicos del back (se suman a la búsqueda general)
+      criterials: { estadoCompra: this.estadoFiltro() },
       filterValue: this.filterValue,
     };
 
@@ -137,6 +147,11 @@ export class CompraList implements OnInit {
   buscar() {
     this.pageIndex.set(0);
     this.funObtenerVenta();
+  }
+  //se ejecuta al hacer clic en Todas / Pendientes / Pagadas
+  filtrarPorEstado(estado: EstadoCompra | null) {
+    this.estadoFiltro.set(estado); //guarda el estado elegido
+    this.buscar(); //vuelve a la página 1 y consulta al back
   }
   limpiar() {
     this.filterValue = '';

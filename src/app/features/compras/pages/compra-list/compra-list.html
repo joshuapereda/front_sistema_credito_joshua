@@ -36,8 +36,28 @@
   <button type="button" class="buscador-btn" (click)="buscar()">Buscar</button>
 </div>
 
+<!--FILTRO POR ESTADO: un botón por cada opción de opcionesEstado-->
+<div class="mb-4 flex flex-wrap gap-2" role="group" aria-label="Filtrar por estado">
+  @for (op of opcionesEstado; track op.texto) {
+  <!--el botón activo se pinta de morado-->
+  <button type="button" (click)="filtrarPorEstado(op.valor)" [attr.aria-pressed]="estadoFiltro() === op.valor"
+    class="rounded-full border px-4 py-1.5 text-sm font-medium transition-colors"
+    [class]="estadoFiltro() === op.valor
+      ? 'border-indigo-600 bg-indigo-600 text-white'
+      : 'border-gray-200 bg-white text-gray-600 hover:bg-gray-50'">
+    {{ op.texto }}
+  </button>
+  }
+</div>
+
 @if (compras().length === 0) {
+<!--con filtro o búsqueda: no hubo coincidencias-->
+@if (estadoFiltro() || filterValue) {
+<app-empty-state titulo="Sin resultados" mensaje="No hay compras que coincidan con el filtro." />
+} @else {
+<!--sin filtro: no hay ninguna compra registrada-->
 <app-empty-state titulo="Aún no hay compras" mensaje="Registra la primera compra para verla aquí." />
+}
 } @else {
 <div class="overflow-hidden rounded-xl border border-gray-200 bg-white shadow-sm">
   <div class="overflow-x-auto">
