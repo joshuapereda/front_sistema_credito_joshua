@@ -3,6 +3,7 @@ import { RouterLink } from '@angular/router';
 import { CurrencyPipe, DatePipe } from '@angular/common';
 import { PageHeader } from '@/app/shared/components/page-header/page-header';
 import { EmptyState } from '@/app/shared/components/empty-state/empty-state';
+import { AvisoDialog } from '@/app/shared/components/aviso-dialog/aviso-dialog';
 import { ErrorCampo } from '@/app/shared/components/error-campo/error-campo';
 import { ErroresServidor } from '@/app/shared/components/errores-servidor/errores-servidor';
 import { aplicarErroresServidor } from '@/app/shared/validators/errores-servidor';
@@ -30,7 +31,7 @@ interface ItemCarrito {
 
 @Component({
   selector: 'app-compra-list',
-  imports: [RouterLink, PageHeader, EmptyState, CurrencyPipe, DatePipe, ReactiveFormsModule, FormsModule, MatPaginatorModule,TicketCompra,MatDialogModule, ErrorCampo, ErroresServidor],
+  imports: [RouterLink, PageHeader, EmptyState, CurrencyPipe, DatePipe, ReactiveFormsModule, FormsModule, MatPaginatorModule,TicketCompra,MatDialogModule, ErrorCampo, ErroresServidor, AvisoDialog],
   templateUrl: './compra-list.html',
 })
 export class CompraList implements OnInit {
@@ -48,6 +49,10 @@ export class CompraList implements OnInit {
   protected readonly crearCliente = signal(false);
   protected readonly crearProducto = signal(false);
   protected readonly errorServidor = signal<string[]>([]);
+  //aviso verde al crear o editar
+  protected readonly mensajeExito = signal<string | null>(null);
+  //título del aviso: cambia si se creó, editó o eliminó
+  protected readonly tituloExito = signal('');
   //si edito o no: null = estoy creando, número = id de la compra que edito
   protected readonly compraEditId = signal<number | null>(null);
   //paginacion y filtro
@@ -315,6 +320,8 @@ export class CompraList implements OnInit {
 
     peticion.subscribe({
       next: () => {
+        if (id === null) this.mostrarExito('Compra registrada', 'La compra se registró correctamente.');
+        else this.mostrarExito('Compra actualizada', `La compra #${id} se actualizó correctamente.`);
         this.cerrarModal();
         this.funObtenerVenta();
       },
@@ -364,6 +371,7 @@ export class CompraList implements OnInit {
 
     this.compraService.funGuardaCliente(cliente).subscribe({
       next: () => {
+        this.mostrarExito('Cliente registrado', `El cliente "${this.clienteForm.controls.nombre.value}" se registró correctamente.`);
         //refrescar la lista para que aparezca en el select
         this.funObtenerCliente();
         this.cerrarModalCliente();
@@ -391,6 +399,7 @@ export class CompraList implements OnInit {
 
     this.compraService.funGuardaProducto(formData).subscribe({
       next: () => {
+        this.mostrarExito('Producto registrado', `El producto "${this.productoForm.controls.nombre.value}" se registró correctamente.`);
         //refrescar la lista para que aparezca en el select
         this.funObtenerProducto();
         this.cerrarModalProducto();
@@ -448,6 +457,16 @@ export class CompraList implements OnInit {
     this.errorServidor.set([]);
     this.crearProducto.set(false);
     this.productoForm.reset({ nombre: '', precioVenta: '', precioCompra: "", categoriaId: "", foto: null });
+  }
+
+  //------------- AVISO DE ÉXITO ---------------//
+  //mismo modal verde para crear, editar y eliminar
+  mostrarExito(titulo: string, mensaje: string) {
+    this.tituloExito.set(titulo);
+    this.mensajeExito.set(mensaje);
+  }
+  cerrarExito() {
+    this.mensajeExito.set(null);
   }
 
   //un solo listener de Escape: cierra primero el modal que esté encima
