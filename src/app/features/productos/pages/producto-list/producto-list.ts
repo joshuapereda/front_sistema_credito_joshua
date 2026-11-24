@@ -2,6 +2,10 @@ import { Component, computed, HostListener, inject, OnInit, signal } from '@angu
 import { RouterLink } from '@angular/router';
 import { PageHeader } from '@/app/shared/components/page-header/page-header';
 import { EmptyState } from '@/app/shared/components/empty-state/empty-state';
+import { ErrorCampo } from '@/app/shared/components/error-campo/error-campo';
+import { ErroresServidor } from '@/app/shared/components/errores-servidor/errores-servidor';
+import { aplicarErroresServidor } from '@/app/shared/validators/errores-servidor';
+import { digitos, noVacio, reglas } from '@/app/shared/validators/reglas';
 import { ProductoService } from '../../services/producto.service';
 import { FormControl, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ConfirmDialog } from '@/app/shared/components/confirm-dialog/confirm-dialog';
@@ -15,7 +19,7 @@ import { environment } from '@/environments/environment';
 
 @Component({
   selector: 'app-producto-list',
-  imports: [RouterLink, PageHeader, EmptyState, ReactiveFormsModule, ConfirmDialog, AvisoDialog, FormsModule, MatPaginatorModule],
+  imports: [RouterLink, PageHeader, EmptyState, ReactiveFormsModule, ConfirmDialog, AvisoDialog, FormsModule, MatPaginatorModule, ErrorCampo, ErroresServidor],
   templateUrl: './producto-list.html',
 })
 export class ProductoList implements OnInit {
@@ -29,6 +33,8 @@ export class ProductoList implements OnInit {
   protected readonly crearProducto = signal(false);
   //si edito o no
   protected readonly user_id = signal<number>(-1);
+  //errores del back que no son de un campo
+  protected readonly errorServidor = signal<string[]>([]);
   //para eliminar
   protected readonly mensajeError = signal<string | null>(null);
   protected readonly mensajeExito = signal<string | null>(null);
@@ -110,14 +116,36 @@ export class ProductoList implements OnInit {
 
   //---------------- FORMULARIO ----------------//
   protected readonly productoForm = new FormGroup({
-    nombre: new FormControl('', { nonNullable: true, validators: [Validators.required] }),
-    precioVenta: new FormControl<number | null>(null, Validators.required),
-    precioCompra: new FormControl<number | null>(null, Validators.required),
-    categoriaId: new FormControl<number | null>(null, Validators.required),
+    nombre: new FormControl('', { nonNullable: true,
+      validators: reglas(
+        [noVacio, 'El nombre del producto es obligatorio'],
+        [Validators.maxLength(100), 'El nombre no puede superar los 100 caracteres'],
+      ),
+    }),
+    precioVenta: new FormControl<number | null>(null, {
+      validators: reglas(
+        [noVacio, 'El precio de venta es obligatorio'],
+        [Validators.min(0.01), 'El precio de venta debe ser mayor a 0'],
+        [digitos(8, 2), 'El precio de venta admite hasta 8 enteros y 2 decimales'],
+      ),
+    }),
+    precioCompra: new FormControl<number | null>(null, {
+      validators: reglas(
+        [noVacio, 'El precio de compra es obligatorio'],
+        [Validators.min(0.01), 'El precio de compra debe ser mayor a 0'],
+        [digitos(8, 2), 'El precio de compra admite hasta 8 enteros y 2 decimales'],
+      ),
+    }),
+    categoriaId: new FormControl<number | null>(null, {
+      validators: reglas(
+        [noVacio, 'Debes asignar una categoría al producto'],
+      ),
+    }),
     foto: new FormControl<File | null>(null),
   });
   //------------- GUARDAR ---------------//
   funGuardarProducto() {
+    this.errorServidor.set([]); //borra los errores anteriores
     //validar si esta editando o creando
     if (this.user_id() !== -1) {
       //EDITAR
@@ -138,7 +166,7 @@ export class ProductoList implements OnInit {
           this.funObtenerProducto();
           this.cerrarModal();
         },
-        error: (err) => console.error('Error al editar la categoría', err),
+        error: (err) => this.errorServidor.set(aplicarErroresServidor(this.productoForm, err)),
       });
     } else {
       if (this.productoForm.invalid) {
@@ -160,7 +188,7 @@ export class ProductoList implements OnInit {
           this.cerrarModal();
           this.funObtenerProducto();
         },
-        error: (error) => console.log(error),
+        error: (err) => this.errorServidor.set(aplicarErroresServidor(this.productoForm, err)),
       });
     }
   }
@@ -224,6 +252,7 @@ export class ProductoList implements OnInit {
     this.crearProducto.set(compra);
   }
   cerrarModal() {
+    this.errorServidor.set([]);
     this.crearProducto.set(false);
     this.productoForm.reset({ nombre: '', precioVenta: null, precioCompra: null, categoriaId: null, foto: null });
   }
