@@ -98,3 +98,25 @@
 | `clientes` y `pagos` (html) | Campo en rojo igual que los demás |
 | `pago-list.ts` | `funEditarPago()` ahora abre el modal |
 | `pago-list.spec.ts` | Prueba el lápiz de editar |
+
+### HU-16 · Aviso al crear y editar, y botón Actualizar
+
+**Como** vendedor
+**quiero** ver un aviso cuando se guarda un registro y saber si estoy creando o editando
+**para** tener la seguridad de que el cambio se hizo.
+
+**Criterios de aceptación**
+- **Dado** que creo un registro, **entonces** veo el aviso verde "... registrado".
+- **Dado** que edito un registro, **entonces** veo el aviso verde "... actualizado".
+- **Dado** que el back rechaza el cambio, **entonces** no sale el aviso y el formulario sigue abierto.
+- **Dado** que edito, **entonces** el título dice "Editar" y el botón "Actualizar". Al crear dicen "Nuevo" y "Guardar".
+
+**Qué se cambió**
+
+| Archivo | Para qué sirve |
+|---|---|
+| `features/*/pages/*-list` (9 módulos) | `mostrarExito()` abre el aviso; título y botón cambian |
+| `shared/components/aviso-dialog/avisos-guardar.spec.ts` (nuevo) | Prueba crear y editar en todos |
+
+**Notas técnicas**
+- Se reutiliza `app-aviso-dialog`, el mismo modal de eliminar.
