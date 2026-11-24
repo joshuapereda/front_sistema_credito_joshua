@@ -234,3 +234,9 @@
 
   @page { size: 80mm auto; margin: 0; }
 }
+
+/* Modales: si el contenido no entra se desplaza, y los botones quedan a la vista */
+.modal-body {
+  max-height: calc(100dvh - 12rem);
+  overflow-y: auto;
+}

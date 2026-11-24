@@ -1,5 +1,6 @@
 import { Component, computed, effect, input, signal } from '@angular/core';
 import { AbstractControl } from '@angular/forms';
+import { ErroresServidor } from '../errores-servidor/errores-servidor';
 
 /**
  * Mensaje de error debajo de un campo.
@@ -7,9 +8,12 @@ import { AbstractControl } from '@angular/forms';
  */
 @Component({
   selector: 'app-error-campo',
+  imports: [ErroresServidor],
+  //sin error no ocupa espacio
+  host: { class: 'block empty:hidden' },
   template: `
     @if (mensaje(); as m) {
-      <p class="m-0 text-[12px] text-red-600" role="alert">{{ m }}</p>
+      <app-errores-servidor [mensajes]="[m]" />
     }
   `,
 })
