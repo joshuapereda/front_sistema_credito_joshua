@@ -35,6 +35,8 @@ export class CategoriaList implements OnInit {
   //para eliminar
   protected readonly mensajeError = signal<string | null>(null);
   protected readonly mensajeExito = signal<string | null>(null);
+  //título del aviso: cambia si se creó, editó o eliminó
+  protected readonly tituloExito = signal('');
   protected readonly categoriaAEliminar = signal<CategoriaInterface | null>(null);
   //paginacion y filtro
   protected readonly totalElementos = signal(0);
@@ -128,6 +130,7 @@ export class CategoriaList implements OnInit {
 
       this.categoriaService.funEditar(this.user_id(), formData).subscribe({
         next: () => {
+          this.mostrarExito('Categoría actualizada', `La categoría "${this.categoriaForm.controls.nombre.value}" se actualizó correctamente.`);
           this.funObtenerCategoria();
           this.cerrarModal();
         },
@@ -147,6 +150,7 @@ export class CategoriaList implements OnInit {
 
       this.categoriaService.funGuarda(formData).subscribe({
         next: () => {
+          this.mostrarExito('Categoría registrada', `La categoría "${this.categoriaForm.controls.nombre.value}" se registró correctamente.`);
           this.funObtenerCategoria();
           this.cerrarModal();
         },
@@ -191,7 +195,7 @@ export class CategoriaList implements OnInit {
       next: () => {
         this.categoriaAEliminar.set(null);
         this.funObtenerCategoria();
-        this.mensajeExito.set(`La categoría "${cat.nombre}" se eliminó exitosamente.`);
+        this.mostrarExito('Categoría eliminada', `La categoría "${cat.nombre}" se eliminó exitosamente.`);
       },
       error: (err: HttpErrorResponse) => {
         this.categoriaAEliminar.set(null);
@@ -216,6 +220,12 @@ export class CategoriaList implements OnInit {
     if (this.crearCategoria()) this.cerrarModal();
   }
   //------------------------------------//
+  //------------- AVISO DE ÉXITO ---------------//
+  //mismo modal verde para crear, editar y eliminar
+  mostrarExito(titulo: string, mensaje: string) {
+    this.tituloExito.set(titulo);
+    this.mensajeExito.set(mensaje);
+  }
   cerrarExito() {
     this.mensajeExito.set(null);
   }
