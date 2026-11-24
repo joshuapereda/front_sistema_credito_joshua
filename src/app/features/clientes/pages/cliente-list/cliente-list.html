@@ -105,22 +105,14 @@
             <label class="field-label" for="nombre">Nombre</label>
             <input class="field-input" id="nombre" type="text" placeholder="Ej: Nombre del producto"
               formControlName="nombre" autofocus />
-            @if (clienteForm.controls.nombre.touched && clienteForm.controls.nombre.invalid) {
-            <p class="field-error">El nombre es obligatorio.</p>
-            }
-            @if (errorServidor().length) {
-            <div class="server-error" role="alert">
-              @for (m of errorServidor(); track m) {
-              <p>{{ m }}</p>
-              }
-            </div>
-            }
+            <app-error-campo [control]="clienteForm.controls.nombre" />
           </div>
 
           <div class="field">
             <label class="field-label" for="gmail">Gmail</label>
             <input class="field-input" id="gmail" type="text" placeholder="Ej: admin@gmail.com" formControlName="gmail"
               autofocus />
+            <app-error-campo [control]="clienteForm.controls.gmail" />
           </div>
         </div>
 
@@ -129,18 +121,14 @@
             <label class="field-label" for="telefono">N° Telefono</label>
             <input class="field-input" id="telefono" type="text" placeholder="Ej: 9XX-XXX-XXX"
               formControlName="telefono" autofocus />
-            @if (clienteForm.controls.telefono.touched && clienteForm.controls.telefono.invalid) {
-            <p class="field-error">El N° Telefono es obligatorio.</p>
-            }
+            <app-error-campo [control]="clienteForm.controls.telefono" />
           </div>
 
           <div class="field">
             <label class="field-label" for="direccion">Direccion</label>
             <input class="field-input" id="direccion" type="text" placeholder="Ej: AV.XXX-XXX"
               formControlName="direccion" autofocus />
-            @if (clienteForm.controls.direccion.touched && clienteForm.controls.direccion.invalid) {
-            <p class="field-error">La Direccion es obligatorio.</p>
-            }
+            <app-error-campo [control]="clienteForm.controls.direccion" />
           </div>
         </div>
         <div class="field-row">
@@ -148,11 +136,10 @@
             <label class="field-label" for="docIdentidad">D° Identidad</label>
             <input class="field-input" id="docIdentidad" type="text" placeholder="Ej: 7XXXXXXX"
               formControlName="docIdentidad" autofocus />
-            @if (clienteForm.controls.docIdentidad.touched && clienteForm.controls.docIdentidad.invalid) {
-            <p class="field-error">El D° Identidad es obligatorio.</p>
-            }
+            <app-error-campo [control]="clienteForm.controls.docIdentidad" />
           </div>
         </div>
+        <app-errores-servidor [mensajes]="errorServidor()" />
       </div>
       <div class="modal-footer">
         <button class="mbtn mbtn-ghost" type="button" (click)="cerrarModal()">Cancelar</button>
