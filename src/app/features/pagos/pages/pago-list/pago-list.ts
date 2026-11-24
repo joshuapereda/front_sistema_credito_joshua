@@ -2,6 +2,7 @@ import { Component, computed, HostListener, inject, OnInit, signal, TemplateRef,
 import { RouterLink } from '@angular/router';
 import { PageHeader } from '@/app/shared/components/page-header/page-header';
 import { EmptyState } from '@/app/shared/components/empty-state/empty-state';
+import { AvisoDialog } from '@/app/shared/components/aviso-dialog/aviso-dialog';
 import { ErrorCampo } from '@/app/shared/components/error-campo/error-campo';
 import { ErroresServidor } from '@/app/shared/components/errores-servidor/errores-servidor';
 import { aplicarErroresServidor } from '@/app/shared/validators/errores-servidor';
@@ -19,7 +20,7 @@ import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 
 @Component({
   selector: 'app-pago-list',
-  imports: [RouterLink, PageHeader, EmptyState,ReactiveFormsModule,CurrencyPipe,DatePipe,DecimalPipe, FormsModule, MatPaginatorModule,TicketPago,MatDialogModule, ErrorCampo, ErroresServidor],
+  imports: [RouterLink, PageHeader, EmptyState,ReactiveFormsModule,CurrencyPipe,DatePipe,DecimalPipe, FormsModule, MatPaginatorModule,TicketPago,MatDialogModule, ErrorCampo, ErroresServidor, AvisoDialog],
   templateUrl: './pago-list.html',
 })
 export class PagoList implements OnInit {
@@ -35,6 +36,10 @@ export class PagoList implements OnInit {
   protected readonly user_id = signal<number>(-1);
   //errores del back que no son de un campo
   protected readonly errorServidor = signal<string[]>([]);
+  //aviso verde al crear o editar
+  protected readonly mensajeExito = signal<string | null>(null);
+  //título del aviso: cambia si se creó, editó o eliminó
+  protected readonly tituloExito = signal('');
   protected readonly compraEditandoId = signal<number | null>(null);
   protected readonly montoOriginal = signal<number>(0);
   //paginacion y filtro
@@ -138,6 +143,7 @@ export class PagoList implements OnInit {
 
       this.pagoService.funEditar(this.user_id(), pago).subscribe({
         next: () => {
+          this.mostrarExito('Pago actualizado', `El pago de S/ ${Number(monto).toFixed(2)} se actualizó correctamente.`);
           this.funObtenerPago();
           this.funObtenerCompra(); // refresca el saldo
           this.cerrarModal();
@@ -156,6 +162,7 @@ export class PagoList implements OnInit {
 
     this.pagoService.funGuarda(pago).subscribe({
       next: () => {
+        this.mostrarExito('Pago registrado', `El pago de S/ ${Number(monto).toFixed(2)} se registró correctamente.`);
         this.cerrarModal();
         this.funObtenerPago();
         this.funObtenerCompra(); // refresca el saldo
@@ -189,6 +196,15 @@ export class PagoList implements OnInit {
   this.compraEditandoId.set(null);
   this.montoOriginal.set(0);
 }
+  //------------- AVISO DE ÉXITO ---------------//
+  //mismo modal verde para crear, editar y eliminar
+  mostrarExito(titulo: string, mensaje: string) {
+    this.tituloExito.set(titulo);
+    this.mensajeExito.set(mensaje);
+  }
+  cerrarExito() {
+    this.mensajeExito.set(null);
+  }
   @HostListener('document:keydown.escape')
   onEscape() {
     if (this.crearPago()) this.cerrarModal();

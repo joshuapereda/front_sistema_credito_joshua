@@ -162,7 +162,8 @@
       </div>
       <div class="modal-footer">
         <button class="mbtn mbtn-ghost" type="button" (click)="cerrarModal()">Cancelar</button>
-        <button class="mbtn colorBoton" type="submit">Guardar</button>
+        <!--el texto cambia según si crea o edita-->
+        <button class="mbtn colorBoton" type="submit">{{ user_id() === -1 ? 'Guardar' : 'Actualizar' }}</button>
       </div>
     </form>
   </div>
@@ -172,7 +173,7 @@
 <app-confirm-dialog [nombre]="usuarioAEliminar()?.username ?? null" titulo="¿Eliminar usuario?"
   (confirmar)="confirmarEliminar()" (cancelar)="cancelarEliminar()" />
 
-<app-aviso-dialog [mensaje]="mensajeExito()" titulo="Usuario eliminado" (cerrar)="cerrarExito()" />
+<app-aviso-dialog [mensaje]="mensajeExito()" [titulo]="tituloExito()" (cerrar)="cerrarExito()" />
 
 <app-aviso-dialog [mensaje]="mensajeError()" titulo="No se pudo eliminar" tipo="error" boton="Entendido"
   (cerrar)="cerrarAviso()" />

@@ -299,8 +299,9 @@
     <div class="modal-header">
       <div class="modal-icon" aria-hidden="true">🛒</div>
       <div class="modal-heading">
-        <h2>Nueva Venta</h2>
-        <p>Registra la venta y sus productos</p>
+        <!--título y botón cambian según si crea o edita-->
+        <h2>{{ compraEditId() === null ? 'Nueva Venta' : 'Editar Venta' }}</h2>
+        <p>{{ compraEditId() === null ? 'Registra la venta y sus productos' : 'Cambia los datos de la venta' }}</p>
       </div>
       <button class="modal-close" type="button" aria-label="Cerrar" (click)="cerrarModal()">✕</button>
     </div>
@@ -382,7 +383,7 @@
 
       <div class="modal-footer">
         <button class="mbtn mbtn-ghost" type="button" (click)="cerrarModal()">Cancelar</button>
-        <button class="mbtn colorBoton" type="submit">Guardar venta</button>
+        <button class="mbtn colorBoton" type="submit">{{ compraEditId() === null ? 'Guardar venta' : 'Actualizar venta' }}</button>
       </div>
     </form>
   </div>
@@ -516,6 +517,8 @@
   </div>
 </div>
 }
+<app-aviso-dialog [mensaje]="mensajeExito()" [titulo]="tituloExito()" (cerrar)="cerrarExito()" />
+
 <style>
   /*  ======BUSCADOR========  */
   .buscador {

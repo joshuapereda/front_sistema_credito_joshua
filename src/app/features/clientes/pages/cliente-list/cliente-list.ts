@@ -35,6 +35,8 @@ export class ClienteList implements OnInit {
   //para eliminar
   protected readonly mensajeError = signal<string | null>(null);
   protected readonly mensajeExito = signal<string | null>(null);
+  //título del aviso: cambia si se creó, editó o eliminó
+  protected readonly tituloExito = signal('');
   protected readonly clienteAEliminar = signal<ClienteInterface | null>(null);
   //paginacion y filtro
   protected readonly totalElementos = signal(0);
@@ -123,6 +125,7 @@ export class ClienteList implements OnInit {
 
       this.clienteService.funEditar(this.user_id(), tcompra).subscribe({
         next: () => {
+          this.mostrarExito('Cliente actualizado', `El cliente "${this.clienteForm.controls.nombre.value}" se actualizó correctamente.`);
           this.funObtenerPersona();
           this.cerrarModal();
         },
@@ -140,6 +143,7 @@ export class ClienteList implements OnInit {
 
       this.clienteService.funGuarda(cliente).subscribe({
         next: () => {
+          this.mostrarExito('Cliente registrado', `El cliente "${this.clienteForm.controls.nombre.value}" se registró correctamente.`);
           this.funObtenerPersona();
           this.cerrarModal();
         },
@@ -178,7 +182,7 @@ export class ClienteList implements OnInit {
       next: () => {
         this.clienteAEliminar.set(null);
         this.funObtenerPersona();
-        this.mensajeExito.set(`El cliente "${cat.nombre}" se eliminó exitosamente.`);
+        this.mostrarExito('Cliente eliminado', `El cliente "${cat.nombre}" se eliminó exitosamente.`);
       },
       error: (err) => {
         this.clienteAEliminar.set(null);
@@ -199,6 +203,12 @@ export class ClienteList implements OnInit {
   @HostListener('document:keydown.escape')
   onEscape() {
     if (this.crearCliente()) this.cerrarModal();
+  }
+  //------------- AVISO DE ÉXITO ---------------//
+  //mismo modal verde para crear, editar y eliminar
+  mostrarExito(titulo: string, mensaje: string) {
+    this.tituloExito.set(titulo);
+    this.mensajeExito.set(mensaje);
   }
   cerrarExito() {
     this.mensajeExito.set(null);

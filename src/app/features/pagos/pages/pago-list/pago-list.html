@@ -164,12 +164,15 @@
 
       <footer class="modal-footer">
         <button class="btn-ghost" type="button" (click)="cerrarModal()">Cancelar</button>
-        <button class="btn-primary" type="submit">Guardar pago</button>
+        <!--el texto cambia según si crea o edita-->
+        <button class="btn-primary" type="submit">{{ user_id() === -1 ? 'Guardar pago' : 'Actualizar pago' }}</button>
       </footer>
     </form>
   </div>
 </div>
 }
+
+<app-aviso-dialog [mensaje]="mensajeExito()" [titulo]="tituloExito()" (cerrar)="cerrarExito()" />
 
 <style>
   /*  ======BUSCADOR========  */

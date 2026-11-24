@@ -47,6 +47,8 @@ export class UsuarioList implements OnInit {
   //para eliminar
   protected readonly mensajeError = signal<string | null>(null);
   protected readonly mensajeExito = signal<string | null>(null);
+  //título del aviso: cambia si se creó, editó o eliminó
+  protected readonly tituloExito = signal('');
   protected readonly usuarioAEliminar = signal<UsuarioInterface|null>(null);
   //paginacion y filtro
   protected readonly totalElementos = signal(0);
@@ -182,6 +184,7 @@ export class UsuarioList implements OnInit {
 
       this.usuarioService.funEditar(this.user_id(), usuario).subscribe({
         next: () => {
+          this.mostrarExito('Usuario actualizado', `El usuario "${this.usuarioForm.controls.username.value}" se actualizó correctamente.`);
           this.funObtenerUsuarios();
           this.cerrarModal();
         },
@@ -197,6 +200,7 @@ export class UsuarioList implements OnInit {
       const usuario: UsuarioInterface = { username, passwprd, personaId: personaId!, rolesId };
       this.usuarioService.funGuarda(usuario).subscribe({
         next: () => {
+          this.mostrarExito('Usuario registrado', `El usuario "${this.usuarioForm.controls.username.value}" se registró correctamente.`);
           this.funObtenerUsuarios();
           this.cerrarModal();
         },
@@ -238,7 +242,7 @@ export class UsuarioList implements OnInit {
       next: () => {
         this.usuarioAEliminar.set(null);
         this.funObtenerUsuarios();
-        this.mensajeExito.set(`El usuario "${cat.username}" se eliminó exitosamente.`);
+        this.mostrarExito('Usuario eliminado', `El usuario "${cat.username}" se eliminó exitosamente.`);
       },
       error: (err) => {
         this.usuarioAEliminar.set(null);
@@ -264,6 +268,12 @@ export class UsuarioList implements OnInit {
   @HostListener('document:keydown.escape')
   onEscape() {
     if (this.crearUsuario()) this.cerrarModal();
+  }
+  //------------- AVISO DE ÉXITO ---------------//
+  //mismo modal verde para crear, editar y eliminar
+  mostrarExito(titulo: string, mensaje: string) {
+    this.tituloExito.set(titulo);
+    this.mensajeExito.set(mensaje);
   }
   cerrarExito() {
     this.mensajeExito.set(null);

@@ -99,7 +99,7 @@
     <div class="modal-header">
       <div class="modal-icon" aria-hidden="true">🏷️</div>
       <div class="modal-heading">
-        <h2 id="modal-titulo">Nuevo Producto</h2>
+        <h2 id="modal-titulo">{{ user_id() === -1 ? 'Nuevo Producto' : 'Editar Producto' }}</h2>
         <p>Define el Producto</p>
       </div>
       <button class="modal-close" type="button" aria-label="Cerrar" (click)="cerrarModal()">
@@ -151,7 +151,8 @@
       </div>
       <div class="modal-footer">
         <button class="mbtn mbtn-ghost" type="button" (click)="cerrarModal()">Cancelar</button>
-        <button class="mbtn colorBoton" type="submit">Guardar</button>
+        <!--el texto cambia según si crea o edita-->
+        <button class="mbtn colorBoton" type="submit">{{ user_id() === -1 ? 'Guardar' : 'Actualizar' }}</button>
       </div>
     </form>
   </div>
@@ -161,7 +162,7 @@
 <app-confirm-dialog [nombre]="productoAEliminar()?.nombre ?? null" titulo="¿Eliminar producto?"
   (confirmar)="confirmarEliminar()" (cancelar)="cancelarEliminar()" />
 
-<app-aviso-dialog [mensaje]="mensajeExito()" titulo="Producto eliminado" (cerrar)="cerrarExito()" />
+<app-aviso-dialog [mensaje]="mensajeExito()" [titulo]="tituloExito()" (cerrar)="cerrarExito()" />
 
 <app-aviso-dialog [mensaje]="mensajeError()" titulo="No se pudo eliminar" tipo="error" boton="Entendido"
   (cerrar)="cerrarAviso()" />

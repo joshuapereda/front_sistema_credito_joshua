@@ -39,6 +39,8 @@ export class TipoCompraList implements OnInit {
   //para eliminar
   protected readonly mensajeError = signal<string | null>(null);
   protected readonly mensajeExito = signal<string | null>(null);
+  //título del aviso: cambia si se creó, editó o eliminó
+  protected readonly tituloExito = signal('');
   protected readonly tCompraAEliminar = signal<TipoCompraInterface | null>(null);
 
   //------------- LISTADO TIPO DE COMPRA ---------------//
@@ -84,6 +86,7 @@ export class TipoCompraList implements OnInit {
 
       this.tipoCompraService.funEditar(this.user_id(), tcompra).subscribe({
         next: () => {
+          this.mostrarExito('Tipo de compra actualizado', `El tipo de compra "${this.tcompraForm.controls.nombre.value}" se actualizó correctamente.`);
           this.funObjtenerTipoCompra();
           this.cerrarModal();
         },
@@ -98,6 +101,7 @@ export class TipoCompraList implements OnInit {
 
       this.tipoCompraService.funGuarda(this.tcompraForm.getRawValue()).subscribe({
         next: () => {
+          this.mostrarExito('Tipo de compra registrado', `El tipo de compra "${this.tcompraForm.controls.nombre.value}" se registró correctamente.`);
           this.cerrarModal();
           this.funObjtenerTipoCompra()
         },
@@ -134,7 +138,7 @@ export class TipoCompraList implements OnInit {
       next: () => {
         this.tCompraAEliminar.set(null);
         this.funObjtenerTipoCompra();
-        this.mensajeExito.set(`El tipo de compra "${cat.nombre}" se eliminó exitosamente.`);
+        this.mostrarExito('Tipo de compra eliminado', `El tipo de compra "${cat.nombre}" se eliminó exitosamente.`);
       },
       error: (err) => {
         this.tCompraAEliminar.set(null);
@@ -143,6 +147,12 @@ export class TipoCompraList implements OnInit {
     });
   }
 
+  //------------- AVISO DE ÉXITO ---------------//
+  //mismo modal verde para crear, editar y eliminar
+  mostrarExito(titulo: string, mensaje: string) {
+    this.tituloExito.set(titulo);
+    this.mensajeExito.set(mensaje);
+  }
   cerrarExito() {
     this.mensajeExito.set(null);
   }
