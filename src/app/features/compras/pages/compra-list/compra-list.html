@@ -317,9 +317,7 @@
               <option [ngValue]="c.id">{{ c.nombre }}</option>
               }
             </select>
-            @if (ventaForm.controls.clienteId.touched && ventaForm.controls.clienteId.invalid) {
-            <p class="field-error">El cliente es obligatorio.</p>
-            }
+            <app-error-campo [control]="ventaForm.controls.clienteId" />
           </div>
 
           <div class="field">
@@ -330,9 +328,7 @@
               <option [ngValue]="u.id">{{ u.username }}</option>
               }
             </select>
-            @if (ventaForm.controls.usuarioId.touched && ventaForm.controls.usuarioId.invalid) {
-            <p class="field-error">El usuario es obligatorio.</p>
-            }
+            <app-error-campo [control]="ventaForm.controls.usuarioId" />
           </div>
         </div>
 
@@ -344,9 +340,7 @@
             <option [ngValue]="t.id">{{ t.nombre }}</option>
             }
           </select>
-          @if (ventaForm.controls.tipoCompraId.touched && ventaForm.controls.tipoCompraId.invalid) {
-          <p class="field-error">El tipo de compra es obligatorio.</p>
-          }
+          <app-error-campo [control]="ventaForm.controls.tipoCompraId" />
         </div>
 
         <!-- Agregar productos -->
@@ -383,13 +377,7 @@
         </div>
         }
 
-        @if (errorServidor().length) {
-        <div class="server-error" role="alert">
-          @for (m of errorServidor(); track m) {
-          <p>{{ m }}</p>
-          }
-        </div>
-        }
+        <app-errores-servidor [mensajes]="errorServidor()" />
       </div>
 
       <div class="modal-footer">
@@ -420,22 +408,14 @@
             <label class="field-label" for="nombre">Nombre</label>
             <input class="field-input" id="nombre" type="text" placeholder="Ej: Nombre del producto"
               formControlName="nombre" autofocus />
-            @if (clienteForm.controls.nombre.touched && clienteForm.controls.nombre.invalid) {
-            <p class="field-error">El nombre es obligatorio.</p>
-            }
-            @if (errorServidor().length) {
-            <div class="server-error" role="alert">
-              @for (m of errorServidor(); track m) {
-              <p>{{ m }}</p>
-              }
-            </div>
-            }
+            <app-error-campo [control]="clienteForm.controls.nombre" />
           </div>
 
           <div class="field">
             <label class="field-label" for="gmail">Gmail</label>
             <input class="field-input" id="gmail" type="text" placeholder="Ej: admin@gmail.com" formControlName="gmail"
               autofocus />
+            <app-error-campo [control]="clienteForm.controls.gmail" />
           </div>
         </div>
 
@@ -444,18 +424,14 @@
             <label class="field-label" for="telefono">N° Telefono</label>
             <input class="field-input" id="telefono" type="text" placeholder="Ej: 9XX-XXX-XXX"
               formControlName="telefono" autofocus />
-            @if (clienteForm.controls.telefono.touched && clienteForm.controls.telefono.invalid) {
-            <p class="field-error">El N° Telefono es obligatorio.</p>
-            }
+            <app-error-campo [control]="clienteForm.controls.telefono" />
           </div>
 
           <div class="field">
             <label class="field-label" for="direccion">Direccion</label>
             <input class="field-input" id="direccion" type="text" placeholder="Ej: AV.XXX-XXX"
               formControlName="direccion" autofocus />
-            @if (clienteForm.controls.direccion.touched && clienteForm.controls.direccion.invalid) {
-            <p class="field-error">La Direccion es obligatorio.</p>
-            }
+            <app-error-campo [control]="clienteForm.controls.direccion" />
           </div>
         </div>
         <div class="field-row">
@@ -463,11 +439,10 @@
             <label class="field-label" for="docIdentidad">D° Identidad</label>
             <input class="field-input" id="docIdentidad" type="text" placeholder="Ej: 7XXXXXXX"
               formControlName="docIdentidad" autofocus />
-            @if (clienteForm.controls.docIdentidad.touched && clienteForm.controls.docIdentidad.invalid) {
-            <p class="field-error">El D° Identidad es obligatorio.</p>
-            }
+            <app-error-campo [control]="clienteForm.controls.docIdentidad" />
           </div>
         </div>
+        <app-errores-servidor [mensajes]="errorServidor()" />
       </div>
       <div class="modal-footer">
         <button class="mbtn mbtn-ghost" type="button" (click)="cerrarModalCliente()">Cancelar</button>
@@ -498,9 +473,7 @@
             <label class="field-label" for="nombre">Nombre</label>
             <input class="field-input" id="nombre" type="text" placeholder="Ej: Nombre del producto"
               formControlName="nombre" autofocus />
-            @if (productoForm.controls.nombre.touched && productoForm.controls.nombre.invalid) {
-            <p class="field-error">El nombre es obligatorio.</p>
-            }
+            <app-error-campo [control]="productoForm.controls.nombre" />
           </div>
           <div class="field">
             <label class="field-label" for="categoriaId">Categoria</label>
@@ -510,9 +483,7 @@
               <option [ngValue]="cat.id">{{ cat.nombre }}</option>
               }
             </select>
-            @if (productoForm.controls.categoriaId.touched && productoForm.controls.categoriaId.invalid) {
-            <p class="field-error">El producto es obligatoria.</p>
-            }
+            <app-error-campo [control]="productoForm.controls.categoriaId" />
           </div>
         </div>
 
@@ -521,24 +492,21 @@
             <label class="field-label" for="precioVenta">Precio de venta</label>
             <input class="field-input" id="precioVenta" type="number" min="0" step="0.01" placeholder="Ej: S/200.00"
               formControlName="precioVenta" />
-            @if (productoForm.controls.precioVenta.touched && productoForm.controls.precioVenta.invalid) {
-            <p class="field-error">El precio de venta es obligatorio.</p>
-            }
+            <app-error-campo [control]="productoForm.controls.precioVenta" />
           </div>
 
           <div class="field">
             <label class="field-label" for="precioCompra">Precio de compra</label>
             <input class="field-input" id="precioCompra" type="number" min="0" step="0.01" placeholder="Ej: S/50.00"
               formControlName="precioCompra" />
-            @if (productoForm.controls.precioCompra.touched && productoForm.controls.precioCompra.invalid) {
-            <p class="field-error">El precio de compra es obligatorio.</p>
-            }
+            <app-error-campo [control]="productoForm.controls.precioCompra" />
           </div>
         </div>
         <div class="field">
           <label class="field-label" for="foto">Foto</label>
           <input class="field-input" id="foto" type="file" accept="image/*" (change)="onFotoSeleccionada($event)" />
         </div>
+        <app-errores-servidor [mensajes]="errorServidor()" />
       </div>
       <div class="modal-footer">
         <button class="mbtn mbtn-ghost" type="button" (click)="cerrarModalProducto()">Cancelar</button>
