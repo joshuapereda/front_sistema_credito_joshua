@@ -40,6 +40,8 @@ export class RolList implements OnInit {
   //para eliminar
   protected readonly mensajeError = signal<string | null>(null);
   protected readonly mensajeExito = signal<string | null>(null);
+  //título del aviso: cambia si se creó, editó o eliminó
+  protected readonly tituloExito = signal('');
   protected readonly rolaAEliminar = signal<RolInterface | null>(null);
   //paginacion y filtro
   protected readonly totalElementos = signal(0);
@@ -137,6 +139,7 @@ export class RolList implements OnInit {
 
       this.rolService.funEditar(this.user_id(), rol).subscribe({
         next: () => {
+          this.mostrarExito('Rol actualizado', `El rol "${this.rolForm.controls.nombre.value}" se actualizó correctamente.`);
           this.funObtenerRol();
           this.cerrarModal();
         },
@@ -158,6 +161,7 @@ export class RolList implements OnInit {
 
       this.rolService.funGuarda(usuario).subscribe({
         next: () => {
+          this.mostrarExito('Rol registrado', `El rol "${this.rolForm.controls.nombre.value}" se registró correctamente.`);
           this.cerrarModal();
           this.funObtenerRol();
         },
@@ -289,13 +293,19 @@ export class RolList implements OnInit {
       next: () => {
         this.rolaAEliminar.set(null);
         this.funObtenerRol();
-        this.mensajeExito.set(`El rol "${cat.nombre}" se eliminó exitosamente.`);
+        this.mostrarExito('Rol eliminado', `El rol "${cat.nombre}" se eliminó exitosamente.`);
       },
       error: (err) => {
         this.rolaAEliminar.set(null);
         this.mensajeError.set(err.error?.message ?? 'No se pudo eliminar el rol');
       },
     });
+  }
+  //------------- AVISO DE ÉXITO ---------------//
+  //mismo modal verde para crear, editar y eliminar
+  mostrarExito(titulo: string, mensaje: string) {
+    this.tituloExito.set(titulo);
+    this.mensajeExito.set(mensaje);
   }
   cerrarExito() {
     this.mensajeExito.set(null);
