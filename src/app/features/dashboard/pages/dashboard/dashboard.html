@@ -22,7 +22,7 @@
 <section
   class="grid overflow-hidden rounded-[10px] border border-line bg-line sm:grid-cols-2 xl:grid-cols-4 gap-px"
 >
-  @for (k of indicadores; track k.etiqueta; let i = $index) {
+  @for (k of indicadores(); track k.etiqueta; let i = $index) {
     <a
       [routerLink]="k.ruta"
       class="rise group flex flex-col bg-surface p-6 transition-colors hover:bg-paper"
@@ -33,22 +33,105 @@
         <span class="font-mono text-[10px] text-line-strong">0{{ i + 1 }}</span>
       </div>
       <p class="num mt-5 text-[34px] leading-none font-medium tracking-[-0.03em]">
-        {{ k.valor ?? '—' }}
+        @if (k.valor === null) {
+          —
+        } @else if (k.esMoneda) {
+          {{ k.valor | currency: 'PEN' : 'S/ ' }}
+        } @else {
+          {{ k.valor }}
+        }
       </p>
       <p class="mt-3 text-[13px] text-muted">{{ k.nota }}</p>
     </a>
   }
 </section>
 
-<!-- Próximos cobros -->
-<section class="mt-12">
-  <div class="mb-4 flex items-baseline justify-between">
-    <h2 class="font-display text-[24px] font-[420] tracking-[-0.02em]">Cobranzas pendientes</h2>
-    <a routerLink="/compras" class="eyebrow hover:text-ink">Ver compras →</a>
+<div class="mt-12 grid gap-10 xl:grid-cols-3">
+  <!-- Cobranzas pendientes -->
+  <section class="xl:col-span-2">
+    <div class="mb-4 flex items-baseline justify-between gap-4">
+      <h2 class="font-display text-[24px] font-[420] tracking-[-0.02em]">Cobranzas pendientes</h2>
+      <a routerLink="/compras" class="eyebrow hover:text-ink">Ver compras →</a>
+    </div>
+
+    @if (errorCobranzas()) {
+      <app-empty-state titulo="No se pudo cargar" mensaje="Recarga la página para intentarlo de nuevo." />
+    } @else if (cobranzas() === null) {
+      <p class="text-[14px] text-muted">Cargando…</p>
+    } @else if (cobranzas()!.length === 0) {
+      <app-empty-state titulo="Todo cobrado" mensaje="No hay compras con saldo pendiente." />
+    } @else {
+      <div class="overflow-x-auto rounded-[10px] border border-line bg-surface">
+        <table class="min-w-full text-[14px]">
+          <thead>
+            <tr class="border-b border-line text-left">
+              <th class="eyebrow px-4 py-3">N°</th>
+              <th class="eyebrow px-4 py-3">Fecha</th>
+              <th class="eyebrow px-4 py-3">Cliente</th>
+              <th class="eyebrow px-4 py-3 text-right">Total</th>
+              <th class="eyebrow px-4 py-3 text-right">Saldo</th>
+            </tr>
+          </thead>
+          <tbody>
+            <!-- de la más antigua a la más reciente -->
+            @for (c of cobranzas(); track c.id) {
+              <tr class="border-b border-line last:border-0">
+                <td class="px-4 py-3 font-mono text-[12px] text-muted">#{{ c.id }}</td>
+                <td class="px-4 py-3 whitespace-nowrap">{{ c.fechaHora | date: 'dd/MM/yyyy' }}</td>
+                <td class="px-4 py-3">{{ c.cliente }}</td>
+                <td class="num px-4 py-3 text-right whitespace-nowrap">
+                  {{ c.total | currency: 'PEN' : 'S/ ' }}
+                </td>
+                <td class="num px-4 py-3 text-right whitespace-nowrap text-danger">
+                  {{ c.saldo | currency: 'PEN' : 'S/ ' }}
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    }
+  </section>
+
+  <div class="flex flex-col gap-10">
+    <!-- Cobrado hoy: solo pagos de créditos, las ventas al contado no generan pago -->
+    <section class="rounded-[10px] border border-line bg-surface p-6">
+      <p class="eyebrow">Cobrado hoy</p>
+      <p class="num mt-4 text-[28px] leading-none font-medium text-ok">
+        @if (resumen(); as r) {
+          {{ r.cobradoHoy | currency: 'PEN' : 'S/ ' }}
+        } @else {
+          —
+        }
+      </p>
+      <p class="mt-3 text-[13px] text-muted">Pagos de créditos recibidos hoy</p>
+    </section>
+
+    <!-- Productos más vendidos -->
+    <section>
+      <h2 class="mb-4 font-display text-[24px] font-[420] tracking-[-0.02em]">Más vendidos</h2>
+      @if (errorResumen()) {
+        <p class="text-[14px] text-muted">No se pudo cargar.</p>
+      } @else if (resumen(); as r) {
+        <ul class="flex flex-col gap-4">
+          @for (p of r.productosMasVendidos; track p.productoId) {
+            <li>
+              <div class="flex justify-between gap-4 text-[14px]">
+                <span class="truncate" [title]="p.nombre">{{ p.nombre }}</span>
+                <span class="num whitespace-nowrap text-muted">{{ p.cantidad }} und.</span>
+              </div>
+              <!-- barra proporcional al más vendido -->
+              <div class="mt-1.5 h-2 rounded-full bg-paper-2">
+                <div class="h-2 rounded-full bg-accent" [style.width.%]="anchoBarra(p.cantidad)"></div>
+              </div>
+            </li>
+          } @empty {
+            <li class="text-[14px] text-muted">Aún no hay ventas.</li>
+          }
+        </ul>
+      } @else {
+        <p class="text-[14px] text-muted">Cargando…</p>
+      }
+    </section>
   </div>
-  <!-- TODO: tabla con las compras a crédito con saldo, ordenadas por antigüedad -->
-  <app-empty-state
-    titulo="Sin datos todavía"
-    mensaje="Aquí se listarán las compras a crédito con saldo pendiente, de la más antigua a la más reciente."
-  />
-</section>
+</div>
