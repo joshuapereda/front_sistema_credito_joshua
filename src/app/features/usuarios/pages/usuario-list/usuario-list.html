@@ -112,9 +112,7 @@
             <label class="field-label" for="username">Username</label>
             <input class="field-input" id="username" type="text" placeholder="Ej: Username del Usuario"
               formControlName="username" autofocus />
-            @if (usuarioForm.controls.username.touched && usuarioForm.controls.username.invalid) {
-            <p class="field-error">El Username es obligatorio.</p>
-            }
+            <app-error-campo [control]="usuarioForm.controls.username" />
           </div>
 
           <div class="field">
@@ -122,9 +120,7 @@
             <input class="field-input" id="passwprd" type="password"
               [placeholder]="user_id() !== -1 ? 'Dejar vacío para no cambiarla' : 'Ej: Contraseña del usuario'"
               formControlName="passwprd" autofocus />
-            @if (usuarioForm.controls.passwprd.touched && usuarioForm.controls.passwprd.invalid) {
-            <p class="field-error">La Contraseña es obligatoria.</p>
-            }
+            <app-error-campo [control]="usuarioForm.controls.passwprd" />
           </div>
         </div>
 
@@ -137,9 +133,7 @@
               <option [ngValue]="per.id">{{ per.nombre }}</option>
               }
             </select>
-            @if (usuarioForm.controls.personaId.touched && usuarioForm.controls.personaId.invalid) {
-            <p class="field-error">La persona es obligatoria.</p>
-            }
+            <app-error-campo [control]="usuarioForm.controls.personaId" />
           </div>
 
           <div class="field">
@@ -161,11 +155,10 @@
               }
             </div>
 
-            @if (usuarioForm.controls.rolesId.touched && usuarioForm.controls.rolesId.invalid) {
-            <p class="field-error">Selecciona al menos un rol.</p>
-            }
+            <app-error-campo [control]="usuarioForm.controls.rolesId" />
           </div>
         </div>
+        <app-errores-servidor [mensajes]="errorServidor()" />
       </div>
       <div class="modal-footer">
         <button class="mbtn mbtn-ghost" type="button" (click)="cerrarModal()">Cancelar</button>
