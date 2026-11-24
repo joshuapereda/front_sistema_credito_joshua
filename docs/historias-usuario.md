@@ -144,3 +144,26 @@
 | `core/layout/main-layout/main-layout.ts` | Un ícono por cada opción |
 | `styles.css` | Colores `marca`, `marca-verde` y `noche` |
 | `core/layout/main-layout/main-layout.spec.ts` (nuevo) | Pruebas del menú |
+
+### HU-19 · Modo día y modo noche
+
+**Como** vendedor
+**quiero** elegir entre un modo claro suave y uno oscuro
+**para** que la pantalla no me canse la vista, sobre todo de noche.
+
+**Criterios de aceptación**
+- **Dado** el modo día, **entonces** el centro no es blanco puro y el menú es suave, con el fucsia de la empresa.
+- **Dado** que hago clic en la luna o el sol, **entonces** cambia todo: menú, tablas, modales y avisos.
+- **Dado** que cierro y vuelvo a entrar, **entonces** se mantiene el modo que elegí.
+- **Dado** cualquiera de los dos modos, **entonces** los textos se leen bien.
+- El login y el ticket impreso no cambian.
+
+**Qué se cambió** (reemplaza los colores de HU-18)
+
+| Archivo | Para qué sirve |
+|---|---|
+| `src/tema.css` (nuevo) | Los colores de día y de noche, en un solo lugar |
+| `core/services/tema.service.ts` (nuevo) | Cambia el modo y lo recuerda |
+| `core/layout/main-layout` | Botón día / noche y menú más suave |
+| `styles.css` | Carga el tema |
+| `dashboard.html` | Los montos ya no se parten en dos líneas |
