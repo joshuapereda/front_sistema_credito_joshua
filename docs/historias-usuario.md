@@ -30,3 +30,33 @@
 - Depende de HU-10 (back): `GET /api/dashboard/resumen`.
 - La tabla reutiliza `POST /api/compra/pagination` con `estadoCompra: 'PENDIENTE'`.
 - "Cobrado hoy" suma solo pagos de créditos: las ventas al contado no generan pago.
+
+## Épica: Formularios
+
+### HU-12 · Ver el mensaje de cada validación
+
+**Como** vendedor
+**quiero** ver debajo de cada campo qué está mal
+**para** corregirlo sin adivinar.
+
+**Criterios de aceptación**
+- **Dado** un formulario vacío, **cuando** lo guardo, **entonces** cada campo obligatorio muestra su mensaje y no se llama al back.
+- **Dado** un dato que no cumple una regla del DTO, **entonces** veo el mensaje de esa regla, no "es obligatorio".
+- **Dado** que el back rechaza un campo, **entonces** su mensaje sale debajo de ese campo y se borra al corregirlo.
+- **Dado** un error que no es de un campo (ej. compra ya pagada), **entonces** sale dentro del modal.
+- Vale para categoría, cliente, compra, pago, permiso, producto, rol, tipo de compra y usuario.
+
+**Qué se creó o cambió** (en `src/app/`)
+
+| Archivo | Para qué sirve |
+|---|---|
+| `shared/validators/reglas.ts` (nuevo) | Une cada validación con su mensaje |
+| `shared/validators/errores-servidor.ts` (nuevo) | Lleva cada error del back a su campo |
+| `shared/components/error-campo` (nuevo) | Mensaje debajo de un campo |
+| `shared/components/errores-servidor` (nuevo) | Errores generales del modal |
+| `features/*/pages/*-list` | Usan lo anterior en sus formularios |
+| `shared/validators/formularios.spec.ts` (nuevo) | Prueba todos los formularios |
+
+**Notas técnicas**
+- Depende de HU-05 (back): necesita `fieldErrors` en la respuesta 400.
+- Los mensajes son los mismos del DTO. Si cambia uno en el back, cambiarlo también aquí.
