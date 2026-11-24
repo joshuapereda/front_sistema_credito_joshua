@@ -1,9 +1,10 @@
-import { Component, computed, inject, signal } from '@angular/core';
+import { Component, computed, DestroyRef, inject, signal } from '@angular/core';
 import { DatePipe } from '@angular/common';
 import { NavigationEnd, Router, RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { filter, map } from 'rxjs';
 import { AuthService } from '@/app/core/services/auth.service';
+import { TemaService } from '@/app/core/services/tema.service';
 
 interface MenuItem {
   label: string;
@@ -24,6 +25,10 @@ interface MenuGrupo {
 export class MainLayout {
   private readonly authService = inject(AuthService);
   private readonly router = inject(Router);
+  private readonly temaService = inject(TemaService);
+
+  //modo día / noche
+  protected readonly tema = this.temaService.tema;
 
   protected readonly hoy = new Date();
   protected readonly usuario = this.authService.usuario;
@@ -80,6 +85,15 @@ export class MainLayout {
       ],
     },
   ];
+
+  constructor() {
+    this.temaService.activar();
+    inject(DestroyRef).onDestroy(() => this.temaService.desactivar());
+  }
+
+  cambiarTema(): void {
+    this.temaService.cambiar();
+  }
 
   cerrarSesion(): void {
     this.authService.logout();

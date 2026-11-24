@@ -7,10 +7,10 @@
     ></div>
   }
 
-  <!-- ───────────── Menú lateral (colores del login) ───────────── -->
+  <!-- ───────────── Menú lateral (sus colores cambian con el tema) ───────────── -->
   <!-- invisible en móvil cerrado: así el teclado no entra a un menú que no se ve -->
   <aside
-    class="menu-lateral fixed inset-y-0 left-0 z-40 flex w-[256px] flex-col text-white transition-[transform,visibility] duration-200 lg:visible lg:sticky lg:top-0 lg:h-dvh lg:translate-x-0"
+    class="fixed inset-y-0 left-0 z-40 flex w-[256px] flex-col border-r border-line bg-menu text-menu-texto transition-[transform,visibility] duration-200 lg:visible lg:sticky lg:top-0 lg:h-dvh lg:translate-x-0"
     [class.-translate-x-full]="!menuAbierto()"
     [class.invisible]="!menuAbierto()"
   >
@@ -21,11 +21,11 @@
       class="block px-6 pt-6 pb-5"
       aria-label="Valentino, ir al dashboard"
     >
-      <span class="block text-[8.5px] font-semibold tracking-[0.26em] text-white/75">
+      <span class="block text-[8.5px] font-semibold tracking-[0.26em] text-menu-suave">
         BOUTIQUE MULTISERVICIOS
       </span>
       <span
-        class="mt-1 block font-display text-[29px] leading-none font-[500] tracking-[0.08em] text-marca"
+        class="mt-1 block font-display text-[29px] leading-none font-[500] tracking-[0.08em] text-marca-texto"
       >
         VALENTINO
       </span>
@@ -34,7 +34,7 @@
     <nav class="menu-scroll flex-1 overflow-y-auto px-3 pt-2 pb-6" aria-label="Principal">
       @for (grupo of menu; track grupo.titulo; let primero = $first) {
         <p
-          class="px-3 pb-2 text-[10.5px] font-semibold tracking-[0.16em] text-white/50 uppercase"
+          class="px-3 pb-2 text-[10.5px] font-semibold tracking-[0.16em] text-menu-suave uppercase"
           [class.pt-5]="!primero"
         >
           {{ grupo.titulo }}
@@ -47,14 +47,14 @@
                 routerLinkActive="nav-activo"
                 ariaCurrentWhenActive="page"
                 (click)="menuAbierto.set(false)"
-                class="nav-item relative flex h-9 items-center gap-3 rounded-lg px-3 text-[14px] font-medium text-white/70 transition-colors hover:bg-white/[0.06] hover:text-white"
+                class="nav-item relative flex h-9 items-center gap-3 rounded-lg px-3 text-[14px] font-medium text-menu-texto transition-colors hover:bg-marca-texto/[0.07] hover:text-ink"
               >
                 <!-- marca fucsia: solo se ve en la opción activa -->
                 <span
-                  class="nav-marca absolute top-1/2 -left-3 h-5 w-[3px] -translate-y-1/2 rounded-r-full bg-marca opacity-0 transition-opacity"
+                  class="nav-marca absolute top-1/2 -left-3 h-5 w-[3px] -translate-y-1/2 rounded-r-full bg-marca-texto opacity-0 transition-opacity"
                 ></span>
                 <svg
-                  class="nav-icono size-[18px] shrink-0 text-white/50 transition-colors"
+                  class="nav-icono size-[18px] shrink-0 text-menu-suave transition-colors"
                   viewBox="0 0 24 24"
                   fill="none"
                   stroke="currentColor"
@@ -74,22 +74,22 @@
     </nav>
 
     <!-- Usuario -->
-    <div class="border-t border-white/10 p-3">
+    <div class="border-t border-line p-3">
       <div class="flex items-center gap-3 px-2 py-2">
         <span
-          class="grid size-9 shrink-0 place-items-center rounded-full bg-marca font-display text-[16px] font-semibold text-black"
+          class="grid size-9 shrink-0 place-items-center rounded-full bg-marca-texto/15 font-display text-[16px] font-semibold text-marca-texto"
           >{{ inicial() }}</span
         >
         <div class="min-w-0 flex-1 leading-tight">
-          <p class="truncate text-[14px] font-semibold">{{ usuario() }}</p>
-          <p class="mt-1 flex items-center gap-1.5 text-[11.5px] text-white/55">
-            <span class="size-1.5 rounded-full bg-marca-verde" aria-hidden="true"></span>
+          <p class="truncate text-[14px] font-semibold text-ink">{{ usuario() }}</p>
+          <p class="mt-1 flex items-center gap-1.5 text-[11.5px] text-menu-suave">
+            <span class="size-1.5 rounded-full bg-ok" aria-hidden="true"></span>
             Sesión activa
           </p>
         </div>
         <button
           type="button"
-          class="grid size-9 place-items-center rounded-lg text-white/60 transition-colors hover:bg-white/[0.06] hover:text-marca"
+          class="grid size-9 place-items-center rounded-lg text-menu-suave transition-colors hover:bg-marca-texto/[0.07] hover:text-marca-texto"
           title="Cerrar sesión"
           aria-label="Cerrar sesión"
           (click)="cerrarSesion()"
@@ -110,13 +110,13 @@
 
   <!-- ───────────── Contenido ───────────── -->
   <div class="flex min-w-0 flex-col">
-    <!-- Barra superior: blanca, con una línea fina fucsia -->
+    <!-- Barra superior -->
     <header
-      class="barra-superior sticky top-0 z-20 flex h-16 items-center gap-4 bg-white/90 px-5 backdrop-blur-md sm:px-8 lg:px-12"
+      class="sticky top-0 z-20 flex h-16 items-center gap-4 border-b border-line bg-barra/90 px-5 backdrop-blur-md sm:px-8 lg:px-12"
     >
       <button
         type="button"
-        class="-ml-1 grid size-10 place-items-center rounded-lg text-noche hover:bg-black/5 lg:hidden"
+        class="-ml-1 grid size-10 place-items-center rounded-lg text-ink hover:bg-marca-texto/[0.07] lg:hidden"
         aria-label="Abrir menú"
         [attr.aria-expanded]="menuAbierto()"
         (click)="menuAbierto.set(true)"
@@ -133,15 +133,43 @@
 
       <p class="flex min-w-0 items-center gap-2.5 text-[14px]">
         @if (seccionActual().grupo) {
-          <span class="hidden text-neutral-500 sm:inline">{{ seccionActual().grupo }}</span>
-          <span class="hidden text-marca sm:inline" aria-hidden="true">/</span>
+          <span class="hidden text-muted sm:inline">{{ seccionActual().grupo }}</span>
+          <span class="hidden text-marca-texto sm:inline" aria-hidden="true">/</span>
         }
-        <span class="truncate font-semibold text-noche">{{ seccionActual().item }}</span>
+        <span class="truncate font-semibold text-ink">{{ seccionActual().item }}</span>
       </p>
 
-      <span class="ml-auto hidden text-[13px] text-neutral-500 first-letter:uppercase md:inline-block">{{
+      <span class="ml-auto hidden text-[13px] text-muted first-letter:uppercase md:inline-block">{{
         hoy | date: "EEEE d 'de' MMMM"
       }}</span>
+
+      <!-- Botón día / noche -->
+      <button
+        type="button"
+        class="ml-auto grid size-10 shrink-0 place-items-center rounded-full border border-line bg-surface text-ink-2 transition-colors hover:border-marca-texto hover:text-marca-texto md:ml-0"
+        [title]="tema() === 'dia' ? 'Cambiar a modo noche' : 'Cambiar a modo día'"
+        [attr.aria-label]="tema() === 'dia' ? 'Cambiar a modo noche' : 'Cambiar a modo día'"
+        (click)="cambiarTema()"
+      >
+        <svg
+          class="size-[18px]"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="1.8"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          aria-hidden="true"
+        >
+          @if (tema() === 'dia') {
+            <path d="M20 14.5A8.5 8.5 0 0 1 9.5 4a8.5 8.5 0 1 0 10.5 10.5z" />
+          } @else {
+            <path
+              d="M12 16a4 4 0 1 0 0-8 4 4 0 0 0 0 8M12 2.5v2M12 19.5v2M4.2 4.2l1.5 1.5M18.3 18.3l1.5 1.5M2.5 12h2M19.5 12h2M4.2 19.8l1.5-1.5M18.3 5.7l1.5-1.5"
+            />
+          }
+        </svg>
+      </button>
     </header>
 
     <main class="mx-auto w-full max-w-[1240px] flex-1 px-5 py-8 sm:px-8 lg:px-12 lg:py-12">

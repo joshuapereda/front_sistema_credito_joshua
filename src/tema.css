@@ -1,0 +1,343 @@
+/*
+ * Temas DÍA y NOCHE
+ * ---------------------------------------------------------------
+ * El layout pone data-tema="dia" o "noche" en <html> (ver tema.service.ts).
+ * El login no lo lleva: mantiene su propio diseño.
+ * Para cambiar un color, se cambia aquí y cambia en todas las pantallas.
+ */
+
+/* ───────── 1. Colores de cada tema ───────── */
+html[data-tema='dia'] {
+  --t-fondo: #f3edf1; /* fondo del centro: rosado grisáceo, no blanco */
+  --t-sup: #fcf9fb; /* tarjetas, tablas y modales */
+  --t-sup-2: #f6eff4; /* cabeceras de tabla, inputs, pies */
+  --t-borde: #e5d9e1;
+  --t-borde-fuerte: #cdbdc8;
+  --t-texto: #2a1f28;
+  --t-texto-2: #55465a;
+  --t-suave: #6f5f6d;
+
+  --color-menu: #f0e3eb;
+  --color-menu-texto: #54434f;
+  --color-menu-suave: #6a5664;
+  --color-barra: #f8f2f6;
+  --color-marca-texto: #9c0f62; /* fucsia de la empresa, más calmado */
+  --color-emerald-600: #047857; /* saldos: más legibles */
+  --color-red-600: #c01818;
+}
+html[data-tema='noche'] {
+  --t-fondo: #171318;
+  --t-sup: #211b23;
+  --t-sup-2: #2a232c;
+  --t-borde: #3a313c;
+  --t-borde-fuerte: #52475a;
+  --t-texto: #ece5ea;
+  --t-texto-2: #cabec8;
+  --t-suave: #a89aa6;
+
+  --color-menu: #1c161d;
+  --color-menu-texto: #cdc0ca;
+  --color-menu-suave: #97899a;
+  --color-barra: #1b151c;
+  --color-marca-texto: #ff7cc4;
+
+  /* etiquetas y avisos: fondo oscuro teñido y texto claro */
+  --color-emerald-50: #15291f;
+  --color-emerald-200: #2c5a43;
+  --color-emerald-600: #5fd39b;
+  --color-emerald-700: #7adcae;
+  --color-amber-50: #2e2413;
+  --color-amber-200: #5f4a1f;
+  --color-amber-300: #7a5e24;
+  --color-amber-700: #f0b45b;
+  --color-violet-50: #241d36;
+  --color-violet-200: #463a6b;
+  --color-violet-700: #bfadf7;
+  --color-sky-50: #14262f;
+  --color-sky-200: #2a4f60;
+  --color-sky-700: #86cdec;
+  --color-indigo-50: #1f2036;
+  --color-indigo-100: #2b2c4d;
+  --color-indigo-200: #3b3d69;
+  --color-indigo-300: #4c4f86;
+  --color-indigo-700: #b1b6ff;
+  --color-red-50: #331a1d;
+  --color-red-200: #5c2a2f;
+  --color-red-300: #7c353b;
+  --color-red-600: #ff8080;
+  --color-red-700: #ff9f9f;
+  --color-fuchsia-50: #2d1a30;
+  --color-fuchsia-100: #3b2140;
+  --color-fuchsia-300: #6b3573;
+  --color-fuchsia-700: #eea0f5;
+
+  --color-ok: #6fd6a0;
+  --color-ok-soft: #15291f;
+  --color-warn: #f0b45b;
+  --color-warn-soft: #2e2413;
+  --color-danger: #ff8080;
+  --color-danger-soft: #331a1d;
+}
+
+/* ───────── 2. Los colores de siempre apuntan al tema ───────── */
+html[data-tema] {
+  --color-paper: var(--t-fondo);
+  --color-paper-2: var(--t-sup-2);
+  --color-surface: var(--t-sup);
+  --color-ink: var(--t-texto);
+  --color-ink-2: var(--t-texto-2);
+  --color-muted: var(--t-suave);
+  --color-line: var(--t-borde);
+  --color-line-strong: var(--t-borde-fuerte);
+  --color-accent: var(--color-marca-texto);
+  --color-accent-ink: var(--color-marca-texto);
+  --color-accent-soft: color-mix(in srgb, var(--color-marca-texto) 18%, transparent);
+
+  --color-gray-50: var(--t-sup-2);
+  --color-gray-100: color-mix(in srgb, var(--t-sup-2) 70%, var(--t-borde));
+  --color-gray-200: var(--t-borde);
+  --color-gray-400: var(--t-suave);
+  --color-gray-500: var(--t-suave);
+  --color-gray-600: var(--t-texto-2);
+  --color-gray-700: var(--t-texto-2);
+  --color-gray-900: var(--t-texto);
+
+  /* Angular Material: paginador, ticket y listas */
+  --mat-sys-surface: var(--t-fondo);
+  --mat-sys-surface-container: var(--t-sup);
+  --mat-sys-surface-container-high: var(--t-sup);
+  --mat-sys-on-surface: var(--t-texto);
+  --mat-sys-on-surface-variant: var(--t-texto-2);
+  --mat-sys-outline: var(--t-borde-fuerte);
+}
+html[data-tema] body {
+  background-color: var(--t-fondo);
+  color: var(--t-texto);
+}
+/* listas, fechas y scroll del navegador */
+html[data-tema='dia'] {
+  color-scheme: light;
+}
+html[data-tema='noche'],
+html[data-tema='noche'] body {
+  color-scheme: dark;
+}
+
+/*
+ * De aquí en adelante, ":not(#_)" solo sirve para que el tema le gane
+ * a los estilos que cada pantalla tiene en su <style>.
+ */
+
+/* ───────── 3. Tarjetas y tablas ───────── */
+html[data-tema] .bg-white {
+  --color-white: var(--t-sup); /* así los efectos al pasar el mouse siguen funcionando */
+}
+html[data-tema]:not(#_) .bg-gray-900\/50 {
+  background-color: rgb(0 0 0 / 0.55);
+}
+
+/* ───────── 4. Buscador ───────── */
+html[data-tema]:not(#_) .buscador-campo input {
+  background: var(--t-sup);
+  border-color: var(--t-borde);
+  color: var(--t-texto);
+}
+
+/* ───────── 5. Modales y formularios ───────── */
+html[data-tema]:not(#_) .modal {
+  background: var(--t-sup);
+}
+html[data-tema]:not(#_) .modal-overlay {
+  background: rgb(20 12 19 / 0.55);
+}
+html[data-tema]:not(#_) .modal-header {
+  background: none;
+  border-color: var(--t-borde);
+}
+html[data-tema]:not(#_) .modal-footer {
+  background: var(--t-sup-2);
+  border-color: var(--t-borde);
+}
+html[data-tema]:not(#_) .modal-heading h2,
+html[data-tema]:not(#_) .modal-header h2,
+html[data-tema]:not(#_) .switch-text strong,
+html[data-tema]:not(#_) .cart-sub {
+  color: var(--t-texto);
+}
+html[data-tema]:not(#_) .modal-heading p,
+html[data-tema]:not(#_) .modal-header p,
+html[data-tema]:not(#_) .switch-text small,
+html[data-tema]:not(#_) .modal-close {
+  color: var(--t-suave);
+}
+html[data-tema]:not(#_) .modal-icon {
+  background: var(--color-accent-soft);
+}
+html[data-tema]:not(#_) .field-label,
+html[data-tema]:not(#_) .cart-name,
+html[data-tema]:not(#_) .perm-all,
+html[data-tema]:not(#_) .perm-col-modulo {
+  color: var(--t-texto-2);
+}
+html[data-tema]:not(#_) .field-input {
+  background: var(--t-sup-2);
+  border-color: var(--t-borde-fuerte);
+  color: var(--t-texto);
+}
+html[data-tema]:not(#_) .field-input:focus {
+  background: var(--t-sup);
+  border-color: var(--color-marca-texto);
+  box-shadow: 0 0 0 4px var(--color-accent-soft);
+}
+/* el rojo de error gana siempre, también con el campo enfocado */
+html[data-tema]:not(#_) .field-input.ng-touched.ng-invalid {
+  border-color: #ef4444;
+}
+html[data-tema]:not(#_) .field-input::placeholder {
+  color: var(--t-suave);
+  opacity: 0.8;
+}
+html[data-tema]:not(#_) .mbtn-ghost,
+html[data-tema]:not(#_) app-pago-list .btn-ghost,
+html[data-tema]:not(#_) app-confirm-dialog .btn-ghost {
+  background: var(--t-sup);
+  border-color: var(--t-borde-fuerte);
+  color: var(--t-texto-2);
+}
+html[data-tema]:not(#_) .mbtn-ghost:hover,
+html[data-tema]:not(#_) app-pago-list .btn-ghost:hover,
+html[data-tema]:not(#_) app-confirm-dialog .btn-ghost:hover,
+html[data-tema]:not(#_) .icon-btn:hover {
+  background: var(--t-sup-2);
+}
+html[data-tema]:not(#_) .switch-row,
+html[data-tema]:not(#_) .role-chip {
+  background: var(--t-sup-2);
+  border-color: var(--t-borde);
+  color: var(--t-texto-2);
+}
+html[data-tema]:not(#_) .switch-row:hover,
+html[data-tema]:not(#_) .role-chip:hover {
+  background: var(--t-sup-2);
+  border-color: var(--color-marca-texto);
+}
+html[data-tema]:not(#_) .role-chip.checked {
+  background: var(--color-accent-soft);
+  border-color: var(--color-marca-texto);
+  color: var(--color-marca-texto);
+}
+html[data-tema]:not(#_) .role-box,
+html[data-tema]:not(#_) .perm-box {
+  background: var(--t-sup);
+  border-color: var(--t-borde-fuerte);
+}
+
+/* marcados: siguen en el fucsia de la empresa */
+html[data-tema]:not(#_) .role-chip.checked .role-box,
+html[data-tema]:not(#_) input:checked + .perm-box {
+  background: #bc1fc2;
+  border-color: #bc1fc2;
+  color: #fff;
+}
+html[data-tema]:not(#_) .modal-close:hover {
+  background: var(--color-red-50);
+  color: var(--color-red-600);
+}
+
+/* carrito de la compra */
+html[data-tema]:not(#_) .cart,
+html[data-tema]:not(#_) .cart-row {
+  border-color: var(--t-borde);
+}
+
+/* tabla de permisos del rol */
+html[data-tema]:not(#_) .perm-table-wrap {
+  background: var(--t-sup);
+  border-color: var(--t-borde);
+}
+html[data-tema]:not(#_) .perm-table thead th {
+  background: var(--t-sup-2);
+  border-color: var(--t-borde);
+  color: var(--t-suave);
+}
+html[data-tema]:not(#_) .perm-table td,
+html[data-tema]:not(#_) .perm-table .perm-col-all {
+  border-color: var(--t-borde);
+}
+html[data-tema]:not(#_) .perm-table tbody tr:hover {
+  background: var(--t-sup-2);
+}
+html[data-tema]:not(#_) .perm-table tbody tr.row-active,
+html[data-tema]:not(#_) .perm-count {
+  background: var(--color-accent-soft);
+}
+html[data-tema]:not(#_) .perm-count {
+  border-color: transparent;
+  color: var(--color-marca-texto);
+}
+
+/* pagos */
+html[data-tema]:not(#_) app-pago-list {
+  --ink: var(--t-texto);
+  --muted: var(--t-suave);
+  --line: var(--t-borde);
+}
+html[data-tema]:not(#_) .progress {
+  background: var(--t-borde);
+}
+html[data-tema='dia']:not(#_) app-pago-list {
+  --ok: #047857;
+  --warn: #b91c1c;
+}
+html[data-tema='noche']:not(#_) .badge-ok {
+  background: #15291f;
+  color: #7adcae;
+}
+html[data-tema='noche']:not(#_) .badge-pending {
+  background: #331a1d;
+  color: #ff9f9f;
+}
+
+/* ───────── 6. Avisos y confirmaciones ───────── */
+html[data-tema]:not(#_) app-aviso-dialog .dialog,
+html[data-tema]:not(#_) app-confirm-dialog .dialog {
+  background: var(--t-sup);
+}
+html[data-tema]:not(#_) app-aviso-dialog h2,
+html[data-tema]:not(#_) app-confirm-dialog h2,
+html[data-tema]:not(#_) app-confirm-dialog strong {
+  color: var(--t-texto);
+}
+html[data-tema]:not(#_) app-aviso-dialog p,
+html[data-tema]:not(#_) app-confirm-dialog p {
+  color: var(--t-suave);
+}
+html[data-tema='noche']:not(#_) app-aviso-dialog .dialog.exito {
+  --c: #6fd6a0;
+  --c-bg: #1d3a2b;
+  --c-ring: #1b2a23;
+}
+html[data-tema='noche']:not(#_) app-aviso-dialog .dialog.error {
+  --c: #ff9f9f;
+  --c-bg: #45232a;
+  --c-ring: #331d22;
+}
+html[data-tema='noche']:not(#_) app-aviso-dialog .dialog.info {
+  --c: #b1b6ff;
+  --c-bg: #2b2c4d;
+  --c-ring: #22223a;
+}
+html[data-tema='noche']:not(#_) app-confirm-dialog .icon {
+  background: #45232a;
+  color: #ff9f9f;
+  box-shadow: 0 0 0 8px #331d22;
+}
+
+/* ───────── 7. Al imprimir el ticket: siempre claro ───────── */
+@media print {
+  html[data-tema],
+  html[data-tema] body {
+    color-scheme: light;
+    background: #fff;
+  }
+}
