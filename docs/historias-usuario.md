@@ -60,3 +60,19 @@
 **Notas técnicas**
 - Depende de HU-05 (back): necesita `fieldErrors` en la respuesta 400.
 - Los mensajes son los mismos del DTO. Si cambia uno en el back, cambiarlo también aquí.
+
+### HU-14 · Crear después de editar no sobrescribe
+
+**Como** vendedor
+**quiero** que "Nuevo" siempre cree un registro
+**para** no perder el que edité antes.
+
+**Criterios de aceptación**
+- **Dado** que edité o abrí un registro y cerré el modal, **cuando** creo uno nuevo, **entonces** se crea (POST) y el anterior no cambia.
+
+**Qué se cambió**
+
+| Archivo | Para qué sirve |
+|---|---|
+| `categoria-list`, `permiso-list`, `producto-list`, `rol-list`, `tipo-compra-list` | `cerrarModal()` vuelve a modo "crear" |
+| `shared/validators/crear-despues-de-editar.spec.ts` (nuevo) | Lo prueba en 8 módulos |
