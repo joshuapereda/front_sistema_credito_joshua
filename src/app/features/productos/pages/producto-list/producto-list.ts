@@ -38,6 +38,8 @@ export class ProductoList implements OnInit {
   //para eliminar
   protected readonly mensajeError = signal<string | null>(null);
   protected readonly mensajeExito = signal<string | null>(null);
+  //título del aviso: cambia si se creó, editó o eliminó
+  protected readonly tituloExito = signal('');
   protected readonly productoAEliminar = signal<ProductoInterface | null>(null);
   //paginacion y filtro
   protected readonly totalElementos = signal(0);
@@ -163,6 +165,7 @@ export class ProductoList implements OnInit {
 
       this.productoService.funEditar(this.user_id(), formData).subscribe({
         next: () => {
+          this.mostrarExito('Producto actualizado', `El producto "${this.productoForm.controls.nombre.value}" se actualizó correctamente.`);
           this.funObtenerProducto();
           this.cerrarModal();
         },
@@ -185,6 +188,7 @@ export class ProductoList implements OnInit {
 
       this.productoService.funGuarda(formData).subscribe({
         next: () => {
+          this.mostrarExito('Producto registrado', `El producto "${this.productoForm.controls.nombre.value}" se registró correctamente.`);
           this.cerrarModal();
           this.funObtenerProducto();
         },
@@ -231,7 +235,7 @@ export class ProductoList implements OnInit {
       next: () => {
         this.productoAEliminar.set(null);
         this.funObtenerProducto();
-        this.mensajeExito.set(`El producto "${cat.nombre}" se eliminó exitosamente.`);
+        this.mostrarExito('Producto eliminado', `El producto "${cat.nombre}" se eliminó exitosamente.`);
       },
       error: (err) => {
         this.productoAEliminar.set(null);
@@ -240,6 +244,12 @@ export class ProductoList implements OnInit {
     });
   }
 
+  //------------- AVISO DE ÉXITO ---------------//
+  //mismo modal verde para crear, editar y eliminar
+  mostrarExito(titulo: string, mensaje: string) {
+    this.tituloExito.set(titulo);
+    this.mensajeExito.set(mensaje);
+  }
   cerrarExito() {
     this.mensajeExito.set(null);
   }
